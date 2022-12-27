@@ -1,93 +1,184 @@
 'use client';
 import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import { FC } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import styles from '../styles/Home.module.css';
 
-type Todo = { title: string; done: boolean; id: string };
-const useTodo = () => {
-  const { mutate } = useSWRConfig();
-  const { data: todos, error } = useSWR<Todo[]>('/api/todo/read', (url) =>
-    fetch(url).then((res) => res.json())
-  );
+const fps = 60;
+const useStopwatch = ({
+  onStop = () => void 0,
+}: { onStop?: (elapsedTime: number) => void } = {}) => {
+  const [elapsedTime, setElapsedTime] = useState<null | number>(null);
+  const [startedAt, setStartedAt] = useState(0);
+  useEffect(() => {
+    if (elapsedTime === null) {
+      return;
+    }
+    let id: number;
+    const work = () => {
+      setElapsedTime(Date.now() - startedAt);
+      id = window.setTimeout(work, 1000 / fps);
+    };
+    id = window.setTimeout(work, 1000 / fps);
+    return () => window.clearTimeout(id);
+  }, [elapsedTime, startedAt]);
 
-  if (!todos) {
-    return { todos } as const;
-  }
-  return {
-    todos,
-    error,
-    createNewTodo: () => {
-      mutate(
-        '/api/todo/read',
-        (async () => [
-          await fetch('/api/todo/create').then((res) => res.json()),
-          ...todos,
-        ])(),
-        {
-          optimisticData: [{ id: 'temp', title: '', done: false }, ...todos],
-          rollbackOnError: true,
-        }
-      );
-    },
-    update: (id: string, newTodo: Todo) => {
-      const index = todos.findIndex((x) => x.id === id);
-      mutate(
-        '/api/todo/read',
-        (async () => [
-          ...todos.slice(0, index),
-          await fetch('/api/todo/update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newTodo),
-          }).then((res) => res.json()),
-          ...todos.slice(index + 1),
-        ])(),
-        {
-          optimisticData: [
-            ...todos.slice(0, index),
-            newTodo,
-            ...todos.slice(index + 1),
-          ],
-          rollbackOnError: true,
-        }
-      );
-    },
-  } as const;
+  const start = useCallback(() => {
+    setStartedAt(Date.now());
+    setElapsedTime(0);
+  }, []);
+  const stop = useCallback(() => {
+    onStop(Date.now() - startedAt);
+    setStartedAt(0);
+    setElapsedTime(null);
+  }, [startedAt, onStop]);
+
+  return elapsedTime === null
+    ? ({ start } as const)
+    : ({ stop, elapsedTime } as const);
+};
+const useTimer = (duration: number) => {
+  const [hasFinished, setHasFinished] = useState<null | boolean>(null); // 開始前は null、開始後は false、時間が経過したら true
+  const id = useRef<number | undefined>(undefined);
+  const on = useCallback(() => {
+    setHasFinished(false);
+    clearTimeout(id.current);
+    id.current = window.setTimeout(() => {
+      setHasFinished(true);
+    }, duration);
+  }, [duration]);
+  const off = useCallback(() => {
+    clearTimeout(id.current);
+    setHasFinished(null);
+  }, []);
+  return { on, off, hasFinished: hasFinished } as const;
 };
 
 const TodoPage: FC<{ user: UserProfile }> = () => {
-  const { todos, update, createNewTodo } = useTodo();
+  const stopwatch = useStopwatch({
+    onStop: useCallback((elapsedTime: number) => {
+      setRecords((records) => [
+        ...records,
+        { time: elapsedTime, createdAt: Date.now() },
+      ]);
+      setInspectionTime(null);
+    }, []),
+  });
+  const { start: startStopwatch } = stopwatch;
+  const [inspectionTime, setInspectionTime] = useState<null | number>(null);
+  const inspectionStopwatch = useStopwatch({
+    onStop: useCallback(
+      (elapsedTime: number) => {
+        setInspectionTime(elapsedTime);
+        startStopwatch?.();
+      },
+      [startStopwatch]
+    ),
+  });
+  const [records, setRecords] = useState<{ time: number; createdAt: number }[]>(
+    []
+  );
+  const timerState =
+    inspectionTime === null && inspectionStopwatch.start
+      ? 'before inspection'
+      : inspectionStopwatch.stop
+      ? 'inspecting'
+      : stopwatch.stop
+      ? 'recording'
+      : 'undefined';
+  const IsSpaceKeyPressed = useRef(false);
+  const { hasFinished: isReadyToStart, on, off } = useTimer(300);
+  useEffect(() => {
+    const keydownListener = (event: KeyboardEvent) => {
+      if (event.key !== ' ') {
+        return;
+      }
+      switch (timerState) {
+        case 'before inspection':
+          if (!IsSpaceKeyPressed.current) {
+            inspectionStopwatch.start?.();
+          }
+          break;
+        case 'inspecting':
+          if (!IsSpaceKeyPressed.current) {
+            on();
+          }
+          break;
+        case 'recording':
+          stopwatch.stop?.();
+          break;
+      }
+      IsSpaceKeyPressed.current = true;
+    };
+    const keyupListener = (event: KeyboardEvent) => {
+      if (event.key !== ' ') {
+        return;
+      }
+      switch (timerState) {
+        case 'before inspection':
+          break;
+        case 'inspecting':
+          if (isReadyToStart) {
+            inspectionStopwatch.stop?.();
+          }
+          off();
+          break;
+        case 'recording':
+          break;
+      }
+      IsSpaceKeyPressed.current = false;
+    };
+    document.addEventListener('keydown', keydownListener);
+    document.addEventListener('keyup', keyupListener);
+    return () => {
+      document.removeEventListener('keydown', keydownListener);
+      document.removeEventListener('keyup', keyupListener);
+    };
+  });
+
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <h1 className={styles.title}>Todo sample</h1>
+        <h1 className={styles.title}>Hi Timer</h1>
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/api/auth/logout">Logout</a>
-
-        <p className={styles.description}>
-          todo list <button onClick={createNewTodo}>add</button>
-        </p>
-        <ul>
-          {todos?.map(({ id, title, done }) => (
-            <li key={id}>
-              <input
-                type="checkbox"
-                checked={done}
-                onChange={({ target }) =>
-                  update(id, { id, title, done: target.checked })
+        {inspectionTime === null ? (
+          inspectionStopwatch.start ? (
+            <button key="inspection start" onClick={inspectionStopwatch.start}>
+              inspection start
+            </button>
+          ) : (
+            <button
+              key="start recording"
+              onPointerDown={on}
+              onPointerUp={() => {
+                if (isReadyToStart) {
+                  inspectionStopwatch.stop?.();
                 }
-              />
-              <input
-                type="text"
-                value={title}
-                onChange={({ target }) =>
-                  update(id, { id, title: target.value, done })
-                }
-              />
-            </li>
-          ))}
-        </ul>
+                off();
+              }}
+              style={{ color: isReadyToStart ? 'red' : 'white' }}
+            >
+              {inspectionStopwatch.elapsedTime < 15000
+                ? `${
+                    15 - Math.trunc(inspectionStopwatch.elapsedTime / 1000)
+                  }sec`
+                : inspectionStopwatch.elapsedTime < 17000
+                ? '+2'
+                : 'DNF'}
+            </button>
+          )
+        ) : stopwatch.start ? (
+          <button onClick={stopwatch.start}>start</button>
+        ) : (
+          <button key="stop recording" onClick={stopwatch.stop}>
+            stop
+          </button>
+        )}
+        {typeof stopwatch.elapsedTime === 'number' &&
+          `${Math.trunc(stopwatch.elapsedTime) / 1000}sec`}
+        {records.map(({ createdAt, time }) => (
+          <li key={createdAt}>{Math.trunc(time) / 1000}sec</li>
+        ))}
       </main>
     </div>
   );
