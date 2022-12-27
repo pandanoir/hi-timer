@@ -1,7 +1,7 @@
 'use client';
 import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import styles from '../styles/Home.module.css';
+import styles from '../../styles/Home.module.css';
 
 const fps = 60;
 const useStopwatch = ({
@@ -53,7 +53,7 @@ const useTimer = (duration: number) => {
   return { on, off, hasFinished: hasFinished } as const;
 };
 
-const TodoPage: FC<{ user: UserProfile }> = () => {
+const TimerPage: FC<{ user: UserProfile }> = () => {
   const [usesInspection, setUsesInspection] = useState(true);
   const [inspectionTime, setInspectionTime] = useState<null | number>(null);
   const [records, setRecords] = useState<{ time: number; createdAt: number }[]>(
@@ -289,4 +289,4 @@ const TodoPage: FC<{ user: UserProfile }> = () => {
     </div>
   );
 };
-export default withPageAuthRequired(TodoPage);
+export default withPageAuthRequired(TimerPage);
