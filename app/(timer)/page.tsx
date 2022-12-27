@@ -53,21 +53,21 @@ const useTimer = (duration: number) => {
   return { on, off, hasFinished: hasFinished } as const;
 };
 
-const TimerPage: FC<{ user: UserProfile }> = () => {
-  const [usesInspection, setUsesInspection] = useState(true);
+const Timer: FC<{
+  usesInspection: boolean;
+  onStart: () => void;
+  onStop: (record: number, inspectionTime: number | null) => void;
+}> = ({ usesInspection, onStart, onStop }) => {
   const [inspectionTime, setInspectionTime] = useState<null | number>(null);
-  const [records, setRecords] = useState<{ time: number; createdAt: number }[]>(
-    []
-  );
 
   const stopwatch = useStopwatch({
-    onStop: useCallback((elapsedTime: number) => {
-      setRecords((records) => [
-        ...records,
-        { time: elapsedTime, createdAt: Date.now() },
-      ]);
-      setInspectionTime(null);
-    }, []),
+    onStop: useCallback(
+      (elapsedTime: number) => {
+        onStop(elapsedTime, inspectionTime);
+        setInspectionTime(null);
+      },
+      [onStop, inspectionTime]
+    ),
   });
   const { start: startStopwatch } = stopwatch;
   const inspectionStopwatch = useStopwatch({
@@ -92,6 +92,33 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     : 'recording';
   const IsSpaceKeyPressed = useRef(false);
   const { hasFinished: isReadyToStart, on, off } = useTimer(300);
+  {
+    const prevInspectionStopwatch = useRef(inspectionStopwatch);
+    useEffect(() => {
+      if (!usesInspection) {
+        return;
+      }
+      if (
+        prevInspectionStopwatch.current.start !== inspectionStopwatch.start &&
+        !inspectionStopwatch.start
+      ) {
+        onStart();
+      }
+      prevInspectionStopwatch.current = inspectionStopwatch;
+    });
+  }
+  {
+    const prevStopwatch = useRef(stopwatch);
+    useEffect(() => {
+      if (usesInspection) {
+        return;
+      }
+      if (prevStopwatch.current.start !== stopwatch.start && !stopwatch.start) {
+        onStart();
+      }
+      prevStopwatch.current = stopwatch;
+    });
+  }
   useEffect(() => {
     if (!usesInspection) {
       const keydownListener = (event: KeyboardEvent) => {
@@ -189,6 +216,75 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
   ]);
 
   return (
+    <>
+      {stopwatch.stop ? (
+        <button key="stop recording" onClick={stopwatch.stop}>
+          stop
+        </button>
+      ) : !usesInspection ? (
+        <button
+          key="start recording"
+          onPointerDown={on}
+          onPointerUp={() => {
+            if (isReadyToStart) {
+              stopwatch.start?.();
+            }
+            off();
+          }}
+          style={{
+            color:
+              isReadyToStart === null
+                ? 'white'
+                : isReadyToStart
+                ? 'red'
+                : 'green',
+          }}
+        >
+          start
+        </button>
+      ) : typeof inspectionStopwatch.elapsedTime !== 'number' ? (
+        <button key="start inspection" onClick={inspectionStopwatch.start}>
+          inspection start
+        </button>
+      ) : (
+        <button
+          key="start recording with inspection"
+          onPointerDown={on}
+          onPointerUp={() => {
+            if (isReadyToStart) {
+              inspectionStopwatch.stop?.();
+            }
+            off();
+          }}
+          style={{
+            color:
+              isReadyToStart === null
+                ? 'white'
+                : isReadyToStart
+                ? 'red'
+                : 'green',
+          }}
+        >
+          {inspectionStopwatch.elapsedTime < 15000
+            ? `${15 - Math.trunc(inspectionStopwatch.elapsedTime / 1000)}sec`
+            : inspectionStopwatch.elapsedTime < 17000
+            ? '+2'
+            : 'DNF'}
+        </button>
+      )}
+      {typeof stopwatch.elapsedTime === 'number' &&
+        `${Math.trunc(stopwatch.elapsedTime) / 1000}sec`}
+    </>
+  );
+};
+
+const TimerPage: FC<{ user: UserProfile }> = () => {
+  const [usesInspection, setUsesInspection] = useState(true);
+  const [records, setRecords] = useState<{ time: number; createdAt: number }[]>(
+    []
+  );
+  const [isTimerRecording, setIsTimerRecording] = useState(false);
+  return (
     <div className={styles.container}>
       <main className={styles.main}>
         <h1 className={styles.title}>Hi Timer</h1>
@@ -199,89 +295,21 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
           type="checkbox"
           checked={usesInspection}
           onChange={({ target: { checked } }) => setUsesInspection(checked)}
-          disabled={
-            !(
-              (usesInspection &&
-                inspectionTime === null &&
-                inspectionStopwatch.start) ||
-              (!usesInspection && stopwatch.start)
-            )
-          }
+          disabled={isTimerRecording}
         />
-        {usesInspection ? (
-          inspectionTime === null ? (
-            inspectionStopwatch.start ? (
-              <button
-                key="inspection start"
-                onClick={inspectionStopwatch.start}
-              >
-                inspection start
-              </button>
-            ) : (
-              <button
-                key="start recording"
-                onPointerDown={on}
-                onPointerUp={() => {
-                  if (isReadyToStart) {
-                    inspectionStopwatch.stop?.();
-                  }
-                  off();
-                }}
-                style={{
-                  color:
-                    isReadyToStart === null
-                      ? 'white'
-                      : isReadyToStart
-                      ? 'red'
-                      : 'green',
-                }}
-              >
-                {inspectionStopwatch.elapsedTime < 15000
-                  ? `${
-                      15 - Math.trunc(inspectionStopwatch.elapsedTime / 1000)
-                    }sec`
-                  : inspectionStopwatch.elapsedTime < 17000
-                  ? '+2'
-                  : 'DNF'}
-              </button>
-            )
-          ) : stopwatch.start ? (
-            <button key="start recording" onClick={stopwatch.start}>
-              start
-            </button>
-          ) : (
-            <button key="stop recording" onClick={stopwatch.stop}>
-              stop
-            </button>
-          )
-        ) : stopwatch.start ? (
-          <button
-            key="start recording"
-            onPointerDown={on}
-            onPointerUp={() => {
-              if (isReadyToStart) {
-                stopwatch.start?.();
-              }
-              off();
-            }}
-            style={{
-              color:
-                isReadyToStart === null
-                  ? 'white'
-                  : isReadyToStart
-                  ? 'red'
-                  : 'green',
-            }}
-          >
-            start
-          </button>
-        ) : (
-          <button key="stop recording" onClick={stopwatch.stop}>
-            stop
-          </button>
-        )}
-        {typeof stopwatch.elapsedTime === 'number' &&
-          `${Math.trunc(stopwatch.elapsedTime) / 1000}sec`}
+        <Timer
+          usesInspection={usesInspection}
+          onStart={() => {
+            setIsTimerRecording(true);
+          }}
+          onStop={(record, _inspectionTime) => {
+            setRecords((records) => [
+              ...records,
+              { time: record, createdAt: Date.now() },
+            ]);
+            setIsTimerRecording(false);
+          }}
+        />
         {records.map(({ createdAt, time }) => (
           <li key={createdAt}>{Math.trunc(time) / 1000}sec</li>
         ))}
