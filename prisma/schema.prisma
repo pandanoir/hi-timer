@@ -12,11 +12,9 @@ datasource db {
   referentialIntegrity = "prisma"
 }
 
-model Todo {
+model TimerRecord {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
-  title     String
-  done      Boolean
+  time      Int
   userId    String
 }
-

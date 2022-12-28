@@ -9,13 +9,17 @@ export default withApiAuthRequired(
       throw new Error('authorization required');
     }
     if (
-      (await prisma.todo.findFirst({ where: { id: req.body.id as string } }))
-        ?.userId !== session.user.sub
+      (
+        await prisma.timerRecord.findFirst({
+          where: { id: req.body.id as string },
+        })
+      )?.userId !== session.user.sub
     ) {
       throw new Error('permission denied');
     }
-    const post = await prisma.todo.delete({
-      where: { id: req.body.id },
+    const post = await prisma.timerRecord.update({
+      where: { id: req.body.id as string },
+      data: { time: req.body.time },
     });
     res.json(post);
   }

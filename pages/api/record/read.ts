@@ -8,9 +8,10 @@ export default withApiAuthRequired(
     if (!session) {
       throw new Error('authorization required');
     }
-    const post = await prisma.todo.create({
-      data: { title: '', done: false, userId: session.user.sub },
+    const posts = await prisma.timerRecord.findMany({
+      where: { userId: session.user.sub },
+      orderBy: { createdAt: 'desc' },
     });
-    res.json(post);
+    res.json(posts);
   }
 );
