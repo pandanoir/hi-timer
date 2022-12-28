@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 
 const userId = 'auth0|000000000000000000000000';
 const main = async () => {
