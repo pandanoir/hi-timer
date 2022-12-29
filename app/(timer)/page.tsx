@@ -8,6 +8,7 @@ import {
   Heading,
   HStack,
   IconButton,
+  Spinner,
   Switch,
   useColorMode,
   VStack,
@@ -153,7 +154,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
           disabled={isTimerRecording}
         />
       </HStack>
-      {records && (
+      {records ? (
         <>
           <Box flex="1">
             <Timer
@@ -225,6 +226,10 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
             })}
           </ul>
         </>
+      ) : (
+        <VStack flex="1" align="center" justify="center">
+          <Spinner size="xl" />
+        </VStack>
       )}
     </VStack>
   );
