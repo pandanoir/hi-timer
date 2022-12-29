@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `TimerRecord` ADD COLUMN `dnf` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `penalty` BOOLEAN NOT NULL DEFAULT false;

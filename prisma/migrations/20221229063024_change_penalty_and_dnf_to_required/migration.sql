@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `TimerRecord` ALTER COLUMN `dnf` DROP DEFAULT,
+    ALTER COLUMN `penalty` DROP DEFAULT;

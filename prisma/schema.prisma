@@ -16,5 +16,7 @@ model TimerRecord {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   time      Int
+  penalty   Boolean
+  dnf       Boolean
   userId    String
 }

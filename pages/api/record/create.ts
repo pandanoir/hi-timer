@@ -9,7 +9,12 @@ export default withApiAuthRequired(
       throw new Error('authorization required');
     }
     const post = await prisma.timerRecord.create({
-      data: { time: req.body.time, userId: session.user.sub },
+      data: {
+        time: req.body.time,
+        penalty: req.body.penalty,
+        dnf: req.body.dnf,
+        userId: session.user.sub,
+      },
     });
     res.json(post);
   }

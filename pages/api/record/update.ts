@@ -19,7 +19,11 @@ export default withApiAuthRequired(
     }
     const post = await prisma.timerRecord.update({
       where: { id: req.body.id as string },
-      data: { time: req.body.time },
+      data: {
+        time: req.body.time,
+        penalty: req.body.penalty,
+        dnf: req.body.dnf,
+      },
     });
     res.json(post);
   }
