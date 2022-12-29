@@ -122,33 +122,39 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 setIsTimerRecording(false);
               }}
             />
-            {!records[0].dnf && (
-              <button
-                key="+2"
-                onClick={() => {
-                  if (records[0].penalty) {
-                    undoPenalty(records[0].id);
-                  } else {
-                    imposePenalty(records[0].id);
-                  }
-                }}
-              >
-                {records[0].penalty ? 'undo +2' : '+2'}
-              </button>
+            {records[0] && (
+              <>
+                {!records[0].dnf && (
+                  <button
+                    key="+2"
+                    onClick={() => {
+                      if (records[0].penalty) {
+                        undoPenalty(records[0].id);
+                      } else {
+                        imposePenalty(records[0].id);
+                      }
+                    }}
+                  >
+                    {records[0].penalty ? 'undo +2' : '+2'}
+                  </button>
+                )}
+                <button
+                  key="DNF"
+                  onClick={() => {
+                    if (records[0].dnf) {
+                      undoDNF(records[0].id);
+                    } else {
+                      toDNF(records[0].id);
+                    }
+                  }}
+                >
+                  {records[0].dnf ? 'undo DNF' : 'DNF'}
+                </button>
+                <button key="delete">
+                  delete
+                </button>
+              </>
             )}
-            <button
-              key="DNF"
-              onClick={() => {
-                if (records[0].dnf) {
-                  undoDNF(records[0].id);
-                } else {
-                  toDNF(records[0].id);
-                }
-              }}
-            >
-              {records[0].dnf ? 'undo DNF' : 'DNF'}
-            </button>
-            <button key="delete">delete</button>
             <ul style={{ overflow: 'scroll', height: 300 }}>
               {records.map(({ time, penalty, dnf, createdAt }) => {
                 const timeStr = `${Math.trunc(time) / 1000}sec${
