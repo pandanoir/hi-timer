@@ -78,14 +78,14 @@ const useTimerRecords = () => {
     undoDNF: (id: string) => {
       update(id, { dnf: false });
     },
-    deleteRecord: (id: string, change: Partial<TimerRecord>) => {
+    deleteRecord: (id: string) => {
       const index = records.findIndex((x) => x.id === id);
       mutate(
         '/api/record/read',
         fetch('/api/record/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...change, id }),
+          body: JSON.stringify({ id }),
         }).then(() => [
           ...records.slice(0, index),
           ...records.slice(index + 1),
