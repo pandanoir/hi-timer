@@ -41,7 +41,7 @@ const useStopwatch = ({
     ? ({ start } as const)
     : ({ stop, elapsedTime } as const);
 };
-const useTimer = (duration: number) => {
+const useCountdownTimer = (duration: number) => {
   const [hasFinished, setHasFinished] = useState<null | boolean>(null); // 開始前は null、開始後は false、時間が経過したら true
   const id = useRef<number | undefined>(undefined);
   const on = useCallback(() => {
@@ -62,13 +62,14 @@ const ScreenButton = (props: ComponentProps<typeof VStack>) => (
   <VStack h="full" align="center" justify="center" {...props} />
 );
 
-export const Timer: FC<{
+const useCubeTimer = ({
+  usesInspection,
+  onStop,
+}: {
   usesInspection: boolean;
-  onStart: () => void;
   onStop: (record: number, inspectionTime: number | null) => void;
-}> = ({ usesInspection, onStart, onStop }) => {
+}) => {
   const [inspectionTime, setInspectionTime] = useState<null | number>(null);
-
   const stopwatch = useStopwatch({
     onStop: useCallback(
       (elapsedTime: number) => {
@@ -88,60 +89,65 @@ export const Timer: FC<{
       [startStopwatch]
     ),
   });
-  const timerState = usesInspection
-    ? inspectionTime === null && inspectionStopwatch.start
-      ? 'before inspection'
-      : inspectionStopwatch.stop
-      ? 'inspecting'
-      : stopwatch.stop
-      ? 'recording'
-      : 'undefined'
-    : stopwatch.start
-    ? 'before start'
-    : 'recording';
+
+  if (stopwatch.stop)
+    return {
+      state: 'recording',
+      stop: stopwatch.stop,
+      elapsedTime: stopwatch.elapsedTime,
+    } as const;
+  if (!usesInspection) {
+    return { state: 'before start', start: stopwatch.start } as const;
+  }
+  if (inspectionTime === null && inspectionStopwatch.start)
+    return {
+      state: 'before inspection',
+      startInspection: inspectionStopwatch.start,
+    } as const;
+  if (inspectionStopwatch.stop)
+    return {
+      state: 'inspecting',
+      start: inspectionStopwatch.stop,
+      elapsedInspectionTime: inspectionStopwatch.elapsedTime,
+    } as const;
+  throw new Error('unexpected error occurred'); // inspection用のタイマーも stopwatch も動いていない分岐なので、起こりえないはず
+};
+
+export const Timer: FC<{
+  usesInspection: boolean;
+  onStart: () => void;
+  onStop: (record: number, inspectionTime: number | null) => void;
+}> = ({ usesInspection, onStart, onStop }) => {
+  const timer = useCubeTimer({ onStop, usesInspection });
+
   const isSpaceKeyPressed = useRef(false);
-  const { hasFinished: isReadyToStart, on, off } = useTimer(300);
-  {
-    const prevInspectionStopwatch = useRef(inspectionStopwatch);
-    useEffect(() => {
-      if (!usesInspection) {
-        return;
-      }
-      if (
-        prevInspectionStopwatch.current.start !== inspectionStopwatch.start &&
-        !inspectionStopwatch.start
-      ) {
-        onStart();
-      }
-      prevInspectionStopwatch.current = inspectionStopwatch;
-    }, [inspectionStopwatch, onStart, usesInspection]);
-  }
-  {
-    const prevStopwatch = useRef(stopwatch);
-    useEffect(() => {
-      if (usesInspection) {
-        return;
-      }
-      if (prevStopwatch.current.start !== stopwatch.start && !stopwatch.start) {
-        onStart();
-      }
-      prevStopwatch.current = stopwatch;
-    }, [onStart, stopwatch, usesInspection]);
-  }
+  const { hasFinished: isReadyToStart, on, off } = useCountdownTimer(300);
+
+  const prevTimerState = useRef<typeof timer.state>(timer.state);
+  useEffect(() => {
+    if (prevTimerState.current === timer.state) {
+      return;
+    }
+    if (timer.state === 'inspecting' || timer.state === 'recording') {
+      onStart();
+    }
+    prevTimerState.current = timer.state;
+  }, [onStart, timer.state]);
+
   useEffect(() => {
     if (!usesInspection) {
       const keydownListener = ({ key }: KeyboardEvent) => {
         if (key !== ' ') {
           return;
         }
-        switch (timerState) {
+        switch (timer.state) {
           case 'before start':
             if (!isSpaceKeyPressed.current) {
               on();
             }
             break;
           case 'recording':
-            stopwatch.stop?.();
+            timer.stop();
             break;
         }
         isSpaceKeyPressed.current = true;
@@ -150,10 +156,10 @@ export const Timer: FC<{
         if (key !== ' ') {
           return;
         }
-        switch (timerState) {
+        switch (timer.state) {
           case 'before start':
             if (isReadyToStart) {
-              stopwatch.start?.();
+              timer.start();
             }
             off();
             break;
@@ -173,10 +179,10 @@ export const Timer: FC<{
       if (key !== ' ') {
         return;
       }
-      switch (timerState) {
+      switch (timer.state) {
         case 'before inspection':
           if (!isSpaceKeyPressed.current) {
-            inspectionStopwatch.start?.();
+            timer.startInspection();
           }
           break;
         case 'inspecting':
@@ -185,7 +191,7 @@ export const Timer: FC<{
           }
           break;
         case 'recording':
-          stopwatch.stop?.();
+          timer.stop();
           break;
       }
       isSpaceKeyPressed.current = true;
@@ -194,12 +200,12 @@ export const Timer: FC<{
       if (key !== ' ') {
         return;
       }
-      switch (timerState) {
+      switch (timer.state) {
         case 'before inspection':
           break;
         case 'inspecting':
           if (isReadyToStart) {
-            inspectionStopwatch.stop?.();
+            timer.start();
           }
           off();
           break;
@@ -214,83 +220,64 @@ export const Timer: FC<{
       document.removeEventListener('keydown', keydownListener);
       document.removeEventListener('keyup', keyupListener);
     };
-  }, [
-    inspectionStopwatch,
-    isReadyToStart,
-    off,
-    on,
-    stopwatch,
-    timerState,
-    usesInspection,
-  ]);
+  }, [isReadyToStart, off, on, timer, usesInspection]);
 
-  return stopwatch.stop ? (
-    <ScreenButton key="stop recording" onClick={stopwatch.stop}>
-      <Button onClick={stopwatch.stop}>stop</Button>
+  if (timer.state === 'inspecting' || timer.state === 'before start') {
+    let buttonText = 'start';
+    if (timer.state === 'inspecting') {
+      buttonText =
+        timer.elapsedInspectionTime < 15000
+          ? `${15 - Math.trunc(timer.elapsedInspectionTime / 1000)}sec`
+          : timer.elapsedInspectionTime < 17000
+          ? '+2'
+          : 'DNF';
+    }
+
+    return (
+      <ScreenButton
+        key={timer.state}
+        onPointerDown={on}
+        onPointerUp={() => {
+          if (isReadyToStart) {
+            timer.start();
+          }
+          off();
+        }}
+      >
+        <Button
+          onPointerDown={on}
+          onPointerUp={() => {
+            if (isReadyToStart) {
+              timer.start();
+            }
+            off();
+          }}
+          colorScheme={
+            isReadyToStart !== null
+              ? isReadyToStart
+                ? 'pink'
+                : 'teal'
+              : undefined
+          }
+        >
+          {buttonText}
+        </Button>
+      </ScreenButton>
+    );
+  }
+  return timer.state === 'before inspection' ? (
+    <ScreenButton key={timer.state} onClick={timer.startInspection}>
+      <Button onClick={timer.startInspection}>inspection start</Button>
+    </ScreenButton>
+  ) : timer.state === 'recording' ? (
+    <ScreenButton key={timer.state} onClick={timer.stop}>
+      <Button onClick={timer.stop}>stop</Button>
       <Text>
-        {typeof stopwatch.elapsedTime === 'number' &&
-          `${Math.trunc(stopwatch.elapsedTime) / 1000}sec`}
+        {typeof timer.elapsedTime === 'number' &&
+          `${Math.trunc(timer.elapsedTime) / 1000}sec`}
       </Text>
     </ScreenButton>
-  ) : !usesInspection ? (
-    <ScreenButton
-      key="start recording"
-      onPointerDown={on}
-      onPointerUp={() => {
-        if (isReadyToStart) {
-          stopwatch.start?.();
-        }
-        off();
-      }}
-    >
-      <Button
-        onPointerDown={on}
-        onPointerUp={() => {
-          if (isReadyToStart) {
-            stopwatch.start?.();
-          }
-          off();
-        }}
-        colorScheme={
-          isReadyToStart === null ? undefined : isReadyToStart ? 'pink' : 'teal'
-        }
-      >
-        start
-      </Button>
-    </ScreenButton>
-  ) : typeof inspectionStopwatch.elapsedTime !== 'number' ? (
-    <ScreenButton key="start inspection" onClick={inspectionStopwatch.start}>
-      <Button onClick={inspectionStopwatch.start}>inspection start</Button>
-    </ScreenButton>
   ) : (
-    <ScreenButton
-      key="start recording with inspection"
-      onPointerDown={on}
-      onPointerUp={() => {
-        if (isReadyToStart) {
-          inspectionStopwatch.stop?.();
-        }
-        off();
-      }}
-    >
-      <Button
-        onPointerDown={on}
-        onPointerUp={() => {
-          if (isReadyToStart) {
-            inspectionStopwatch.stop?.();
-          }
-          off();
-        }}
-        colorScheme={
-          isReadyToStart === null ? undefined : isReadyToStart ? 'pink' : 'teal'
-        }
-      >
-        {inspectionStopwatch.elapsedTime < 15000
-          ? `${15 - Math.trunc(inspectionStopwatch.elapsedTime / 1000)}sec`
-          : inspectionStopwatch.elapsedTime < 17000
-          ? '+2'
-          : 'DNF'}
-      </Button>
-    </ScreenButton>
+    (timer satisfies never, null)
   );
 };
