@@ -55,7 +55,7 @@ const useTimer = (duration: number) => {
     clearTimeout(id.current);
     setHasFinished(null);
   }, []);
-  return { on, off, hasFinished: hasFinished } as const;
+  return { on, off, hasFinished } as const;
 };
 
 const ScreenButton = (props: ComponentProps<typeof VStack>) => (
@@ -99,7 +99,7 @@ export const Timer: FC<{
     : stopwatch.start
     ? 'before start'
     : 'recording';
-  const IsSpaceKeyPressed = useRef(false);
+  const isSpaceKeyPressed = useRef(false);
   const { hasFinished: isReadyToStart, on, off } = useTimer(300);
   {
     const prevInspectionStopwatch = useRef(inspectionStopwatch);
@@ -114,7 +114,7 @@ export const Timer: FC<{
         onStart();
       }
       prevInspectionStopwatch.current = inspectionStopwatch;
-    });
+    }, [inspectionStopwatch, onStart, usesInspection]);
   }
   {
     const prevStopwatch = useRef(stopwatch);
@@ -126,17 +126,17 @@ export const Timer: FC<{
         onStart();
       }
       prevStopwatch.current = stopwatch;
-    });
+    }, [onStart, stopwatch, usesInspection]);
   }
   useEffect(() => {
     if (!usesInspection) {
-      const keydownListener = (event: KeyboardEvent) => {
-        if (event.key !== ' ') {
+      const keydownListener = ({ key }: KeyboardEvent) => {
+        if (key !== ' ') {
           return;
         }
         switch (timerState) {
           case 'before start':
-            if (!IsSpaceKeyPressed.current) {
+            if (!isSpaceKeyPressed.current) {
               on();
             }
             break;
@@ -144,10 +144,10 @@ export const Timer: FC<{
             stopwatch.stop?.();
             break;
         }
-        IsSpaceKeyPressed.current = true;
+        isSpaceKeyPressed.current = true;
       };
-      const keyupListener = (event: KeyboardEvent) => {
-        if (event.key !== ' ') {
+      const keyupListener = ({ key }: KeyboardEvent) => {
+        if (key !== ' ') {
           return;
         }
         switch (timerState) {
@@ -160,7 +160,7 @@ export const Timer: FC<{
           case 'recording':
             break;
         }
-        IsSpaceKeyPressed.current = false;
+        isSpaceKeyPressed.current = false;
       };
       document.addEventListener('keydown', keydownListener);
       document.addEventListener('keyup', keyupListener);
@@ -169,18 +169,18 @@ export const Timer: FC<{
         document.removeEventListener('keyup', keyupListener);
       };
     }
-    const keydownListener = (event: KeyboardEvent) => {
-      if (event.key !== ' ') {
+    const keydownListener = ({ key }: KeyboardEvent) => {
+      if (key !== ' ') {
         return;
       }
       switch (timerState) {
         case 'before inspection':
-          if (!IsSpaceKeyPressed.current) {
+          if (!isSpaceKeyPressed.current) {
             inspectionStopwatch.start?.();
           }
           break;
         case 'inspecting':
-          if (!IsSpaceKeyPressed.current) {
+          if (!isSpaceKeyPressed.current) {
             on();
           }
           break;
@@ -188,10 +188,10 @@ export const Timer: FC<{
           stopwatch.stop?.();
           break;
       }
-      IsSpaceKeyPressed.current = true;
+      isSpaceKeyPressed.current = true;
     };
-    const keyupListener = (event: KeyboardEvent) => {
-      if (event.key !== ' ') {
+    const keyupListener = ({ key }: KeyboardEvent) => {
+      if (key !== ' ') {
         return;
       }
       switch (timerState) {
@@ -206,7 +206,7 @@ export const Timer: FC<{
         case 'recording':
           break;
       }
-      IsSpaceKeyPressed.current = false;
+      isSpaceKeyPressed.current = false;
     };
     document.addEventListener('keydown', keydownListener);
     document.addEventListener('keyup', keyupListener);
