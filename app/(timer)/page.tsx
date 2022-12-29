@@ -78,6 +78,27 @@ const useTimerRecords = () => {
     undoDNF: (id: string) => {
       update(id, { dnf: false });
     },
+    deleteRecord: (id: string, change: Partial<TimerRecord>) => {
+      const index = records.findIndex((x) => x.id === id);
+      mutate(
+        '/api/record/read',
+        fetch('/api/record/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...change, id }),
+        }).then(() => [
+          ...records.slice(0, index),
+          ...records.slice(index + 1),
+        ]),
+        {
+          optimisticData: [
+            ...records.slice(0, index),
+            ...records.slice(index + 1),
+          ],
+          rollbackOnError: true,
+        }
+      );
+    },
   } as const;
 };
 
@@ -90,6 +111,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     toDNF,
     undoPenalty,
     undoDNF,
+    deleteRecord,
   } = useTimerRecords();
   const [isTimerRecording, setIsTimerRecording] = useState(false);
   return (
@@ -150,7 +172,10 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 >
                   {records[0].dnf ? 'undo DNF' : 'DNF'}
                 </button>
-                <button key="delete">
+                <button
+                  key="delete"
+                  onClick={() => deleteRecord(records[0].id)}
+                >
                   delete
                 </button>
               </>
