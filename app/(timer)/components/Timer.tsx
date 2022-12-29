@@ -1,4 +1,4 @@
-import { Box, Text, Button, VStack } from '@chakra-ui/react';
+import { Text, Button, VStack } from '@chakra-ui/react';
 import {
   ComponentProps,
   FC,
@@ -251,10 +251,9 @@ export const Timer: FC<{
           }
           off();
         }}
-        style={{
-          color:
-            isReadyToStart === null ? '' : isReadyToStart ? 'red' : 'green',
-        }}
+        colorScheme={
+          isReadyToStart === null ? undefined : isReadyToStart ? 'pink' : 'teal'
+        }
       >
         start
       </Button>
@@ -282,10 +281,9 @@ export const Timer: FC<{
           }
           off();
         }}
-        style={{
-          color:
-            isReadyToStart === null ? '' : isReadyToStart ? 'red' : 'green',
-        }}
+        colorScheme={
+          isReadyToStart === null ? undefined : isReadyToStart ? 'pink' : 'teal'
+        }
       >
         {inspectionStopwatch.elapsedTime < 15000
           ? `${15 - Math.trunc(inspectionStopwatch.elapsedTime / 1000)}sec`
