@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   FormLabel,
+  Heading,
   HStack,
   Switch,
   VStack,
@@ -124,15 +125,18 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
   return (
     <VStack as="main" align="left" height="100dvh">
       <HStack justify="space-between">
-        <h1>Hi Timer</h1>
+        <Heading>Hi-Timer</Heading>
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <Button as="a" href="/api/auth/logout">
           Logout
         </Button>
       </HStack>
       <HStack>
-        <FormLabel>uses inspection:</FormLabel>
+        <FormLabel userSelect="none" htmlFor="use inspection">
+          use inspection:
+        </FormLabel>
         <Switch
+          id="use inspection"
           isChecked={usesInspection}
           onChange={({ target: { checked } }) => setUsesInspection(checked)}
           disabled={isTimerRecording}
