@@ -1,117 +1,11 @@
 import { Text, Button, VStack } from '@chakra-ui/react';
-import {
-  ComponentProps,
-  FC,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-
-const fps = 60;
-const useStopwatch = ({
-  onStop = () => void 0,
-}: { onStop?: (elapsedTime: number) => void } = {}) => {
-  const [elapsedTime, setElapsedTime] = useState<null | number>(null);
-  const [startedAt, setStartedAt] = useState(0);
-  useEffect(() => {
-    if (elapsedTime === null) {
-      return;
-    }
-    let id: number;
-    const work = () => {
-      setElapsedTime(Date.now() - startedAt);
-      id = window.setTimeout(work, 1000 / fps);
-    };
-    id = window.setTimeout(work, 1000 / fps);
-    return () => window.clearTimeout(id);
-  }, [elapsedTime, startedAt]);
-
-  const start = useCallback(() => {
-    setStartedAt(Date.now());
-    setElapsedTime(0);
-  }, []);
-  const stop = useCallback(() => {
-    onStop(Date.now() - startedAt);
-    setStartedAt(0);
-    setElapsedTime(null);
-  }, [startedAt, onStop]);
-
-  return elapsedTime === null
-    ? ({ start } as const)
-    : ({ stop, elapsedTime } as const);
-};
-const useCountdownTimer = (duration: number) => {
-  const [hasFinished, setHasFinished] = useState<null | boolean>(null); // 開始前は null、開始後は false、時間が経過したら true
-  const id = useRef<number | undefined>(undefined);
-  const on = useCallback(() => {
-    setHasFinished(false);
-    clearTimeout(id.current);
-    id.current = window.setTimeout(() => {
-      setHasFinished(true);
-    }, duration);
-  }, [duration]);
-  const off = useCallback(() => {
-    clearTimeout(id.current);
-    setHasFinished(null);
-  }, []);
-  return { on, off, hasFinished } as const;
-};
+import { ComponentProps, FC, useCallback, useEffect, useRef } from 'react';
+import { useCountdownTimer } from '../hooks/useCountdownTimer';
+import { useCubeTimer } from '../hooks/useCubeTimer';
 
 const ScreenButton = (props: ComponentProps<typeof VStack>) => (
   <VStack h="full" align="center" justify="center" {...props} />
 );
-
-const useCubeTimer = ({
-  usesInspection,
-  onStop,
-}: {
-  usesInspection: boolean;
-  onStop: (record: number, inspectionTime: number | null) => void;
-}) => {
-  const [inspectionTime, setInspectionTime] = useState<null | number>(null);
-  const stopwatch = useStopwatch({
-    onStop: useCallback(
-      (elapsedTime: number) => {
-        onStop(elapsedTime, inspectionTime);
-        setInspectionTime(null);
-      },
-      [onStop, inspectionTime]
-    ),
-  });
-  const { start: startStopwatch } = stopwatch;
-  const inspectionStopwatch = useStopwatch({
-    onStop: useCallback(
-      (elapsedTime: number) => {
-        setInspectionTime(elapsedTime);
-        startStopwatch?.();
-      },
-      [startStopwatch]
-    ),
-  });
-
-  if (stopwatch.stop)
-    return {
-      state: 'recording',
-      stop: stopwatch.stop,
-      elapsedTime: stopwatch.elapsedTime,
-    } as const;
-  if (!usesInspection) {
-    return { state: 'before start', start: stopwatch.start } as const;
-  }
-  if (inspectionTime === null && inspectionStopwatch.start)
-    return {
-      state: 'before inspection',
-      startInspection: inspectionStopwatch.start,
-    } as const;
-  if (inspectionStopwatch.stop)
-    return {
-      state: 'inspecting',
-      start: inspectionStopwatch.stop,
-      elapsedInspectionTime: inspectionStopwatch.elapsedTime,
-    } as const;
-  throw new Error('unexpected error occurred'); // inspection用のタイマーも stopwatch も動いていない分岐なので、起こりえないはず
-};
 
 export const Timer: FC<{
   usesInspection: boolean;
@@ -121,18 +15,16 @@ export const Timer: FC<{
   const timer = useCubeTimer({ onStop, usesInspection });
 
   const isSpaceKeyPressed = useRef(false);
-  const { hasFinished: isReadyToStart, on, off } = useCountdownTimer(300);
-
-  const prevTimerState = useRef<typeof timer.state>(timer.state);
-  useEffect(() => {
-    if (prevTimerState.current === timer.state) {
+  const { hasFinished: isReadyToStart, on, off } = useCountdownTimer(300); // ボタンを 300ms 押し続けて離すとタイマーがスタートする
+  const onReleaseStartButton = useCallback(() => {
+    if (timer.state !== 'before start' && timer.state !== 'inspecting') {
       return;
     }
-    if (timer.state === 'inspecting' || timer.state === 'recording') {
-      onStart();
+    if (isReadyToStart) {
+      timer.start();
     }
-    prevTimerState.current = timer.state;
-  }, [onStart, timer.state]);
+    off();
+  }, [isReadyToStart, timer, off]);
 
   useEffect(() => {
     if (!usesInspection) {
@@ -158,10 +50,7 @@ export const Timer: FC<{
         }
         switch (timer.state) {
           case 'before start':
-            if (isReadyToStart) {
-              timer.start();
-            }
-            off();
+            onReleaseStartButton();
             break;
           case 'recording':
             break;
@@ -204,10 +93,7 @@ export const Timer: FC<{
         case 'before inspection':
           break;
         case 'inspecting':
-          if (isReadyToStart) {
-            timer.start();
-          }
-          off();
+          onReleaseStartButton();
           break;
         case 'recording':
           break;
@@ -220,7 +106,20 @@ export const Timer: FC<{
       document.removeEventListener('keydown', keydownListener);
       document.removeEventListener('keyup', keyupListener);
     };
-  }, [isReadyToStart, off, on, timer, usesInspection]);
+  }, [on, timer, usesInspection, onReleaseStartButton]);
+
+  {
+    const prevTimerState = useRef<typeof timer.state>(timer.state);
+    useEffect(() => {
+      if (prevTimerState.current === timer.state) {
+        return;
+      }
+      if (timer.state === 'inspecting' || timer.state === 'recording') {
+        onStart();
+      }
+      prevTimerState.current = timer.state;
+    }, [onStart, timer.state]);
+  }
 
   if (timer.state === 'inspecting' || timer.state === 'before start') {
     let buttonText = 'start';
@@ -237,21 +136,11 @@ export const Timer: FC<{
       <ScreenButton
         key={timer.state}
         onPointerDown={on}
-        onPointerUp={() => {
-          if (isReadyToStart) {
-            timer.start();
-          }
-          off();
-        }}
+        onPointerUp={onReleaseStartButton}
       >
         <Button
           onPointerDown={on}
-          onPointerUp={() => {
-            if (isReadyToStart) {
-              timer.start();
-            }
-            off();
-          }}
+          onPointerUp={onReleaseStartButton}
           colorScheme={
             isReadyToStart !== null
               ? isReadyToStart
