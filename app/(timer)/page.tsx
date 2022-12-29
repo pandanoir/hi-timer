@@ -1,5 +1,13 @@
 'use client';
 import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import {
+  Box,
+  Button,
+  FormLabel,
+  HStack,
+  Switch,
+  VStack,
+} from '@chakra-ui/react';
 import { FC, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { Timer } from './components/Timer';
@@ -114,20 +122,25 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
   } = useTimerRecords();
   const [isTimerRecording, setIsTimerRecording] = useState(false);
   return (
-    <div>
-      <main>
+    <VStack as="main" align="left" height="100dvh">
+      <HStack justify="space-between">
         <h1>Hi Timer</h1>
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-        <a href="/api/auth/logout">Logout</a>
-        uses inspection:
-        <input
-          type="checkbox"
-          checked={usesInspection}
+        <Button as="a" href="/api/auth/logout">
+          Logout
+        </Button>
+      </HStack>
+      <HStack>
+        <FormLabel>uses inspection:</FormLabel>
+        <Switch
+          isChecked={usesInspection}
           onChange={({ target: { checked } }) => setUsesInspection(checked)}
           disabled={isTimerRecording}
         />
-        {records && (
-          <>
+      </HStack>
+      {records && (
+        <>
+          <Box flex="1">
             <Timer
               usesInspection={usesInspection}
               onStart={() => {
@@ -143,56 +156,62 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 setIsTimerRecording(false);
               }}
             />
-            {records[0] && (
-              <>
-                {!records[0].dnf && (
-                  <button
-                    key="+2"
-                    onClick={() => {
-                      if (records[0].penalty) {
-                        undoPenalty(records[0].id);
-                      } else {
-                        imposePenalty(records[0].id);
-                      }
-                    }}
-                  >
-                    {records[0].penalty ? 'undo +2' : '+2'}
-                  </button>
-                )}
-                <button
-                  key="DNF"
+          </Box>
+          {records[0] && (
+            <HStack spacing={2}>
+              {!records[0].dnf && (
+                <Button
+                  key="+2"
                   onClick={() => {
-                    if (records[0].dnf) {
-                      undoDNF(records[0].id);
+                    if (records[0].penalty) {
+                      undoPenalty(records[0].id);
                     } else {
-                      toDNF(records[0].id);
+                      imposePenalty(records[0].id);
                     }
                   }}
+                  variant="outline"
+                  colorScheme="blue"
                 >
-                  {records[0].dnf ? 'undo DNF' : 'DNF'}
-                </button>
-                <button
-                  key="delete"
-                  onClick={() => deleteRecord(records[0].id)}
-                >
-                  delete
-                </button>
-              </>
-            )}
-            <ul style={{ overflow: 'scroll', height: 300 }}>
-              {records.map(({ time, penalty, dnf, createdAt }) => {
-                const timeStr = `${Math.trunc(time) / 1000}sec${
-                  penalty ? ' + 2' : ''
-                }`;
-                return (
-                  <li key={createdAt}>{dnf ? `DNF(${timeStr})` : timeStr}</li>
-                );
-              })}
-            </ul>
-          </>
-        )}
-      </main>
-    </div>
+                  {records[0].penalty ? 'undo +2' : '+2'}
+                </Button>
+              )}
+              <Button
+                key="DNF"
+                onClick={() => {
+                  if (records[0].dnf) {
+                    undoDNF(records[0].id);
+                  } else {
+                    toDNF(records[0].id);
+                  }
+                }}
+                variant="outline"
+                colorScheme="blue"
+              >
+                {records[0].dnf ? 'undo DNF' : 'DNF'}
+              </Button>
+              <Button
+                key="delete"
+                onClick={() => deleteRecord(records[0].id)}
+                variant="outline"
+                colorScheme="red"
+              >
+                delete
+              </Button>
+            </HStack>
+          )}
+          <ul style={{ overflow: 'scroll', height: 300 }}>
+            {records.map(({ time, penalty, dnf, createdAt }) => {
+              const timeStr = `${Math.trunc(time) / 1000}sec${
+                penalty ? ' + 2' : ''
+              }`;
+              return (
+                <li key={createdAt}>{dnf ? `DNF(${timeStr})` : timeStr}</li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+    </VStack>
   );
 };
 export default withPageAuthRequired(TimerPage);

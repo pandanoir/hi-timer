@@ -1,4 +1,12 @@
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { Box, Text, Button, VStack } from '@chakra-ui/react';
+import {
+  ComponentProps,
+  FC,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 const fps = 60;
 const useStopwatch = ({
@@ -49,6 +57,10 @@ const useTimer = (duration: number) => {
   }, []);
   return { on, off, hasFinished: hasFinished } as const;
 };
+
+const ScreenButton = (props: ComponentProps<typeof VStack>) => (
+  <VStack h="full" align="center" justify="center" {...props} />
+);
 
 export const Timer: FC<{
   usesInspection: boolean;
@@ -212,65 +224,75 @@ export const Timer: FC<{
     usesInspection,
   ]);
 
-  return (
-    <>
-      {stopwatch.stop ? (
-        <button key="stop recording" onClick={stopwatch.stop}>
-          stop
-        </button>
-      ) : !usesInspection ? (
-        <button
-          key="start recording"
-          onPointerDown={on}
-          onPointerUp={() => {
-            if (isReadyToStart) {
-              stopwatch.start?.();
-            }
-            off();
-          }}
-          style={{
-            color:
-              isReadyToStart === null
-                ? 'white'
-                : isReadyToStart
-                ? 'red'
-                : 'green',
-          }}
-        >
-          start
-        </button>
-      ) : typeof inspectionStopwatch.elapsedTime !== 'number' ? (
-        <button key="start inspection" onClick={inspectionStopwatch.start}>
-          inspection start
-        </button>
-      ) : (
-        <button
-          key="start recording with inspection"
-          onPointerDown={on}
-          onPointerUp={() => {
-            if (isReadyToStart) {
-              inspectionStopwatch.stop?.();
-            }
-            off();
-          }}
-          style={{
-            color:
-              isReadyToStart === null
-                ? 'white'
-                : isReadyToStart
-                ? 'red'
-                : 'green',
-          }}
-        >
-          {inspectionStopwatch.elapsedTime < 15000
-            ? `${15 - Math.trunc(inspectionStopwatch.elapsedTime / 1000)}sec`
-            : inspectionStopwatch.elapsedTime < 17000
-            ? '+2'
-            : 'DNF'}
-        </button>
-      )}
-      {typeof stopwatch.elapsedTime === 'number' &&
-        `${Math.trunc(stopwatch.elapsedTime) / 1000}sec`}
-    </>
+  return stopwatch.stop ? (
+    <ScreenButton key="stop recording" onClick={stopwatch.stop}>
+      <Button onClick={stopwatch.stop}>stop</Button>
+      <Text>
+        {typeof stopwatch.elapsedTime === 'number' &&
+          `${Math.trunc(stopwatch.elapsedTime) / 1000}sec`}
+      </Text>
+    </ScreenButton>
+  ) : !usesInspection ? (
+    <ScreenButton
+      key="start recording"
+      onPointerDown={on}
+      onPointerUp={() => {
+        if (isReadyToStart) {
+          stopwatch.start?.();
+        }
+        off();
+      }}
+    >
+      <Button
+        onPointerDown={on}
+        onPointerUp={() => {
+          if (isReadyToStart) {
+            stopwatch.start?.();
+          }
+          off();
+        }}
+        style={{
+          color:
+            isReadyToStart === null ? '' : isReadyToStart ? 'red' : 'green',
+        }}
+      >
+        start
+      </Button>
+    </ScreenButton>
+  ) : typeof inspectionStopwatch.elapsedTime !== 'number' ? (
+    <ScreenButton key="start inspection" onClick={inspectionStopwatch.start}>
+      <Button onClick={inspectionStopwatch.start}>inspection start</Button>
+    </ScreenButton>
+  ) : (
+    <ScreenButton
+      key="start recording with inspection"
+      onPointerDown={on}
+      onPointerUp={() => {
+        if (isReadyToStart) {
+          inspectionStopwatch.stop?.();
+        }
+        off();
+      }}
+    >
+      <Button
+        onPointerDown={on}
+        onPointerUp={() => {
+          if (isReadyToStart) {
+            inspectionStopwatch.stop?.();
+          }
+          off();
+        }}
+        style={{
+          color:
+            isReadyToStart === null ? '' : isReadyToStart ? 'red' : 'green',
+        }}
+      >
+        {inspectionStopwatch.elapsedTime < 15000
+          ? `${15 - Math.trunc(inspectionStopwatch.elapsedTime / 1000)}sec`
+          : inspectionStopwatch.elapsedTime < 17000
+          ? '+2'
+          : 'DNF'}
+      </Button>
+    </ScreenButton>
   );
 };
