@@ -1,12 +1,15 @@
 'use client';
 import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import {
   Box,
   Button,
   FormLabel,
   Heading,
   HStack,
+  IconButton,
   Switch,
+  useColorMode,
   VStack,
 } from '@chakra-ui/react';
 import { FC, useState } from 'react';
@@ -122,14 +125,22 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     deleteRecord,
   } = useTimerRecords();
   const [isTimerRecording, setIsTimerRecording] = useState(false);
+  const { colorMode, toggleColorMode } = useColorMode();
+
   return (
     <VStack as="main" align="left" height="100dvh">
       <HStack justify="space-between">
         <Heading>Hi-Timer</Heading>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-        <Button as="a" href="/api/auth/logout">
-          Logout
-        </Button>
+        <HStack>
+          <IconButton
+            onClick={toggleColorMode}
+            icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            aria-label={'toggle color theme'}
+          />
+          <Button as="a" href="/api/auth/logout">
+            Logout
+          </Button>
+        </HStack>
       </HStack>
       <HStack>
         <FormLabel userSelect="none" htmlFor="use inspection">
