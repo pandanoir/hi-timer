@@ -1,5 +1,12 @@
 import { Text, Button, VStack } from '@chakra-ui/react';
-import { ComponentProps, FC, useCallback, useEffect, useRef } from 'react';
+import {
+  ComponentProps,
+  FC,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import { useCountdownTimer } from '../hooks/useCountdownTimer';
 import { useCubeTimer } from '../hooks/useCubeTimer';
 
@@ -11,7 +18,7 @@ export const Timer: FC<{
   usesInspection: boolean;
   onStart: () => void;
   onStop: (record: number, inspectionTime: number | null) => void;
-}> = ({ usesInspection, onStart, onStop }) => {
+}> = memo(function Timer({ usesInspection, onStart, onStop }) {
   const timer = useCubeTimer({ onStop, usesInspection });
 
   const isSpaceKeyPressed = useRef(false);
@@ -169,4 +176,4 @@ export const Timer: FC<{
   ) : (
     (timer satisfies never, null)
   );
-};
+});

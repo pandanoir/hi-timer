@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import {
   FC,
+  memo,
   useCallback,
   useContext,
   useEffect,
@@ -157,7 +158,7 @@ const CarouselIndex = ({
   return null;
 };
 
-const Carousel = ({
+const Carousel = memo(function Carousel({
   scrambleHistory,
   animationDisabled, // HACK: totalSlides が変化したときに不要なアニメーションが走るので、そのときにアニメーションを無効化する
   carouselIndex,
@@ -169,52 +170,54 @@ const Carousel = ({
   carouselIndex: number;
   onTransitionEnd?: () => void;
   onCarouselIndexChange: (carouselIndex: number) => void;
-}) => (
-  <Box h={8} textAlign="center">
-    <CarouselProvider
-      naturalSlideWidth={50}
-      naturalSlideHeight={24}
-      isIntrinsicHeight
-      totalSlides={scrambleHistory.length}
-    >
-      <CarouselIndex
-        carouselIndex={carouselIndex}
-        onCarouselIndexChange={onCarouselIndexChange}
-      />
-      <HStack w="full">
-        <ButtonBack disabled={animationDisabled ? true : undefined}>
-          <ArrowLeftIcon
-            css={css`
-              button:disabled & {
-                opacity: 0.4;
-              }
-            `}
-          />
-        </ButtonBack>
-        <Slider
-          classNameAnimation={animationDisabled ? 'disabled' : undefined}
-          style={{ flex: '1' }}
-          onTransitionEnd={onTransitionEnd}
-        >
-          {scrambleHistory.map((scramble, index) => (
-            <Slide key={index} index={index} style={{ margin: '0 8px' }}>
-              <Text fontSize="xl">{scramble}</Text>
-            </Slide>
-          ))}
-        </Slider>
-        <ButtonNext disabled={animationDisabled ? true : undefined}>
-          <ArrowRightIcon
-            css={css`
-              button:disabled & {
-                opacity: 0.4;
-              }
-            `}
-          />
-        </ButtonNext>
-      </HStack>
-    </CarouselProvider>
-  </Box>
-);
+}) {
+  return (
+    <Box h={8} textAlign="center">
+      <CarouselProvider
+        naturalSlideWidth={50}
+        naturalSlideHeight={24}
+        isIntrinsicHeight
+        totalSlides={scrambleHistory.length}
+      >
+        <CarouselIndex
+          carouselIndex={carouselIndex}
+          onCarouselIndexChange={onCarouselIndexChange}
+        />
+        <HStack w="full">
+          <ButtonBack disabled={animationDisabled ? true : undefined}>
+            <ArrowLeftIcon
+              css={css`
+                button:disabled & {
+                  opacity: 0.4;
+                }
+              `}
+            />
+          </ButtonBack>
+          <Slider
+            classNameAnimation={animationDisabled ? 'disabled' : undefined}
+            style={{ flex: '1' }}
+            onTransitionEnd={onTransitionEnd}
+          >
+            {scrambleHistory.map((scramble, index) => (
+              <Slide key={index} index={index} style={{ margin: '0 8px' }}>
+                <Text fontSize="xl">{scramble}</Text>
+              </Slide>
+            ))}
+          </Slider>
+          <ButtonNext disabled={animationDisabled ? true : undefined}>
+            <ArrowRightIcon
+              css={css`
+                button:disabled & {
+                  opacity: 0.4;
+                }
+              `}
+            />
+          </ButtonNext>
+        </HStack>
+      </CarouselProvider>
+    </Box>
+  );
+});
 const scrambler = new Scrambow();
 const TimerPage: FC<{ user: UserProfile }> = () => {
   const [usesInspection, setUsesInspection] = useState(true);
@@ -228,7 +231,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     deleteRecord,
   } = useTimerRecords();
   const [isTimerRecording, setIsTimerRecording] = useState(false);
-  const [scrambleHistory, setScrambleHistory] = useState<string[]>(
+  const [scrambleHistory, setScrambleHistory] = useState(() =>
     scrambler.get(50).map((x) => x.scramble_string)
   );
   const [onCarouselTransitionEnd, setOnCarouselTransitionEnd] = useState<
@@ -237,6 +240,28 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
   const [carouselAnimationDisabled, setCarouselAnimationDisabled] =
     useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const onCarouselIndexChange = useCallback(
+    (nextCarouselIndex: number) => {
+      setCarouselIndex(nextCarouselIndex);
+      if (scrambleHistory.length - nextCarouselIndex >= 10) {
+        return;
+      }
+      // pure-react-carousel は要素を増やすと不要なアニメーションが走る(https://github.com/express-labs/pure-react-carousel/issues/371)
+      // この問題へのワークアラウンドとして、要素を追加したときはアニメーションを一時的に無効化している
+      setOnCarouselTransitionEnd(() => () => {
+        setScrambleHistory((list) => [
+          ...list,
+          ...scrambler.get(50).map((x) => x.scramble_string),
+        ]);
+        setCarouselAnimationDisabled(true);
+        setTimeout(() => {
+          setCarouselAnimationDisabled(false);
+          setOnCarouselTransitionEnd(undefined);
+        }, 100);
+      });
+    },
+    [scrambleHistory]
+  );
 
   return (
     <VStack flex="1" align="left" as="main">
@@ -256,25 +281,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
           <Box h={8} textAlign="center">
             <Carousel
               carouselIndex={carouselIndex}
-              onCarouselIndexChange={(nextCarouselIndex) => {
-                setCarouselIndex(nextCarouselIndex);
-                if (scrambleHistory.length - nextCarouselIndex >= 10) {
-                  return;
-                }
-                // pure-react-carousel は要素を増やすと不要なアニメーションが走る(https://github.com/express-labs/pure-react-carousel/issues/371)
-                // この問題へのワークアラウンドとして、要素を追加したときはアニメーションを一時的に無効化している
-                setOnCarouselTransitionEnd(() => () => {
-                  setScrambleHistory((list) => [
-                    ...list,
-                    ...scrambler.get(50).map((x) => x.scramble_string),
-                  ]);
-                  setCarouselAnimationDisabled(true);
-                  setTimeout(() => {
-                    setCarouselAnimationDisabled(false);
-                    setOnCarouselTransitionEnd(undefined);
-                  }, 100);
-                });
-              }}
+              onCarouselIndexChange={onCarouselIndexChange}
               onTransitionEnd={onCarouselTransitionEnd}
               scrambleHistory={scrambleHistory}
               animationDisabled={carouselAnimationDisabled}
