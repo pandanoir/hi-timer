@@ -13,6 +13,7 @@ export default withApiAuthRequired(
         time: req.body.time,
         penalty: req.body.penalty,
         dnf: req.body.dnf,
+        scramble: req.body.scramble,
         userId: session.user.sub,
       },
     });

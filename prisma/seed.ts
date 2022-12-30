@@ -1,6 +1,8 @@
 import { prisma } from '../lib/prisma';
+import { Scrambow } from 'scrambow';
 
 const userId = 'auth0|000000000000000000000000';
+const scrambler = new Scrambow();
 const main = async () => {
   for (let i = 0; i < 100; i++)
     await prisma.timerRecord.create({
@@ -8,6 +10,7 @@ const main = async () => {
         time: Math.trunc(Math.random() * 10000),
         penalty: false,
         dnf: false,
+        scramble: scrambler.get()[0].scramble_string,
         userId,
       },
     });

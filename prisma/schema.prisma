@@ -18,5 +18,6 @@ model TimerRecord {
   time      Int
   penalty   Boolean
   dnf       Boolean
+  scramble  String
   userId    String
 }
