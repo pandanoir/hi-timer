@@ -5,6 +5,8 @@ import {
   Button,
   FormLabel,
   HStack,
+  List,
+  ListItem,
   Spinner,
   Switch,
   VStack,
@@ -197,16 +199,18 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
               </Button>
             </HStack>
           )}
-          <ul style={{ overflow: 'scroll', height: 300 }}>
+          <List overflowY="scroll" h={[100, 300]}>
             {records.map(({ time, penalty, dnf, createdAt }) => {
               const timeStr = `${Math.trunc(time) / 1000}sec${
                 penalty ? ' + 2' : ''
               }`;
               return (
-                <li key={createdAt}>{dnf ? `DNF(${timeStr})` : timeStr}</li>
+                <ListItem key={createdAt}>
+                  {dnf ? `DNF(${timeStr})` : timeStr}
+                </ListItem>
               );
             })}
-          </ul>
+          </List>
         </>
       ) : (
         <VStack flex="1" align="center" justify="center">
