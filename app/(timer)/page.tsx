@@ -200,50 +200,50 @@ const Carousel = memo(function Carousel({
   onCarouselIndexChange: (carouselIndex: number) => void;
 }) {
   return (
-    <Box h={8} textAlign="center">
-      <CarouselProvider
-        naturalSlideWidth={50}
-        naturalSlideHeight={24}
-        isIntrinsicHeight
-        totalSlides={scrambleHistory.length}
-      >
-        <CarouselIndex
-          carouselIndex={carouselIndex}
-          onCarouselIndexChange={onCarouselIndexChange}
-        />
-        <HStack w="full">
-          <ButtonBack disabled={animationDisabled ? true : undefined}>
-            <ArrowLeftIcon
-              css={css`
-                button:disabled & {
-                  opacity: 0.4;
-                }
-              `}
-            />
-          </ButtonBack>
-          <Slider
-            classNameAnimation={animationDisabled ? 'disabled' : undefined}
-            style={{ flex: '1' }}
-            onTransitionEnd={onTransitionEnd}
-          >
-            {scrambleHistory.map((scramble, index) => (
-              <Slide key={index} index={index} style={{ margin: '0 8px' }}>
-                <Text fontSize="xl">{scramble}</Text>
-              </Slide>
-            ))}
-          </Slider>
-          <ButtonNext disabled={animationDisabled ? true : undefined}>
-            <ArrowRightIcon
-              css={css`
-                button:disabled & {
-                  opacity: 0.4;
-                }
-              `}
-            />
-          </ButtonNext>
-        </HStack>
-      </CarouselProvider>
-    </Box>
+    <CarouselProvider
+      naturalSlideWidth={50}
+      naturalSlideHeight={24}
+      isIntrinsicHeight
+      totalSlides={scrambleHistory.length}
+    >
+      <CarouselIndex
+        carouselIndex={carouselIndex}
+        onCarouselIndexChange={onCarouselIndexChange}
+      />
+      <HStack w="full">
+        <ButtonBack disabled={animationDisabled ? true : undefined}>
+          <ArrowLeftIcon
+            css={css`
+              button:disabled & {
+                opacity: 0.4;
+              }
+            `}
+          />
+        </ButtonBack>
+        <Slider
+          classNameAnimation={animationDisabled ? 'disabled' : undefined}
+          style={{ flex: '1' }}
+          onTransitionEnd={onTransitionEnd}
+        >
+          {scrambleHistory.map((scramble, index) => (
+            <Slide key={index} index={index} style={{ margin: '0 8px' }}>
+              <Text fontSize={['xl', '3xl']} textAlign="center">
+                {scramble}
+              </Text>
+            </Slide>
+          ))}
+        </Slider>
+        <ButtonNext disabled={animationDisabled ? true : undefined}>
+          <ArrowRightIcon
+            css={css`
+              button:disabled & {
+                opacity: 0.4;
+              }
+            `}
+          />
+        </ButtonNext>
+      </HStack>
+    </CarouselProvider>
   );
 });
 const scrambler = new Scrambow();
@@ -330,15 +330,13 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
         </HStack>
         {records ? (
           <>
-            <Box h={8} textAlign="center">
-              <Carousel
-                carouselIndex={currentScramble}
-                onCarouselIndexChange={onCarouselIndexChange}
-                onTransitionEnd={onCarouselTransitionEnd}
-                scrambleHistory={scrambleHistory}
-                animationDisabled={carouselAnimationDisabled}
-              />
-            </Box>
+            <Carousel
+              carouselIndex={currentScramble}
+              onCarouselIndexChange={onCarouselIndexChange}
+              onTransitionEnd={onCarouselTransitionEnd}
+              scrambleHistory={scrambleHistory}
+              animationDisabled={carouselAnimationDisabled}
+            />
             <Box flex="1">
               <Timer
                 usesInspection={usesInspection}
