@@ -3,6 +3,7 @@ import {
   ComponentProps,
   FC,
   memo,
+  PropsWithChildren,
   useCallback,
   useEffect,
   useRef,
@@ -14,12 +15,20 @@ const ScreenButton = (props: ComponentProps<typeof VStack>) => (
   <VStack h="full" align="center" justify="center" {...props} />
 );
 
-export const Timer: FC<{
-  usesInspection: boolean;
-  onStart: () => void;
-  onStop: (record: number, inspectionTime: number | null) => void;
-  onCancel: () => void;
-}> = memo(function Timer({ usesInspection, onStart, onStop, onCancel }) {
+export const Timer: FC<
+  PropsWithChildren<{
+    usesInspection: boolean;
+    onStart: () => void;
+    onStop: (record: number, inspectionTime: number | null) => void;
+    onCancel: () => void;
+  }>
+> = memo(function Timer({
+  children,
+  usesInspection,
+  onStart,
+  onStop,
+  onCancel,
+}) {
   const timer = useCubeTimer({ onStop, usesInspection });
 
   const isSpaceKeyPressed = useRef(false);
@@ -147,22 +156,21 @@ export const Timer: FC<{
           : 'DNF';
     }
 
+    // 押してる秒数に応じて色が変わる
+    const colorScheme =
+      isReadyToStart !== null ? (isReadyToStart ? 'pink' : 'teal') : undefined;
+
     return (
       <ScreenButton
         key={timer.state}
         onPointerDown={on}
         onPointerUp={onReleaseStartButton}
       >
+        {timer.state === 'before start' && children}
         <Button
           onPointerDown={on}
           onPointerUp={onReleaseStartButton}
-          colorScheme={
-            isReadyToStart !== null
-              ? isReadyToStart
-                ? 'pink'
-                : 'teal'
-              : undefined
-          }
+          colorScheme={colorScheme}
         >
           {buttonText}
         </Button>
@@ -195,6 +203,7 @@ export const Timer: FC<{
         onInspectionStartButtonRelease();
       }}
     >
+      {children}
       <Button
         onPointerDown={(event) => {
           event.stopPropagation();
@@ -213,11 +222,17 @@ export const Timer: FC<{
     </ScreenButton>
   ) : timer.state === 'recording' ? (
     <ScreenButton key={timer.state} onPointerDown={timer.stop}>
-      <Button onPointerDown={timer.stop}>stop</Button>
-      <Text>
+      <Text
+        fontSize="5xl"
+        fontWeight="bold"
+        fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
+      >
         {typeof timer.elapsedTime === 'number' &&
-          `${Math.trunc(timer.elapsedTime) / 1000}sec`}
+          `${Math.trunc(timer.elapsedTime / 1000)}.${`${
+            timer.elapsedTime % 1000
+          }`.padStart(3, '0')}sec`}
       </Text>
+      <Button onPointerDown={timer.stop}>stop</Button>
     </ScreenButton>
   ) : (
     (timer satisfies never, null)

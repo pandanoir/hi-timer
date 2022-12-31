@@ -4,6 +4,8 @@ import {
   Box,
   Button,
   FormLabel,
+  Grid,
+  GridItem,
   HStack,
   Icon,
   IconButton,
@@ -221,6 +223,20 @@ const Carousel = memo(function Carousel({
   );
 });
 const scrambler = new Scrambow();
+const calcAo = (records: TimerRecord[]) => {
+  const sorted = records
+    .map(({ time, penalty, dnf }) =>
+      dnf ? Infinity : time + (penalty ? 2000 : 0)
+    )
+    .sort((a, b) => a - b);
+  const numToOmit = Math.ceil(records.length * 0.05) * 2;
+  return (
+    sorted
+      .slice(numToOmit / 2, sorted.length - numToOmit / 2)
+      .reduce((sum, x) => sum + x, 0) /
+    (records.length - numToOmit)
+  );
+};
 const TimerPage: FC<{ user: UserProfile }> = () => {
   const [usesInspection, setUsesInspection] = useState(true);
   const {
@@ -317,11 +333,55 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 onCancel={() => {
                   setIsTimerRecording(false);
                 }}
-              />
+              >
+                <VStack align="center">
+                  <Text
+                    fontSize="5xl"
+                    fontWeight="bold"
+                    fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
+                  >
+                    {records[0].dnf
+                      ? 'DNF'
+                      : `${Math.trunc(records[0].time / 1000)}.${`${
+                          records[0].time % 1000
+                        }`.padStart(3, '0')}sec${
+                          records[0].penalty ? ' + 2' : ''
+                        }`}
+                  </Text>
+                  <Grid templateColumns="max-content 1fr" columnGap={1}>
+                    {records.length >= 5 && (
+                      <>
+                        <GridItem>ao5</GridItem>
+                        <GridItem>
+                          {(() => {
+                            const ao5 = calcAo(records.slice(0, 5));
+                            return Number.isFinite(ao5)
+                              ? `${Math.trunc(ao5) / 1000}sec`
+                              : 'DNF';
+                          })()}
+                        </GridItem>
+                      </>
+                    )}
+                    {records.length >= 12 && (
+                      <>
+                        <GridItem>ao12</GridItem>
+                        <GridItem>
+                          {(() => {
+                            const ao12 = calcAo(records.slice(0, 12));
+                            return Number.isFinite(ao12)
+                              ? `${Math.trunc(ao12) / 1000}sec`
+                              : 'DNF';
+                          })()}
+                        </GridItem>
+                      </>
+                    )}
+                  </Grid>
+                </VStack>
+              </Timer>
             </Box>
             {records[0] ? (
               <HStack justify="space-between">
-                <HStack spacing={2}>
+                <HStack spacing={2} flex="1">
                   {!records[0].dnf && (
                     <Button
                       key="+2"
