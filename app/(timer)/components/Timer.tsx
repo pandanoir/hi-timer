@@ -18,11 +18,19 @@ export const Timer: FC<{
   usesInspection: boolean;
   onStart: () => void;
   onStop: (record: number, inspectionTime: number | null) => void;
-}> = memo(function Timer({ usesInspection, onStart, onStop }) {
+  onCancel: () => void;
+}> = memo(function Timer({ usesInspection, onStart, onStop, onCancel }) {
   const timer = useCubeTimer({ onStop, usesInspection });
 
   const isSpaceKeyPressed = useRef(false);
   const { hasFinished: isReadyToStart, on, off } = useCountdownTimer(300); // ボタンを 300ms 押し続けて離すとタイマーがスタートする
+  const isInspectionStartButtonPressed = useRef(false);
+  const onInspectionStartButtonPress = () => {
+    isInspectionStartButtonPressed.current = true;
+  };
+  const onInspectionStartButtonRelease = () => {
+    isInspectionStartButtonPressed.current = false;
+  };
   const onReleaseStartButton = useCallback(() => {
     if (timer.state !== 'before start' && timer.state !== 'inspecting') {
       return;
@@ -162,6 +170,9 @@ export const Timer: FC<{
           <Button
             onPointerDown={(event) => {
               event.stopPropagation();
+            }}
+            onClick={() => {
+              onCancel();
               off();
               timer.cancel();
             }}
@@ -174,8 +185,35 @@ export const Timer: FC<{
     );
   }
   return timer.state === 'before inspection' ? (
-    <ScreenButton key={timer.state} onClick={timer.startInspection}>
-      <Button onClick={timer.startInspection}>inspection start</Button>
+    <ScreenButton
+      key={timer.state}
+      onPointerDown={onInspectionStartButtonPress}
+      onPointerUp={() => {
+        if (isInspectionStartButtonPressed.current) {
+          timer.startInspection();
+        }
+        onInspectionStartButtonRelease();
+      }}
+    >
+      <Button
+        onPointerDown={(event) => {
+          event.stopPropagation();
+          onInspectionStartButtonPress();
+        }}
+        onPointerUp={(event) => {
+          event.stopPropagation();
+          if (isInspectionStartButtonPressed.current) {
+            // requestAnimationFrame をしないと pointerup -> startInspection -> render -> click の順になり
+            // キャンセルボタンの click イベントが発火する
+            requestAnimationFrame(() => {
+              timer.startInspection();
+            });
+          }
+          onInspectionStartButtonRelease();
+        }}
+      >
+        inspection start
+      </Button>
     </ScreenButton>
   ) : timer.state === 'recording' ? (
     <ScreenButton key={timer.state} onPointerDown={timer.stop}>

@@ -313,6 +313,9 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                   setCarouselIndex((n) => n + 1);
                   setIsTimerRecording(false);
                 }}
+                onCancel={() => {
+                  setIsTimerRecording(false);
+                }}
               />
             </Box>
             {records[0] ? (
