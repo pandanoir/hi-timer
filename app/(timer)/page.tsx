@@ -29,7 +29,16 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import { FC, memo, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  FC,
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Scrambow } from 'scrambow';
 import useSWR, { useSWRConfig } from 'swr';
 import { Timer } from './components/Timer';
@@ -261,6 +270,27 @@ const calcAo = (records: TimerRecord[]) => {
 };
 const TimerPage: FC<{ user: UserProfile }> = () => {
   const [usesInspection, setUsesInspection] = useState(true);
+
+  {
+    const hasCalled = useRef(false);
+    useLayoutEffect(() => {
+      if (hasCalled.current) {
+        return;
+      }
+      hasCalled.current = true;
+      try {
+        setUsesInspection(
+          JSON.parse(localStorage.getItem('usesInspection') ?? 'true')
+        );
+      } catch {
+        void 0;
+      }
+    }, []);
+  }
+  useEffect(() => {
+    localStorage.setItem('usesInspection', JSON.stringify(usesInspection));
+  }, [usesInspection]);
+
   const {
     records,
     createNewRecord,
