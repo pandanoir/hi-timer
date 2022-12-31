@@ -12,7 +12,7 @@ const manager = createLocalStorageManager('hi-timer-color-mode-manager');
 const RootLayout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <ChakraProvider colorModeManager={manager}>
-      <VStack align="left" height="100dvh">
+      <VStack align="left" height="100dvh" pb="env(safe-area-inset-bottom)">
         <Header />
         {children}
       </VStack>
