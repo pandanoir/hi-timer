@@ -188,7 +188,7 @@ export const Timer: FC<{
     <ScreenButton
       key={timer.state}
       onPointerDown={onInspectionStartButtonPress}
-      onPointerUp={() => {
+      onClick={() => {
         if (isInspectionStartButtonPressed.current) {
           timer.startInspection();
         }
@@ -200,14 +200,10 @@ export const Timer: FC<{
           event.stopPropagation();
           onInspectionStartButtonPress();
         }}
-        onPointerUp={(event) => {
+        onClick={(event) => {
           event.stopPropagation();
           if (isInspectionStartButtonPressed.current) {
-            // requestAnimationFrame をしないと pointerup -> startInspection -> render -> click の順になり
-            // キャンセルボタンの click イベントが発火する
-            requestAnimationFrame(() => {
-              timer.startInspection();
-            });
+            timer.startInspection();
           }
           onInspectionStartButtonRelease();
         }}
