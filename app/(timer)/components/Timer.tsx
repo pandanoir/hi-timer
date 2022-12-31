@@ -158,6 +158,18 @@ export const Timer: FC<{
         >
           {buttonText}
         </Button>
+        {timer.state === 'inspecting' && (
+          <Button
+            onPointerDown={(event) => {
+              event.stopPropagation();
+              off();
+              timer.cancel();
+            }}
+            colorScheme="red"
+          >
+            cancel
+          </Button>
+        )}
       </ScreenButton>
     );
   }
@@ -166,8 +178,8 @@ export const Timer: FC<{
       <Button onClick={timer.startInspection}>inspection start</Button>
     </ScreenButton>
   ) : timer.state === 'recording' ? (
-    <ScreenButton key={timer.state} onClick={timer.stop}>
-      <Button onClick={timer.stop}>stop</Button>
+    <ScreenButton key={timer.state} onPointerDown={timer.stop}>
+      <Button onPointerDown={timer.stop}>stop</Button>
       <Text>
         {typeof timer.elapsedTime === 'number' &&
           `${Math.trunc(timer.elapsedTime) / 1000}sec`}
