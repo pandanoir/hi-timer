@@ -5,11 +5,21 @@ import {
   Button,
   FormLabel,
   HStack,
+  Icon,
+  IconButton,
   List,
   ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Spinner,
   Switch,
   Text,
+  useDisclosure,
   VStack,
 } from '@chakra-ui/react';
 import { FC, memo, useCallback, useContext, useEffect, useState } from 'react';
@@ -26,6 +36,7 @@ import {
   Slider,
 } from 'pure-react-carousel';
 import { ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons';
+import { AiFillDatabase } from 'react-icons/ai';
 import { css } from '@emotion/react';
 
 type TimerRecord = {
@@ -254,110 +265,152 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     [scrambleHistory]
   );
 
+  const {
+    isOpen: isRecordModalOpen,
+    onOpen: onRecordModalOpen,
+    onClose: onRecordModalClose,
+  } = useDisclosure();
+
   return (
-    <VStack flex="1" align="left" as="main">
-      <HStack>
-        <FormLabel userSelect="none" htmlFor="use inspection">
-          use inspection:
-        </FormLabel>
-        <Switch
-          id="use inspection"
-          isChecked={usesInspection}
-          onChange={({ target: { checked } }) => setUsesInspection(checked)}
-          disabled={isTimerRecording}
-        />
-      </HStack>
-      {records ? (
-        <>
-          <Box h={8} textAlign="center">
-            <Carousel
-              carouselIndex={carouselIndex}
-              onCarouselIndexChange={onCarouselIndexChange}
-              onTransitionEnd={onCarouselTransitionEnd}
-              scrambleHistory={scrambleHistory}
-              animationDisabled={carouselAnimationDisabled}
-            />
-          </Box>
-          <Box flex="1">
-            <Timer
-              usesInspection={usesInspection}
-              onStart={() => {
-                setIsTimerRecording(true);
-              }}
-              onStop={(record, inspectionTime) => {
-                createNewRecord({
-                  time: record,
-                  penalty: inspectionTime !== null && inspectionTime >= 15000,
-                  dnf: inspectionTime !== null && inspectionTime >= 17000,
-                  scramble: scrambleHistory[carouselIndex],
-                  createdAt: Date.now(),
-                });
-                setCarouselIndex((n) => n + 1);
-                setIsTimerRecording(false);
-              }}
-            />
-          </Box>
-          {records[0] && (
-            <HStack spacing={2}>
-              {!records[0].dnf && (
-                <Button
-                  key="+2"
-                  onClick={() => {
-                    if (records[0].penalty) {
-                      undoPenalty(records[0].id);
-                    } else {
-                      imposePenalty(records[0].id);
-                    }
-                  }}
-                  variant="outline"
-                  colorScheme="blue"
-                >
-                  {records[0].penalty ? 'undo +2' : '+2'}
-                </Button>
-              )}
-              <Button
-                key="DNF"
-                onClick={() => {
-                  if (records[0].dnf) {
-                    undoDNF(records[0].id);
-                  } else {
-                    toDNF(records[0].id);
-                  }
+    <>
+      <VStack flex="1" align="left" as="main">
+        <HStack>
+          <FormLabel userSelect="none" htmlFor="use inspection">
+            use inspection:
+          </FormLabel>
+          <Switch
+            id="use inspection"
+            isChecked={usesInspection}
+            onChange={({ target: { checked } }) => setUsesInspection(checked)}
+            disabled={isTimerRecording}
+          />
+        </HStack>
+        {records ? (
+          <>
+            <Box h={8} textAlign="center">
+              <Carousel
+                carouselIndex={carouselIndex}
+                onCarouselIndexChange={onCarouselIndexChange}
+                onTransitionEnd={onCarouselTransitionEnd}
+                scrambleHistory={scrambleHistory}
+                animationDisabled={carouselAnimationDisabled}
+              />
+            </Box>
+            <Box flex="1">
+              <Timer
+                usesInspection={usesInspection}
+                onStart={() => {
+                  setIsTimerRecording(true);
                 }}
-                variant="outline"
-                colorScheme="blue"
-              >
-                {records[0].dnf ? 'undo DNF' : 'DNF'}
-              </Button>
-              <Button
-                key="delete"
-                onClick={() => deleteRecord(records[0].id)}
-                variant="outline"
-                colorScheme="red"
-              >
-                delete
-              </Button>
-            </HStack>
-          )}
-          <List overflowY="scroll" h={[100, 300]}>
-            {records.map(({ time, penalty, dnf, createdAt, scramble }) => {
-              const timeStr = `${Math.trunc(time) / 1000}sec${
-                penalty ? ' + 2' : ''
-              }`;
-              return (
-                <ListItem key={createdAt}>
-                  {dnf ? `DNF(${timeStr})` : timeStr} {scramble}
-                </ListItem>
-              );
-            })}
-          </List>
-        </>
-      ) : (
-        <VStack flex="1" align="center" justify="center">
-          <Spinner size="xl" />
-        </VStack>
-      )}
-    </VStack>
+                onStop={(record, inspectionTime) => {
+                  createNewRecord({
+                    time: record,
+                    penalty: inspectionTime !== null && inspectionTime >= 15000,
+                    dnf: inspectionTime !== null && inspectionTime >= 17000,
+                    scramble: scrambleHistory[carouselIndex],
+                    createdAt: Date.now(),
+                  });
+                  setCarouselIndex((n) => n + 1);
+                  setIsTimerRecording(false);
+                }}
+              />
+            </Box>
+            {records[0] ? (
+              <HStack justify="space-between">
+                <HStack spacing={2}>
+                  {!records[0].dnf && (
+                    <Button
+                      key="+2"
+                      onClick={() => {
+                        if (records[0].penalty) {
+                          undoPenalty(records[0].id);
+                        } else {
+                          imposePenalty(records[0].id);
+                        }
+                      }}
+                      variant="outline"
+                      colorScheme="blue"
+                    >
+                      {records[0].penalty ? 'undo +2' : '+2'}
+                    </Button>
+                  )}
+                  <Button
+                    key="DNF"
+                    onClick={() => {
+                      if (records[0].dnf) {
+                        undoDNF(records[0].id);
+                      } else {
+                        toDNF(records[0].id);
+                      }
+                    }}
+                    variant="outline"
+                    colorScheme="blue"
+                  >
+                    {records[0].dnf ? 'undo DNF' : 'DNF'}
+                  </Button>
+                  <Button
+                    key="delete"
+                    onClick={() => deleteRecord(records[0].id)}
+                    variant="outline"
+                    colorScheme="red"
+                  >
+                    delete
+                  </Button>
+                </HStack>
+                <IconButton
+                  onClick={onRecordModalOpen}
+                  icon={<Icon as={AiFillDatabase} />}
+                  aria-label="open record list"
+                />
+              </HStack>
+            ) : (
+              <HStack justify="end">
+                <IconButton
+                  onClick={onRecordModalOpen}
+                  icon={<Icon as={AiFillDatabase} />}
+                  aria-label="open record list"
+                />
+              </HStack>
+            )}
+          </>
+        ) : (
+          <VStack flex="1" align="center" justify="center">
+            <Spinner size="xl" />
+          </VStack>
+        )}
+      </VStack>
+      <Modal isOpen={isRecordModalOpen} onClose={onRecordModalClose} size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Time records</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {records && records.length > 0 ? (
+              <List>
+                {records.map(({ time, penalty, dnf, createdAt, scramble }) => {
+                  const timeStr = `${Math.trunc(time) / 1000}sec${
+                    penalty ? ' + 2' : ''
+                  }`;
+                  return (
+                    <ListItem key={createdAt}>
+                      {dnf ? `DNF(${timeStr})` : timeStr} {scramble}
+                    </ListItem>
+                  );
+                })}
+              </List>
+            ) : (
+              <Box>No record exists.</Box>
+            )}
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onRecordModalClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 export default withPageAuthRequired(TimerPage);
