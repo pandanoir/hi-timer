@@ -4,6 +4,7 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
+  eslint: { dirs: ['app', 'pages', 'lib', 'prisma'] },
 };
 
 module.exports = nextConfig;

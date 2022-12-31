@@ -1,9 +1,5 @@
 'use client';
-import {
-  UserProfile,
-  useUser,
-  withPageAuthRequired,
-} from '@auth0/nextjs-auth0/client';
+import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import {
   Box,
   Button,
@@ -16,16 +12,7 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import {
-  FC,
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+import { FC, memo, useCallback, useContext, useEffect, useState } from 'react';
 import { Scrambow } from 'scrambow';
 import useSWR, { useSWRConfig } from 'swr';
 import { Timer } from './components/Timer';

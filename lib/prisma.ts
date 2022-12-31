@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 
-declare module global {
-  let prisma: PrismaClient | undefined;
+declare global {
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient | undefined;
 }
 let prisma: PrismaClient;
 
