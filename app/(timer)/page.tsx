@@ -390,13 +390,13 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
           <ModalBody>
             {records && records.length > 0 ? (
               <List>
-                {records.map(({ time, penalty, dnf, createdAt, scramble }) => {
+                {records.map(({ time, penalty, dnf, createdAt }) => {
                   const timeStr = `${Math.trunc(time) / 1000}sec${
                     penalty ? ' + 2' : ''
                   }`;
                   return (
                     <ListItem key={createdAt}>
-                      {dnf ? `DNF(${timeStr})` : timeStr} {scramble}
+                      {dnf ? `DNF(${timeStr})` : timeStr}
                     </ListItem>
                   );
                 })}
