@@ -232,6 +232,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     undoDNF,
     deleteRecord,
   } = useTimerRecords();
+
   const [isTimerRecording, setIsTimerRecording] = useState(false);
   const [scrambleHistory, setScrambleHistory] = useState(() =>
     scrambler.get(50).map((x) => x.scramble_string)
@@ -241,10 +242,10 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
   >(undefined);
   const [carouselAnimationDisabled, setCarouselAnimationDisabled] =
     useState(false);
-  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [currentScramble, setCurrentScramble] = useState(0);
   const onCarouselIndexChange = useCallback(
     (nextCarouselIndex: number) => {
-      setCarouselIndex(nextCarouselIndex);
+      setCurrentScramble(nextCarouselIndex);
       if (scrambleHistory.length - nextCarouselIndex >= 10) {
         return;
       }
@@ -289,7 +290,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
           <>
             <Box h={8} textAlign="center">
               <Carousel
-                carouselIndex={carouselIndex}
+                carouselIndex={currentScramble}
                 onCarouselIndexChange={onCarouselIndexChange}
                 onTransitionEnd={onCarouselTransitionEnd}
                 scrambleHistory={scrambleHistory}
@@ -307,10 +308,10 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                     time: record,
                     penalty: inspectionTime !== null && inspectionTime >= 15000,
                     dnf: inspectionTime !== null && inspectionTime >= 17000,
-                    scramble: scrambleHistory[carouselIndex],
+                    scramble: scrambleHistory[currentScramble],
                     createdAt: Date.now(),
                   });
-                  setCarouselIndex((n) => n + 1);
+                  setCurrentScramble((n) => n + 1);
                   setIsTimerRecording(false);
                 }}
                 onCancel={() => {
