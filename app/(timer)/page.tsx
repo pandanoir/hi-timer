@@ -1,5 +1,9 @@
 'use client';
-import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import {
+  UserProfile,
+  useUser,
+  withPageAuthRequired,
+} from '@auth0/nextjs-auth0/client';
 import {
   Box,
   Button,
