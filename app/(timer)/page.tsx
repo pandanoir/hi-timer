@@ -3,7 +3,6 @@ import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import {
   Alert,
   AlertDescription,
-  AlertTitle,
   Box,
   Button,
   CloseButton,
@@ -30,7 +29,6 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import { chakra } from '@chakra-ui/system';
 import { FC, memo, useCallback, useContext, useEffect, useState } from 'react';
 import { Scrambow } from 'scrambow';
 import useSWR, { useSWRConfig } from 'swr';
