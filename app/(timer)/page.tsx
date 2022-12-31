@@ -1,8 +1,13 @@
 'use client';
 import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Box,
   Button,
+  CloseButton,
+  Flex,
   FormLabel,
   Grid,
   GridItem,
@@ -22,8 +27,10 @@ import {
   Switch,
   Text,
   useDisclosure,
+  useToast,
   VStack,
 } from '@chakra-ui/react';
+import { chakra } from '@chakra-ui/system';
 import { FC, memo, useCallback, useContext, useEffect, useState } from 'react';
 import { Scrambow } from 'scrambow';
 import useSWR, { useSWRConfig } from 'swr';
@@ -132,6 +139,23 @@ const useTimerRecords = () => {
             ...records.slice(0, index),
             ...records.slice(index + 1),
           ],
+          rollbackOnError: true,
+        }
+      );
+    },
+    restoreDeletedRecord: (record: Omit<TimerRecord, 'id'>) => {
+      mutate(
+        '/api/record/read',
+        fetch('/api/record/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(record),
+        }).then(async (res) => [await res.json(), ...records]),
+        {
+          optimisticData: [
+            { ...record, id: 'temp' },
+            ...records,
+          ] satisfies TimerRecord[],
           rollbackOnError: true,
         }
       );
@@ -247,6 +271,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     undoPenalty,
     undoDNF,
     deleteRecord,
+    restoreDeletedRecord,
   } = useTimerRecords();
 
   const [isTimerRecording, setIsTimerRecording] = useState(false);
@@ -287,6 +312,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     onOpen: onRecordModalOpen,
     onClose: onRecordModalClose,
   } = useDisclosure();
+  const toast = useToast();
 
   return (
     <>
@@ -414,7 +440,55 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                   </Button>
                   <Button
                     key="delete"
-                    onClick={() => deleteRecord(records[0].id)}
+                    onClick={() => {
+                      const deletedRecord = records[0];
+                      deleteRecord(records[0].id);
+                      toast({
+                        duration: null,
+                        isClosable: true,
+                        render: ({ status, variant, onClose, isClosable }) => (
+                          <Alert
+                            addRole={false}
+                            status={status}
+                            variant={variant}
+                            alignItems="start"
+                            borderRadius="md"
+                            boxShadow="lg"
+                            paddingEnd={8}
+                            textAlign="start"
+                            width="auto"
+                          >
+                            <AlertDescription
+                              flex="1"
+                              maxWidth="100%"
+                              display="block"
+                            >
+                              <Flex align="center">
+                                <Text flex="1">deleted</Text>
+                                <Button
+                                  variant="ghost"
+                                  onClick={() => {
+                                    restoreDeletedRecord(deletedRecord);
+                                    onClose();
+                                  }}
+                                >
+                                  undo
+                                </Button>
+                              </Flex>
+                            </AlertDescription>
+                            {isClosable && (
+                              <CloseButton
+                                size="sm"
+                                onClick={onClose}
+                                position="absolute"
+                                insetEnd={1}
+                                top={1}
+                              />
+                            )}
+                          </Alert>
+                        ),
+                      });
+                    }}
                     variant="outline"
                     colorScheme="red"
                   >
