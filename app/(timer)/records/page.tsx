@@ -21,7 +21,7 @@ import { TimerRecord } from '../types/TimerRecord';
 import { calcAo } from '../utils/calcAo';
 import { recordToMilliSeconds } from '../utils/recordToMilliSeconds';
 
-const pageSize = 50;
+const pageSize = 100;
 const useTimerRecords = () => {
   const {
     data: records,
@@ -74,18 +74,18 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
       return bestAverages;
     }
     const latestRecords = records.flat().slice(0, 100);
-    if (records.length >= 1) {
+    if (latestRecords.length >= 1) {
       bestAverages.best = latestRecords
         .map(recordToMilliSeconds)
         .sort((a, b) => a - b)[0];
     }
-    if (records.length >= 100) {
+    if (latestRecords.length >= 100) {
       bestAverages.ao100 = calcAo(latestRecords);
     }
-    if (records.length >= 12) {
+    if (latestRecords.length >= 12) {
       bestAverages.ao12 = calcBestAo(latestRecords, 12);
     }
-    if (records.length >= 5) {
+    if (latestRecords.length >= 5) {
       bestAverages.ao5 = calcBestAo(latestRecords, 5);
     }
     return bestAverages;
