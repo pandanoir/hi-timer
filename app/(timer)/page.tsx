@@ -387,19 +387,21 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 }}
               >
                 <VStack align="center">
-                  <Text
-                    fontSize="5xl"
-                    fontWeight="bold"
-                    fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
-                  >
-                    {records[0].dnf
-                      ? 'DNF'
-                      : `${Math.trunc(records[0].time / 1000)}.${`${
-                          records[0].time % 1000
-                        }`.padStart(3, '0')}sec${
-                          records[0].penalty ? ' + 2' : ''
-                        }`}
-                  </Text>
+                  {records[0] && (
+                    <Text
+                      fontSize="5xl"
+                      fontWeight="bold"
+                      fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
+                    >
+                      {records[0].dnf
+                        ? 'DNF'
+                        : `${Math.trunc(records[0].time / 1000)}.${`${
+                            records[0].time % 1000
+                          }`.padStart(3, '0')}sec${
+                            records[0].penalty ? ' + 2' : ''
+                          }`}
+                    </Text>
+                  )}
                   <Grid templateColumns="max-content 1fr" columnGap={1}>
                     {records.length >= 5 && (
                       <>
