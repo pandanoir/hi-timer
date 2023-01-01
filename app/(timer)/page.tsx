@@ -54,15 +54,9 @@ import {
 import { ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons';
 import { AiFillDatabase } from 'react-icons/ai';
 import { css } from '@emotion/react';
+import { TimerRecord } from './types/TimerRecord';
+import { calcAo } from './utils/calcAo';
 
-type TimerRecord = {
-  time: number;
-  penalty: boolean;
-  dnf: boolean;
-  createdAt: number;
-  scramble: string;
-  id: string;
-};
 const useTimerRecords = () => {
   const { mutate } = useSWRConfig();
   const { data: records, error } = useSWR<TimerRecord[]>(
@@ -254,20 +248,6 @@ const Carousel = memo(function Carousel({
   );
 });
 const scrambler = new Scrambow();
-const calcAo = (records: TimerRecord[]) => {
-  const sorted = records
-    .map(({ time, penalty, dnf }) =>
-      dnf ? Infinity : time + (penalty ? 2000 : 0)
-    )
-    .sort((a, b) => a - b);
-  const numToOmit = Math.ceil(records.length * 0.05) * 2;
-  return (
-    sorted
-      .slice(numToOmit / 2, sorted.length - numToOmit / 2)
-      .reduce((sum, x) => sum + x, 0) /
-    (records.length - numToOmit)
-  );
-};
 const TimerPage: FC<{ user: UserProfile }> = () => {
   const [usesInspection, setUsesInspection] = useState(true);
 
@@ -551,18 +531,23 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
           <ModalCloseButton />
           <ModalBody>
             {records && records.length > 0 ? (
-              <List>
-                {records.map(({ time, penalty, dnf, createdAt }) => {
-                  const timeStr = `${Math.trunc(time) / 1000}sec${
-                    penalty ? ' + 2' : ''
-                  }`;
-                  return (
-                    <ListItem key={createdAt}>
-                      {dnf ? `DNF(${timeStr})` : timeStr}
-                    </ListItem>
-                  );
-                })}
-              </List>
+              <VStack spacing={2} align="left">
+                <Button as="a" href="/records" w="max-content">
+                  See record details
+                </Button>
+                <List>
+                  {records.map(({ time, penalty, dnf, createdAt }) => {
+                    const timeStr = `${Math.trunc(time) / 1000}sec${
+                      penalty ? ' + 2' : ''
+                    }`;
+                    return (
+                      <ListItem key={createdAt}>
+                        {dnf ? `DNF(${timeStr})` : timeStr}
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              </VStack>
             ) : (
               <Box>No record exists.</Box>
             )}

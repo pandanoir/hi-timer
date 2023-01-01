@@ -9,14 +9,12 @@ import './global.css';
 import { Header } from './components/Header';
 
 const manager = createLocalStorageManager('hi-timer-color-mode-manager');
-const RootLayout: FC<PropsWithChildren> = ({ children }) => {
-  return (
-    <ChakraProvider colorModeManager={manager}>
-      <VStack align="left" height="100dvh" pb="env(safe-area-inset-bottom)">
-        <Header />
-        {children}
-      </VStack>
-    </ChakraProvider>
-  );
-};
+const RootLayout: FC<PropsWithChildren> = ({ children }) => (
+  <ChakraProvider colorModeManager={manager}>
+    <VStack align="left" height="100dvh" pb="env(safe-area-inset-bottom)">
+      <Header />
+      {children}
+    </VStack>
+  </ChakraProvider>
+);
 export default RootLayout;

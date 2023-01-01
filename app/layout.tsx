@@ -9,17 +9,14 @@ import { Socket } from 'net';
 // https://github.com/auth0/nextjs-auth0/issues/889#issuecomment-1337896197
 // Note: This is an experiment to test that the SDK works in the experimental app directory.
 // You should not rely on this code (or the app directory) in production.
-const reqRes = () => {
+
+const getSession = () => {
   const req = new IncomingMessage(new Socket());
   const header = headers();
   for (const key of header.keys()) {
     req.headers[key] = header.get(key) || '';
   }
-  return { req, res: new ServerResponse(req) };
-};
-
-const getSession = () => {
-  const { req, res } = reqRes();
+  const res = new ServerResponse(req);
   return auth0GetSession(req, res);
 };
 
