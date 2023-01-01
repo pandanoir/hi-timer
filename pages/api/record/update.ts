@@ -4,6 +4,10 @@ import { prisma } from '../../../lib/prisma';
 
 export default withApiAuthRequired(
   async (req: NextApiRequest, res: NextApiResponse) => {
+    if (req.method !== 'POST') {
+      res.status(405).json({ error: 'Method not allowed' });
+      return;
+    }
     const session = await getSession(req, res);
     if (!session) {
       throw new Error('authorization required');
