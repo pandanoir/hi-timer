@@ -61,7 +61,11 @@ const useTimerRecords = () => {
   const { mutate } = useSWRConfig();
   const { data: records, error } = useSWR<TimerRecord[]>(
     '/api/record/read',
-    async (url) => (await fetch(url)).json()
+    async (key) => {
+      const url = new URL(key, location.origin);
+      url.searchParams.append('limit', '100');
+      return (await fetch(url.toString())).json();
+    }
   );
 
   if (!records) {
@@ -527,13 +531,13 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
       <Modal isOpen={isRecordModalOpen} onClose={onRecordModalClose} size="xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Time records</ModalHeader>
+          <ModalHeader>100 most recent time records</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {records && records.length > 0 ? (
               <VStack spacing={2} align="left">
                 <Button as="a" href="/records" w="max-content">
-                  See record details
+                  See more records
                 </Button>
                 <List>
                   {records.map(({ time, penalty, dnf, createdAt }) => {
