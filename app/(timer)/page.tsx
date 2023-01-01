@@ -472,7 +472,6 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                       const deletedRecord = records[0];
                       deleteRecord(records[0].id);
                       toast({
-                        duration: null,
                         isClosable: true,
                         render: ({ status, variant, onClose, isClosable }) => (
                           <Alert
@@ -506,7 +505,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                             </AlertDescription>
                             {isClosable && (
                               <CloseButton
-                                size="sm"
+                                size="md"
                                 onClick={onClose}
                                 position="absolute"
                                 insetEnd={1}
