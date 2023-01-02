@@ -5,11 +5,12 @@ import { recordToMilliSeconds } from '../../utils/recordToMilliSeconds';
 
 const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => (
   <ResponsiveLine
+    theme={{ tooltip: { basic: { color: 'black' } } }}
     data={[
       {
         id: 'record',
-        data: records.map((time) => ({
-          x: new Date(time.createdAt).toLocaleString(),
+        data: [...records].reverse().map((time) => ({
+          x: new Date(time.createdAt).toLocaleString().replace(/^\d+\//, ''),
           y: time.dnf ? null : recordToMilliSeconds(time) / 1000,
         })),
       },
@@ -29,8 +30,8 @@ const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => (
     axisBottom={{
       tickSize: 5,
       tickPadding: 5,
-      tickRotation: 0,
-      legend: 'transportation',
+      tickRotation: 15,
+      legend: 'date',
       legendOffset: 36,
       legendPosition: 'middle',
     }}
@@ -38,7 +39,7 @@ const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => (
       tickSize: 5,
       tickPadding: 5,
       tickRotation: 0,
-      legend: 'count',
+      legend: 'time',
       legendOffset: -40,
       legendPosition: 'middle',
     }}
