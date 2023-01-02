@@ -112,7 +112,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
   }
 
   return (
-    <Tabs isLazy defaultIndex={1}>
+    <Tabs isLazy>
       <TabList>
         <Tab>table</Tab>
         <Tab>graph</Tab>
