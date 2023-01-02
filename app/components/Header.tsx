@@ -11,7 +11,7 @@ import {
 
 export const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   return (
     <HStack justify="space-between" as="header">
       <Heading>Hi-Timer</Heading>
@@ -21,15 +21,16 @@ export const Header = () => {
           icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
           aria-label={'toggle color theme'}
         />
-        {user ? (
-          <Button as="a" href="/api/auth/logout">
-            Logout
-          </Button>
-        ) : (
-          <Button as="a" href="/api/auth/login">
-            login
-          </Button>
-        )}
+        {!isLoading &&
+          (user ? (
+            <Button as="a" href="/api/auth/logout">
+              Logout
+            </Button>
+          ) : (
+            <Button as="a" href="/api/auth/login">
+              Login
+            </Button>
+          ))}
       </HStack>
     </HStack>
   );
