@@ -1,12 +1,20 @@
 'use client';
 import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import {
+  Box,
   Button,
+  Card,
+  Flex,
   List,
   ListItem,
   Spinner,
+  Tab,
   Table,
   TableContainer,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Tbody,
   Td,
   Text,
@@ -15,12 +23,13 @@ import {
   Tr,
   VStack,
 } from '@chakra-ui/react';
-import { FC, useMemo } from 'react';
+import { FC, lazy, Suspense, useMemo } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { TimerRecord } from '../types/TimerRecord';
 import { calcAo } from '../utils/calcAo';
 import { recordToMilliSeconds } from '../utils/recordToMilliSeconds';
 
+const RecordGraph = lazy(() => import('./components/RecordGraph'));
 const pageSize = 100;
 const useTimerRecords = () => {
   const {
@@ -95,59 +104,81 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     return <div>error caused</div>;
   }
   if (!records) {
-    return <Spinner />;
+    return (
+      <Flex justify="center">
+        <Spinner size="xl" />
+      </Flex>
+    );
   }
-  return (
-    <VStack align="left" spacing={2}>
-      {records.length > 0 && (
-        <>
-          <Text>among last 100 records:</Text>
-          <List>
-            {Object.entries(bestRecords).map(([ao, val]) => (
-              <ListItem key={ao}>
-                {ao === 'best' ? 'best: ' : `best ${ao}: `}
-                {Number.isFinite(val)
-                  ? `${Math.trunc(val / 1000)}.${`${Math.trunc(
-                      val % 1000
-                    )}`.padStart(3, '0')}`
-                  : 'DNF'}
-              </ListItem>
-            ))}
-          </List>
-        </>
-      )}
-      <TableContainer>
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>time</Th>
-              <Th>recorded at</Th>
-              <Th>scramble</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {records
-              .flat()
-              .map(({ time, penalty, dnf, scramble, createdAt, id }) => {
-                const timeStr = `${Math.trunc(time / 1000)}.${`${
-                  time % 1000
-                }`.padStart(3, '0')}${penalty ? ' + 2' : ''}`;
 
-                return (
-                  <Tr key={id}>
-                    <Td>{dnf ? `DNF(${timeStr})` : timeStr}</Td>
-                    <Td>{new Date(createdAt).toLocaleString()}</Td>
-                    <Td>{scramble}</Td>
+  return (
+    <Tabs isLazy defaultIndex={1}>
+      <TabList>
+        <Tab>table</Tab>
+        <Tab>graph</Tab>
+      </TabList>
+      <TabPanels>
+        <TabPanel>
+          <VStack align="left" spacing={2}>
+            {records.length > 0 && (
+              <>
+                <Text>among last 100 records:</Text>
+                <List>
+                  {Object.entries(bestRecords).map(([ao, val]) => (
+                    <ListItem key={ao}>
+                      {ao === 'best' ? 'best: ' : `best ${ao}: `}
+                      {Number.isFinite(val)
+                        ? `${Math.trunc(val / 1000)}.${`${Math.trunc(
+                            val % 1000
+                          )}`.padStart(3, '0')}`
+                        : 'DNF'}
+                    </ListItem>
+                  ))}
+                </List>
+              </>
+            )}
+            <TableContainer>
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th>time</Th>
+                    <Th>recorded at</Th>
+                    <Th>scramble</Th>
                   </Tr>
-                );
-              })}
-          </Tbody>
-        </Table>
-      </TableContainer>
-      {records[records.length - 1].length === pageSize && (
-        <Button onClick={() => setSize((n) => n + 1)}>load more</Button>
-      )}
-    </VStack>
+                </Thead>
+                <Tbody>
+                  {records
+                    .flat()
+                    .map(({ time, penalty, dnf, scramble, createdAt, id }) => {
+                      const timeStr = `${Math.trunc(time / 1000)}.${`${
+                        time % 1000
+                      }`.padStart(3, '0')}${penalty ? ' + 2' : ''}`;
+
+                      return (
+                        <Tr key={id}>
+                          <Td>{dnf ? `DNF(${timeStr})` : timeStr}</Td>
+                          <Td>{new Date(createdAt).toLocaleString()}</Td>
+                          <Td>{scramble}</Td>
+                        </Tr>
+                      );
+                    })}
+                </Tbody>
+              </Table>
+            </TableContainer>
+            {records[records.length - 1].length === pageSize && (
+              <Button onClick={() => setSize((n) => n + 1)}>load more</Button>
+            )}
+          </VStack>
+        </TabPanel>
+        <TabPanel>
+          <Card h={96} bg="gray.50" align="center" justify="center">
+            <Suspense fallback={<Spinner color="black" size="xl" />}>
+              <RecordGraph records={records.flat().slice(0, 50)} />
+            </Suspense>
+          </Card>
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
   );
 };
 export default withPageAuthRequired(TimerPage);
