@@ -436,6 +436,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                         imposePenalty(records[0].id);
                       }
                     }}
+                    disabled={isTimerRecording}
                     variant="outline"
                     colorScheme="blue"
                   >
@@ -451,6 +452,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                       toDNF(records[0].id);
                     }
                   }}
+                  disabled={isTimerRecording}
                   variant="outline"
                   colorScheme="blue"
                 >
@@ -506,6 +508,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                       ),
                     });
                   }}
+                  disabled={isTimerRecording}
                   variant="outline"
                   colorScheme="red"
                 >
@@ -514,6 +517,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
               </HStack>
               <IconButton
                 onClick={onRecordModalOpen}
+                disabled={isTimerRecording}
                 icon={<Icon as={AiFillDatabase} />}
                 aria-label="open record list"
               />
@@ -522,6 +526,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
             <HStack justify="end">
               <IconButton
                 onClick={onRecordModalOpen}
+                disabled={isTimerRecording}
                 icon={<Icon as={AiFillDatabase} />}
                 aria-label="open record list"
               />
