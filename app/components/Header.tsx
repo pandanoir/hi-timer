@@ -8,13 +8,16 @@ import {
   IconButton,
   useColorMode,
 } from '@chakra-ui/react';
+import Link from 'next/link';
 
 export const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const { user, isLoading } = useUser();
   return (
     <HStack justify="space-between" as="header">
-      <Heading>Hi-Timer</Heading>
+      <Heading>
+        <Link href="/">Hi-Timer</Link>
+      </Heading>
       <HStack>
         <IconButton
           onClick={toggleColorMode}
