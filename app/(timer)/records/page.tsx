@@ -1,36 +1,23 @@
 'use client';
 import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import {
-  Button,
   Card,
   Flex,
-  List,
-  ListItem,
   Spinner,
   Tab,
-  Table,
-  TableContainer,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  VStack,
 } from '@chakra-ui/react';
-import { FC, lazy, Suspense, useMemo } from 'react';
+import { FC, lazy, Suspense } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { TimerRecord } from '../types/TimerRecord';
-import { calcAo } from '../utils/calcAo';
-import { recordToMilliSeconds } from '../utils/recordToMilliSeconds';
+import { RecordTable } from './components/RecordTable';
 
 const RecordGraph = lazy(() => import('./components/RecordGraph'));
 const pageSize = 100;
-const useTimerRecords = () => {
+const useTimerRecordsInfinite = () => {
   const {
     data: records,
     error,
@@ -66,50 +53,11 @@ const useTimerRecords = () => {
   } as const;
 };
 
-const calcBestAo = (records: TimerRecord[], size: number) => {
-  let ao = Infinity;
-  for (let i = 0; i + size <= records.length; i++) {
-    ao = Math.min(ao, calcAo(records.slice(i, i + size)));
-  }
-  return ao;
-};
 const TimerPage: FC<{ user: UserProfile }> = () => {
-  const { records, error, setSize } = useTimerRecords();
-
-  const bestRecords = useMemo<Record<string, number>>(() => {
-    const bestAverages: Record<string, number> = {};
-    if (!records) {
-      return bestAverages;
-    }
-    const latestRecords = records.flat().slice(0, 100);
-    if (latestRecords.length >= 1) {
-      bestAverages.best = latestRecords
-        .map(recordToMilliSeconds)
-        .sort((a, b) => a - b)[0];
-    }
-    if (latestRecords.length >= 100) {
-      bestAverages.ao100 = calcAo(latestRecords);
-    }
-    if (latestRecords.length >= 12) {
-      bestAverages.ao12 = calcBestAo(latestRecords, 12);
-    }
-    if (latestRecords.length >= 5) {
-      bestAverages.ao5 = calcBestAo(latestRecords, 5);
-    }
-    return bestAverages;
-  }, [records]);
-
+  const { records, error, setSize } = useTimerRecordsInfinite();
   if (error) {
     return <div>error caused</div>;
   }
-  if (!records) {
-    return (
-      <Flex justify="center">
-        <Spinner size="xl" />
-      </Flex>
-    );
-  }
-
   return (
     <Tabs isLazy>
       <TabList>
@@ -118,61 +66,26 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
       </TabList>
       <TabPanels>
         <TabPanel>
-          <VStack align="left" spacing={2}>
-            {records.length > 0 && (
-              <>
-                <Text>among last 100 records:</Text>
-                <List>
-                  {Object.entries(bestRecords).map(([ao, val]) => (
-                    <ListItem key={ao}>
-                      {ao === 'best' ? 'best: ' : `best ${ao}: `}
-                      {Number.isFinite(val)
-                        ? `${Math.trunc(val / 1000)}.${`${Math.trunc(
-                            val % 1000
-                          )}`.padStart(3, '0')}`
-                        : 'DNF'}
-                    </ListItem>
-                  ))}
-                </List>
-              </>
-            )}
-            <TableContainer>
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>time</Th>
-                    <Th>recorded at</Th>
-                    <Th>scramble</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {records
-                    .flat()
-                    .map(({ time, penalty, dnf, scramble, createdAt, id }) => {
-                      const timeStr = `${Math.trunc(time / 1000)}.${`${
-                        time % 1000
-                      }`.padStart(3, '0')}${penalty ? ' + 2' : ''}`;
-
-                      return (
-                        <Tr key={id}>
-                          <Td>{dnf ? `DNF(${timeStr})` : timeStr}</Td>
-                          <Td>{new Date(createdAt).toLocaleString()}</Td>
-                          <Td>{scramble}</Td>
-                        </Tr>
-                      );
-                    })}
-                </Tbody>
-              </Table>
-            </TableContainer>
-            {records[records.length - 1].length === pageSize && (
-              <Button onClick={() => setSize((n) => n + 1)}>load more</Button>
-            )}
-          </VStack>
+          {records ? (
+            <RecordTable
+              records={records}
+              pageSize={pageSize}
+              onLoadMoreClick={() => setSize((size) => size + 1)}
+            />
+          ) : (
+            <Flex justify="center">
+              <Spinner size="xl" />
+            </Flex>
+          )}
         </TabPanel>
         <TabPanel>
           <Card h={96} bg="gray.50" align="center" justify="center">
             <Suspense fallback={<Spinner color="black" size="xl" />}>
-              <RecordGraph records={records.flat().slice(0, 50)} />
+              {records ? (
+                <RecordGraph records={records.flat().slice(0, 50)} />
+              ) : (
+                <Spinner size="xl" />
+              )}
             </Suspense>
           </Card>
         </TabPanel>
