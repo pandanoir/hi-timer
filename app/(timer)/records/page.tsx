@@ -16,6 +16,7 @@ import { TimerRecord } from '../types/TimerRecord';
 import { RecordTable } from './components/RecordTable';
 
 const RecordGraph = lazy(() => import('./components/RecordGraph'));
+const DailyAverageGraph = lazy(() => import('./components/DailyAverageGraph'));
 const pageSize = 100;
 const useTimerRecordsInfinite = () => {
   const {
@@ -28,7 +29,7 @@ const useTimerRecordsInfinite = () => {
       if (previousPageData && previousPageData.length < pageSize) {
         return null;
       }
-      const url = new URL('/api/record/read', location.origin);
+      const url = new URL('/api/daily_average', location.origin);
       url.searchParams.append('limit', `${pageSize}`);
       if (previousPageData) {
         url.searchParams.append(
@@ -63,6 +64,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
       <TabList>
         <Tab>table</Tab>
         <Tab>graph</Tab>
+        <Tab>daily average</Tab>
       </TabList>
       <TabPanels>
         <TabPanel>
@@ -88,6 +90,9 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
               )}
             </Suspense>
           </Card>
+        </TabPanel>
+        <TabPanel>
+          <DailyAverageGraph />
         </TabPanel>
       </TabPanels>
     </Tabs>

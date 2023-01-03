@@ -10,7 +10,7 @@ const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => (
       {
         id: 'record',
         data: [...records].reverse().map((time) => ({
-          x: new Date(time.createdAt).toLocaleString().replace(/^\d+\//, ''),
+          x: time.createdAt.replace(/^\d+\//, ''), // 年をはぶく
           y: time.dnf ? null : recordToMilliSeconds(time) / 1000,
         })),
       },

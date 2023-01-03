@@ -2,7 +2,7 @@ export type TimerRecord = {
   time: number;
   penalty: boolean;
   dnf: boolean;
-  createdAt: number;
+  createdAt: string;
   scramble: string;
   id: string;
 };

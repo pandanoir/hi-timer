@@ -98,7 +98,9 @@ const useTimerRecords = () => {
   return {
     records,
     error,
-    createNewRecord: (record: Omit<TimerRecord, 'id'>) => {
+    createNewRecord: (
+      record: Omit<TimerRecord, 'id' | 'createdAt'> & { createdAt: number }
+    ) => {
       mutate(
         '/api/record/read',
         fetch('/api/record/create', {
@@ -108,7 +110,11 @@ const useTimerRecords = () => {
         }).then(async (res) => [await res.json(), ...records]),
         {
           optimisticData: [
-            { ...record, id: 'temp' },
+            {
+              ...record,
+              id: 'temp',
+              createdAt: new Date(record.createdAt).toISOString(),
+            },
             ...records,
           ] satisfies TimerRecord[],
           rollbackOnError: true,
