@@ -22,7 +22,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Spinner,
   Switch,
   Text,
   useDisclosure,
@@ -346,36 +345,36 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
             disabled={isTimerRecording}
           />
         </HStack>
-        {records ? (
-          <>
-            <Carousel
-              carouselIndex={currentScramble}
-              onCarouselIndexChange={onCarouselIndexChange}
-              onTransitionEnd={onCarouselTransitionEnd}
-              scrambleHistory={scrambleHistory}
-              animationDisabled={carouselAnimationDisabled}
-            />
-            <Box flex="1">
-              <Timer
-                usesInspection={usesInspection}
-                onStart={() => {
-                  setIsTimerRecording(true);
-                }}
-                onStop={(record, inspectionTime) => {
-                  createNewRecord({
-                    time: record,
-                    penalty: inspectionTime !== null && inspectionTime >= 15000,
-                    dnf: inspectionTime !== null && inspectionTime >= 17000,
-                    scramble: scrambleHistory[currentScramble],
-                    createdAt: Date.now(),
-                  });
-                  setCurrentScramble((n) => n + 1);
-                  setIsTimerRecording(false);
-                }}
-                onCancel={() => {
-                  setIsTimerRecording(false);
-                }}
-              >
+        <>
+          <Carousel
+            carouselIndex={currentScramble}
+            onCarouselIndexChange={onCarouselIndexChange}
+            onTransitionEnd={onCarouselTransitionEnd}
+            scrambleHistory={scrambleHistory}
+            animationDisabled={carouselAnimationDisabled}
+          />
+          <Box flex="1">
+            <Timer
+              usesInspection={usesInspection}
+              onStart={() => {
+                setIsTimerRecording(true);
+              }}
+              onStop={(record, inspectionTime) => {
+                createNewRecord?.({
+                  time: record,
+                  penalty: inspectionTime !== null && inspectionTime >= 15000,
+                  dnf: inspectionTime !== null && inspectionTime >= 17000,
+                  scramble: scrambleHistory[currentScramble],
+                  createdAt: Date.now(),
+                });
+                setCurrentScramble((n) => n + 1);
+                setIsTimerRecording(false);
+              }}
+              onCancel={() => {
+                setIsTimerRecording(false);
+              }}
+            >
+              {records && (
                 <VStack align="center">
                   {records[0] && (
                     <Text
@@ -421,118 +420,114 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                     )}
                   </Grid>
                 </VStack>
-              </Timer>
-            </Box>
-            {records[0] ? (
-              <HStack justify="space-between">
-                <HStack spacing={2} flex="1">
-                  {!records[0].dnf && (
-                    <Button
-                      key="+2"
-                      onClick={() => {
-                        if (records[0].penalty) {
-                          undoPenalty(records[0].id);
-                        } else {
-                          imposePenalty(records[0].id);
-                        }
-                      }}
-                      variant="outline"
-                      colorScheme="blue"
-                    >
-                      {records[0].penalty ? 'undo +2' : '+2'}
-                    </Button>
-                  )}
+              )}
+            </Timer>
+          </Box>
+          {records?.[0] ? (
+            <HStack justify="space-between">
+              <HStack spacing={2} flex="1">
+                {!records[0].dnf && (
                   <Button
-                    key="DNF"
+                    key="+2"
                     onClick={() => {
-                      if (records[0].dnf) {
-                        undoDNF(records[0].id);
+                      if (records[0].penalty) {
+                        undoPenalty(records[0].id);
                       } else {
-                        toDNF(records[0].id);
+                        imposePenalty(records[0].id);
                       }
                     }}
                     variant="outline"
                     colorScheme="blue"
                   >
-                    {records[0].dnf ? 'undo DNF' : 'DNF'}
+                    {records[0].penalty ? 'undo +2' : '+2'}
                   </Button>
-                  <Button
-                    key="delete"
-                    onClick={() => {
-                      const deletedRecord = records[0];
-                      deleteRecord(records[0].id);
-                      toast({
-                        isClosable: true,
-                        render: ({ status, variant, onClose, isClosable }) => (
-                          <Alert
-                            addRole={false}
-                            status={status}
-                            variant={variant}
-                            alignItems="start"
-                            borderRadius="md"
-                            boxShadow="lg"
-                            paddingEnd={8}
-                            textAlign="start"
-                            width="auto"
+                )}
+                <Button
+                  key="DNF"
+                  onClick={() => {
+                    if (records[0].dnf) {
+                      undoDNF(records[0].id);
+                    } else {
+                      toDNF(records[0].id);
+                    }
+                  }}
+                  variant="outline"
+                  colorScheme="blue"
+                >
+                  {records[0].dnf ? 'undo DNF' : 'DNF'}
+                </Button>
+                <Button
+                  key="delete"
+                  onClick={() => {
+                    const deletedRecord = records[0];
+                    deleteRecord(records[0].id);
+                    toast({
+                      isClosable: true,
+                      render: ({ status, variant, onClose, isClosable }) => (
+                        <Alert
+                          addRole={false}
+                          status={status}
+                          variant={variant}
+                          alignItems="start"
+                          borderRadius="md"
+                          boxShadow="lg"
+                          paddingEnd={8}
+                          textAlign="start"
+                          width="auto"
+                        >
+                          <AlertDescription
+                            flex="1"
+                            maxWidth="100%"
+                            display="block"
                           >
-                            <AlertDescription
-                              flex="1"
-                              maxWidth="100%"
-                              display="block"
-                            >
-                              <Flex align="center">
-                                <Text flex="1">deleted</Text>
-                                <Button
-                                  variant="ghost"
-                                  onClick={() => {
-                                    restoreDeletedRecord(deletedRecord);
-                                    onClose();
-                                  }}
-                                >
-                                  undo
-                                </Button>
-                              </Flex>
-                            </AlertDescription>
-                            {isClosable && (
-                              <CloseButton
-                                size="md"
-                                onClick={onClose}
-                                position="absolute"
-                                insetEnd={1}
-                                top={1}
-                              />
-                            )}
-                          </Alert>
-                        ),
-                      });
-                    }}
-                    variant="outline"
-                    colorScheme="red"
-                  >
-                    delete
-                  </Button>
-                </HStack>
-                <IconButton
-                  onClick={onRecordModalOpen}
-                  icon={<Icon as={AiFillDatabase} />}
-                  aria-label="open record list"
-                />
+                            <Flex align="center">
+                              <Text flex="1">deleted</Text>
+                              <Button
+                                variant="ghost"
+                                onClick={() => {
+                                  restoreDeletedRecord(deletedRecord);
+                                  onClose();
+                                }}
+                              >
+                                undo
+                              </Button>
+                            </Flex>
+                          </AlertDescription>
+                          {isClosable && (
+                            <CloseButton
+                              size="md"
+                              onClick={onClose}
+                              position="absolute"
+                              insetEnd={1}
+                              top={1}
+                            />
+                          )}
+                        </Alert>
+                      ),
+                    });
+                  }}
+                  variant="outline"
+                  colorScheme="red"
+                >
+                  delete
+                </Button>
               </HStack>
-            ) : (
-              <HStack justify="end">
-                <IconButton
-                  onClick={onRecordModalOpen}
-                  icon={<Icon as={AiFillDatabase} />}
-                  aria-label="open record list"
-                />
-              </HStack>
-            )}
-          </>
-        ) : (
-          <VStack flex="1" align="center" justify="center">
-            <Spinner size="xl" />
-          </VStack>
-        )}
+              <IconButton
+                onClick={onRecordModalOpen}
+                icon={<Icon as={AiFillDatabase} />}
+                aria-label="open record list"
+              />
+            </HStack>
+          ) : (
+            <HStack justify="end">
+              <IconButton
+                onClick={onRecordModalOpen}
+                icon={<Icon as={AiFillDatabase} />}
+                aria-label="open record list"
+              />
+            </HStack>
+          )}
+        </>
       </VStack>
       <Modal isOpen={isRecordModalOpen} onClose={onRecordModalClose} size="xl">
         <ModalOverlay />
