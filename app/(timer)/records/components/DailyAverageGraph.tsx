@@ -7,14 +7,12 @@ import { TimerRecord } from '../../types/TimerRecord';
 import { Button, Card, VStack } from '@chakra-ui/react';
 const pageSize = 1000;
 const useDailyAverageInfinite = () => {
-  const {
-    data: records,
-    error,
-    size,
-    setSize,
-  } = useSWRInfinite<TimerRecord[]>(
+  const { data, error, size, setSize } = useSWRInfinite<{
+    data: TimerRecord[];
+    hasNextPage: boolean;
+  }>(
     (_pageIndex, previousPageData) => {
-      if (previousPageData && previousPageData.length < pageSize) {
+      if (previousPageData?.hasNextPage === false) {
         return null;
       }
       const url = new URL('/api/record/read', location.origin);
@@ -22,13 +20,14 @@ const useDailyAverageInfinite = () => {
       if (previousPageData) {
         url.searchParams.append(
           'cursor',
-          previousPageData[previousPageData.length - 1].id
+          previousPageData.data[previousPageData.data.length - 1].id
         );
       }
       return url.toString();
     },
     async (url) => (await fetch(url)).json()
   );
+  const records = data?.map(({ data }) => data);
 
   const averages = useMemo<Record<string, number>>(() => {
     if (!records) {
@@ -58,18 +57,18 @@ const useDailyAverageInfinite = () => {
   if (!records) {
     return { averages: undefined } as const;
   }
-  const isReachingEnd = records[records.length - 1].length < pageSize;
+  const hasNextPage = data?.[data.length - 1].hasNextPage !== false; // !data だったら !records なので、undefined になることはない
   return {
     averages,
     error,
     size,
     setSize,
-    isReachingEnd,
+    hasNextPage,
   } as const;
 };
 
 const DailyAverageGraph: FC = () => {
-  const { averages, setSize, isReachingEnd } = useDailyAverageInfinite();
+  const { averages, setSize, hasNextPage } = useDailyAverageInfinite();
   const data = useMemo(
     () =>
       averages
@@ -154,7 +153,7 @@ const DailyAverageGraph: FC = () => {
           ]}
         />
       </Card>
-      {!isReachingEnd && (
+      {hasNextPage && (
         <Button onClick={() => setSize((size) => size + 1)}>load more</Button>
       )}
     </VStack>

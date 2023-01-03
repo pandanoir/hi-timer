@@ -10,7 +10,7 @@ import {
   TabPanels,
   Tabs,
 } from '@chakra-ui/react';
-import { FC, lazy, Suspense } from 'react';
+import { FC, lazy, Suspense, useMemo } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { TimerRecord } from '../types/TimerRecord';
 import { RecordTable } from './components/RecordTable';
@@ -19,14 +19,12 @@ const RecordGraph = lazy(() => import('./components/RecordGraph'));
 const DailyAverageGraph = lazy(() => import('./components/DailyAverageGraph'));
 const pageSize = 100;
 const useTimerRecordsInfinite = () => {
-  const {
-    data: records,
-    error,
-    size,
-    setSize,
-  } = useSWRInfinite<TimerRecord[]>(
+  const { data, error, size, setSize } = useSWRInfinite<{
+    data: TimerRecord[];
+    hasNextPage: boolean;
+  }>(
     (_pageIndex, previousPageData) => {
-      if (previousPageData && previousPageData.length < pageSize) {
+      if (previousPageData?.hasNextPage === false) {
         return null;
       }
       const url = new URL('/api/record/read', location.origin);
@@ -34,20 +32,23 @@ const useTimerRecordsInfinite = () => {
       if (previousPageData) {
         url.searchParams.append(
           'cursor',
-          previousPageData[previousPageData.length - 1].id
+          previousPageData.data[previousPageData.data.length - 1].id
         );
       }
       return url.toString();
     },
     async (url) => (await fetch(url)).json()
   );
+  const records = useMemo(() => data?.map(({ data }) => data), [data]);
 
   if (!records) {
+    // !records と !data どっちかだけでいいんだけど、型推論のために両方必要
     return { records } as const;
   }
 
   return {
     records,
+    hasNextPage: data?.[data.length - 1].hasNextPage !== false, // data は undefined にはならないはず
     error,
     size,
     setSize,
@@ -55,7 +56,7 @@ const useTimerRecordsInfinite = () => {
 };
 
 const TimerPage: FC<{ user: UserProfile }> = () => {
-  const { records, error, setSize } = useTimerRecordsInfinite();
+  const { records, error, hasNextPage, setSize } = useTimerRecordsInfinite();
   if (error) {
     return <div>error caused</div>;
   }
@@ -71,7 +72,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
           {records ? (
             <RecordTable
               records={records}
-              pageSize={pageSize}
+              hasNextPage={hasNextPage}
               onLoadMoreClick={() => setSize((size) => size + 1)}
             />
           ) : (

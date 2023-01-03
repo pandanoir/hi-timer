@@ -27,9 +27,9 @@ const calcBestAo = (records: TimerRecord[], size: number) => {
 
 export const RecordTable: FC<{
   records: TimerRecord[][];
-  pageSize: number;
   onLoadMoreClick: () => void;
-}> = ({ records, pageSize, onLoadMoreClick }) => {
+  hasNextPage: boolean;
+}> = ({ records, hasNextPage, onLoadMoreClick }) => {
   const bestRecords = useMemo<Record<string, number>>(() => {
     const bestAverages: Record<string, number> = {};
     const latestRecords = records.flat().slice(0, 100);
@@ -97,10 +97,7 @@ export const RecordTable: FC<{
           </Tbody>
         </Table>
       </TableContainer>
-      {records.length > 0 &&
-        records[records.length - 1].length === pageSize && (
-          <Button onClick={onLoadMoreClick}>load more</Button>
-        )}
+      {hasNextPage && <Button onClick={onLoadMoreClick}>load more</Button>}
     </VStack>
   );
 };

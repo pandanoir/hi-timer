@@ -12,16 +12,24 @@ export default withApiAuthRequired(
     const cursor = Array.isArray(req.query.cursor)
       ? req.query.cursor[0]
       : req.query.cursor;
-    const limit = Array.isArray(req.query.limit)
-      ? req.query.limit[0]
-      : req.query.limit;
+    const limit = Number(
+      Array.isArray(req.query.limit)
+        ? req.query.limit[0]
+        : req.query.limit ?? 50
+    );
 
     const posts = await prisma.timerRecord.findMany({
-      take: Number(limit ?? 50),
+      take: limit + 1,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       where: { userId: session.user.sub },
       orderBy: { createdAt: 'desc' },
     });
-    res.json(posts);
+    const hasNextPage = posts.length === limit + 1;
+    if (hasNextPage) {
+      // hasNextPage の判定用に1つ多く取ってきているぶんを消す
+      posts.pop();
+    }
+
+    res.json({ data: posts, hasNextPage });
   }
 );

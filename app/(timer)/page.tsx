@@ -58,18 +58,19 @@ import { calcAo } from './utils/calcAo';
 
 const useTimerRecords = () => {
   const { mutate } = useSWRConfig();
-  const { data: records, error } = useSWR<TimerRecord[]>(
-    '/api/record/read',
-    async (key) => {
-      const url = new URL(key, location.origin);
-      url.searchParams.append('limit', '100');
-      return (await fetch(url.toString())).json();
-    }
-  );
+  const { data, error } = useSWR<{
+    data: TimerRecord[];
+    hasNextPage: boolean;
+  }>('/api/record/read', async (key) => {
+    const url = new URL(key, location.origin);
+    url.searchParams.append('limit', '100');
+    return (await fetch(url.toString())).json();
+  });
 
-  if (!records) {
-    return { records } as const;
+  if (!data) {
+    return { records: undefined } as const;
   }
+  const records = data.data;
 
   const update = (id: string, change: Partial<TimerRecord>) => {
     const index = records.findIndex((x) => x.id === id);
