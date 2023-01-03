@@ -29,7 +29,7 @@ const useTimerRecordsInfinite = () => {
       if (previousPageData && previousPageData.length < pageSize) {
         return null;
       }
-      const url = new URL('/api/daily_average', location.origin);
+      const url = new URL('/api/record/read', location.origin);
       url.searchParams.append('limit', `${pageSize}`);
       if (previousPageData) {
         url.searchParams.append(
