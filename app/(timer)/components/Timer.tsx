@@ -11,6 +11,31 @@ import {
 import { useCountdownTimer } from '../hooks/useCountdownTimer';
 import { useCubeTimer } from '../hooks/useCubeTimer';
 
+export const usePreventDefault = <T extends HTMLElement>(
+  eventName: string,
+  enable = true
+) => {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    if (!enable) {
+      return;
+    }
+    const current = ref.current;
+    if (!current) {
+      return;
+    }
+    const handler = (event: Event) => {
+      event.preventDefault();
+    };
+    current.addEventListener(eventName, handler);
+    return () => {
+      current.removeEventListener(eventName, handler);
+    };
+  }, [enable, eventName]);
+
+  return ref;
+};
+
 const ScreenButton = (props: ComponentProps<typeof VStack>) => (
   <VStack h="full" align="center" justify="center" {...props} />
 );
@@ -144,6 +169,7 @@ export const Timer: FC<
       prevTimerState.current = timer.state;
     }, [onStart, timer.state]);
   }
+  const screenButtonRef = usePreventDefault<HTMLDivElement>('touchstart');
 
   if (timer.state === 'inspecting' || timer.state === 'before start') {
     let buttonText = 'start';
@@ -165,6 +191,7 @@ export const Timer: FC<
         key={timer.state}
         onPointerDown={on}
         onPointerUp={onReleaseStartButton}
+        ref={screenButtonRef}
       >
         {timer.state === 'before start' && children}
         <Button
@@ -202,6 +229,7 @@ export const Timer: FC<
         }
         onInspectionStartButtonRelease();
       }}
+      ref={screenButtonRef}
     >
       {children}
       <Button
@@ -221,7 +249,11 @@ export const Timer: FC<
       </Button>
     </ScreenButton>
   ) : timer.state === 'recording' ? (
-    <ScreenButton key={timer.state} onPointerDown={timer.stop}>
+    <ScreenButton
+      key={timer.state}
+      onPointerDown={timer.stop}
+      ref={screenButtonRef}
+    >
       <Text
         fontSize="5xl"
         fontWeight="bold"
