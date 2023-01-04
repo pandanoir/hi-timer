@@ -31,14 +31,14 @@ export const RecordTable: FC<{
         .map(recordToMilliSeconds)
         .sort((a, b) => a - b)[0];
     }
-    if (latestRecords.length >= 100) {
-      bestAverages.ao100 = calcAo(latestRecords);
+    if (latestRecords.length >= 5) {
+      bestAverages.ao5 = calcBestAo(latestRecords, 5);
     }
     if (latestRecords.length >= 12) {
       bestAverages.ao12 = calcBestAo(latestRecords, 12);
     }
-    if (latestRecords.length >= 5) {
-      bestAverages.ao5 = calcBestAo(latestRecords, 5);
+    if (latestRecords.length >= 100) {
+      bestAverages.ao100 = calcAo(latestRecords);
     }
     return bestAverages;
   }, [records]);
