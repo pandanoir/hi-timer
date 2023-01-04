@@ -402,7 +402,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 <VStack align="center">
                   {records[0] && (
                     <Text
-                      fontSize="5xl"
+                      fontSize={['5xl', '8xl']}
                       fontWeight="bold"
                       fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
                     >
