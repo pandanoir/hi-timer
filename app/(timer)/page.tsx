@@ -369,87 +369,87 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
             disabled={isTimerRecording}
           />
         </HStack>
-        <>
-          <Carousel
-            carouselIndex={currentScramble}
-            onCarouselIndexChange={onCarouselIndexChange}
-            onTransitionEnd={onCarouselTransitionEnd}
-            scrambleHistory={scrambleHistory}
-            animationDisabled={carouselAnimationDisabled}
-          />
-          <Box flex="1">
-            <Timer
-              usesInspection={usesInspection}
-              onStart={() => {
-                setIsTimerRecording(true);
-              }}
-              onStop={(record, inspectionTime) => {
-                createNewRecord?.({
-                  time: record,
-                  penalty: inspectionTime !== null && inspectionTime >= 15000,
-                  dnf: inspectionTime !== null && inspectionTime >= 17000,
-                  scramble: scrambleHistory[currentScramble],
-                  createdAt: Date.now(),
-                });
-                setCurrentScramble((n) => n + 1);
-                setIsTimerRecording(false);
-              }}
-              onCancel={() => {
-                setIsTimerRecording(false);
-              }}
-            >
-              {records && (
-                <VStack align="center">
-                  {records[0] && (
-                    <Text
-                      fontSize={['5xl', '8xl']}
-                      fontWeight="bold"
-                      fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
-                    >
-                      {records[0].dnf
-                        ? 'DNF'
-                        : `${Math.trunc(records[0].time / 1000)}.${`${
-                            records[0].time % 1000
-                          }`.padStart(3, '0')}sec${
-                            records[0].penalty ? ' + 2' : ''
-                          }`}
-                    </Text>
+        <Carousel
+          carouselIndex={currentScramble}
+          onCarouselIndexChange={onCarouselIndexChange}
+          onTransitionEnd={onCarouselTransitionEnd}
+          scrambleHistory={scrambleHistory}
+          animationDisabled={carouselAnimationDisabled}
+        />
+        <Box flex="1">
+          <Timer
+            usesInspection={usesInspection}
+            onStart={() => {
+              setIsTimerRecording(true);
+            }}
+            onStop={(record, inspectionTime) => {
+              createNewRecord?.({
+                time: record,
+                penalty: inspectionTime !== null && inspectionTime >= 15000,
+                dnf: inspectionTime !== null && inspectionTime >= 17000,
+                scramble: scrambleHistory[currentScramble],
+                createdAt: Date.now(),
+              });
+              setCurrentScramble((n) => n + 1);
+              setIsTimerRecording(false);
+            }}
+            onCancel={() => {
+              setIsTimerRecording(false);
+            }}
+          >
+            {records && (
+              <VStack align="center">
+                {records[0] && (
+                  <Text
+                    fontSize={['5xl', '8xl']}
+                    fontWeight="bold"
+                    fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
+                  >
+                    {records[0].dnf
+                      ? 'DNF'
+                      : `${Math.trunc(records[0].time / 1000)}.${`${
+                          records[0].time % 1000
+                        }`.padStart(3, '0')}sec${
+                          records[0].penalty ? ' + 2' : ''
+                        }`}
+                  </Text>
+                )}
+                <Grid templateColumns="max-content 1fr" columnGap={1}>
+                  {records.length >= 5 && (
+                    <>
+                      <GridItem>ao5</GridItem>
+                      <GridItem>
+                        {(() => {
+                          const ao5 = calcAo(records.slice(0, 5));
+                          return Number.isFinite(ao5)
+                            ? `${Math.trunc(ao5) / 1000}sec`
+                            : 'DNF';
+                        })()}
+                      </GridItem>
+                    </>
                   )}
-                  <Grid templateColumns="max-content 1fr" columnGap={1}>
-                    {records.length >= 5 && (
-                      <>
-                        <GridItem>ao5</GridItem>
-                        <GridItem>
-                          {(() => {
-                            const ao5 = calcAo(records.slice(0, 5));
-                            return Number.isFinite(ao5)
-                              ? `${Math.trunc(ao5) / 1000}sec`
-                              : 'DNF';
-                          })()}
-                        </GridItem>
-                      </>
-                    )}
-                    {records.length >= 12 && (
-                      <>
-                        <GridItem>ao12</GridItem>
-                        <GridItem>
-                          {(() => {
-                            const ao12 = calcAo(records.slice(0, 12));
-                            return Number.isFinite(ao12)
-                              ? `${Math.trunc(ao12) / 1000}sec`
-                              : 'DNF';
-                          })()}
-                        </GridItem>
-                      </>
-                    )}
-                  </Grid>
-                </VStack>
-              )}
-            </Timer>
-          </Box>
-          {records?.[0] ? (
-            <HStack justify="space-between">
-              <HStack spacing={2} flex="1">
+                  {records.length >= 12 && (
+                    <>
+                      <GridItem>ao12</GridItem>
+                      <GridItem>
+                        {(() => {
+                          const ao12 = calcAo(records.slice(0, 12));
+                          return Number.isFinite(ao12)
+                            ? `${Math.trunc(ao12) / 1000}sec`
+                            : 'DNF';
+                        })()}
+                      </GridItem>
+                    </>
+                  )}
+                </Grid>
+              </VStack>
+            )}
+          </Timer>
+        </Box>
+        <HStack justify="space-between">
+          <HStack spacing={2} flex="1">
+            {records?.[0] && (
+              <>
                 {!records[0].dnf && (
                   <Button
                     key="+2"
@@ -538,27 +538,18 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 >
                   delete
                 </Button>
-              </HStack>
-              <IconButton
-                onClick={onRecordModalOpen}
-                disabled={isTimerRecording}
-                icon={<Icon as={AiFillDatabase} />}
-                aria-label="open record list"
-              />
-            </HStack>
-          ) : (
-            <HStack justify="end">
-              <IconButton
-                onClick={onRecordModalOpen}
-                disabled={isTimerRecording}
-                icon={<Icon as={AiFillDatabase} />}
-                aria-label="open record list"
-              />
-            </HStack>
-          )}
-        </>
+              </>
+            )}
+          </HStack>
+          <IconButton
+            onClick={onRecordModalOpen}
+            disabled={isTimerRecording}
+            icon={<Icon as={AiFillDatabase} />}
+            aria-label="open record list"
+          />
+        </HStack>
       </VStack>
-      <Modal isOpen={isRecordModalOpen} onClose={onRecordModalClose} size="xl">
+      <Modal isOpen={isRecordModalOpen} onClose={onRecordModalClose} size="3xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>100 most recent time records</ModalHeader>
