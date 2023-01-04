@@ -15,15 +15,8 @@ import {
 } from '@chakra-ui/react';
 import { TimerRecord } from '../../types/TimerRecord';
 import { calcAo } from '../../utils/calcAo';
+import { calcBestAo } from '../../utils/calcBestAo';
 import { recordToMilliSeconds } from '../../utils/recordToMilliSeconds';
-
-const calcBestAo = (records: TimerRecord[], size: number) => {
-  let ao = Infinity;
-  for (let i = 0; i + size <= records.length; i++) {
-    ao = Math.min(ao, calcAo(records.slice(i, i + size)));
-  }
-  return ao;
-};
 
 export const RecordTable: FC<{
   records: TimerRecord[][];

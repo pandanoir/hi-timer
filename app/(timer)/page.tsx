@@ -33,6 +33,7 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -44,6 +45,8 @@ import { AiFillDatabase } from 'react-icons/ai';
 import { TimerRecord } from './types/TimerRecord';
 import { calcAo } from './utils/calcAo';
 import { ScrambleCarousel } from './components/ScrambleCarousel';
+import { calcBestAo } from './utils/calcBestAo';
+import { recordToMilliSeconds } from './utils/recordToMilliSeconds';
 
 type RecordReadApiResponse = {
   data: TimerRecord[];
@@ -184,6 +187,43 @@ const useTimerRecords = () => {
       );
     },
   } as const;
+};
+
+const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
+  const bestRecords = useMemo<Record<string, number>>(() => {
+    const bestAverages: Record<string, number> = {};
+    const latestRecords = records.flat().slice(0, 100);
+    if (latestRecords.length >= 1) {
+      bestAverages.best = latestRecords
+        .map(recordToMilliSeconds)
+        .sort((a, b) => a - b)[0];
+    }
+    if (latestRecords.length >= 5) {
+      bestAverages.ao5 = calcBestAo(latestRecords, 5);
+    }
+    if (latestRecords.length >= 12) {
+      bestAverages.ao12 = calcBestAo(latestRecords, 12);
+    }
+    if (latestRecords.length >= 100) {
+      bestAverages.ao100 = calcAo(latestRecords);
+    }
+    return bestAverages;
+  }, [records]);
+  return (
+    <List>
+      {Object.entries(bestRecords).map(([ao, val]) => (
+        <ListItem key={ao}>
+          {ao === 'best' ? 'best: ' : `best ${ao}: `}
+          {Number.isFinite(val)
+            ? `${Math.trunc(val / 1000)}.${`${Math.trunc(val % 1000)}`.padStart(
+                3,
+                '0'
+              )}`
+            : 'DNF'}
+        </ListItem>
+      ))}
+    </List>
+  );
 };
 
 const scrambler = new Scrambow();
@@ -466,6 +506,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 <Button as="a" href="/records" w="max-content">
                   See more records
                 </Button>
+                <BestAverages records={records} />
                 <List>
                   {records.map(({ time, penalty, dnf, createdAt }) => {
                     const timeStr = `${Math.trunc(time) / 1000}sec${
@@ -494,4 +535,5 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     </>
   );
 };
+
 export default withPageAuthRequired(TimerPage);
