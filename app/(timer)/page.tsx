@@ -56,16 +56,20 @@ import { css } from '@emotion/react';
 import { TimerRecord } from './types/TimerRecord';
 import { calcAo } from './utils/calcAo';
 
+type RecordReadApiResponse = {
+  data: TimerRecord[];
+};
+
 const useTimerRecords = () => {
   const { mutate } = useSWRConfig();
-  const { data, error } = useSWR<{
-    data: TimerRecord[];
-    hasNextPage: boolean;
-  }>('/api/record/read', async (key) => {
-    const url = new URL(key, location.origin);
-    url.searchParams.append('limit', '100');
-    return (await fetch(url.toString())).json();
-  });
+  const { data, error } = useSWR<RecordReadApiResponse>(
+    '/api/record/read',
+    async (key) => {
+      const url = new URL(key, location.origin);
+      url.searchParams.append('limit', '100');
+      return (await fetch(url.toString())).json();
+    }
+  );
 
   if (!data) {
     return { records: undefined } as const;
@@ -80,17 +84,24 @@ const useTimerRecords = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...change, id }),
-      }).then(async (res) => [
-        ...records.slice(0, index),
-        await res.json(),
-        ...records.slice(index + 1),
-      ]),
+      }).then(
+        async (res) =>
+          ({
+            data: [
+              ...records.slice(0, index),
+              await res.json(),
+              ...records.slice(index + 1),
+            ],
+          } satisfies RecordReadApiResponse)
+      ),
       {
-        optimisticData: [
-          ...records.slice(0, index),
-          { ...records[index], ...change },
-          ...records.slice(index + 1),
-        ],
+        optimisticData: {
+          data: [
+            ...records.slice(0, index),
+            { ...records[index], ...change },
+            ...records.slice(index + 1),
+          ],
+        } satisfies RecordReadApiResponse,
         rollbackOnError: true,
       }
     );
@@ -107,16 +118,23 @@ const useTimerRecords = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(record),
-        }).then(async (res) => [await res.json(), ...records]),
+        }).then(
+          async (res) =>
+            ({
+              data: [await res.json(), ...records],
+            } satisfies RecordReadApiResponse)
+        ),
         {
-          optimisticData: [
-            {
-              ...record,
-              id: 'temp',
-              createdAt: new Date(record.createdAt).toISOString(),
-            },
-            ...records,
-          ] satisfies TimerRecord[],
+          optimisticData: {
+            data: [
+              {
+                ...record,
+                id: 'temp',
+                createdAt: new Date(record.createdAt).toISOString(),
+              },
+              ...records,
+            ],
+          } satisfies RecordReadApiResponse,
           rollbackOnError: true,
         }
       );
@@ -141,15 +159,16 @@ const useTimerRecords = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id }),
-        }).then(() => [
-          ...records.slice(0, index),
-          ...records.slice(index + 1),
-        ]),
+        }).then(
+          () =>
+            ({
+              data: [...records.slice(0, index), ...records.slice(index + 1)],
+            } satisfies RecordReadApiResponse)
+        ),
         {
-          optimisticData: [
-            ...records.slice(0, index),
-            ...records.slice(index + 1),
-          ],
+          optimisticData: {
+            data: [...records.slice(0, index), ...records.slice(index + 1)],
+          } satisfies RecordReadApiResponse,
           rollbackOnError: true,
         }
       );
@@ -161,12 +180,16 @@ const useTimerRecords = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(record),
-        }).then(async (res) => [await res.json(), ...records]),
+        }).then(
+          async (res) =>
+            ({
+              data: [await res.json(), ...records],
+            } satisfies RecordReadApiResponse)
+        ),
         {
-          optimisticData: [
-            { ...record, id: 'temp' },
-            ...records,
-          ] satisfies TimerRecord[],
+          optimisticData: {
+            data: [{ ...record, id: 'temp' }, ...records],
+          } satisfies RecordReadApiResponse,
           rollbackOnError: true,
         }
       );
