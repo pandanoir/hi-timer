@@ -11,16 +11,16 @@ const useDailyAverageInfinite = () => {
     data: TimerRecord[];
     hasNextPage: boolean;
   }>(
-    (_pageIndex, previousPageData) => {
-      if (previousPageData?.hasNextPage === false) {
+    (_pageIndex, prevPage) => {
+      if (prevPage?.hasNextPage === false) {
         return null;
       }
       const url = new URL('/api/record/read', location.origin);
       url.searchParams.append('limit', `${pageSize}`);
-      if (previousPageData) {
+      if (prevPage) {
         url.searchParams.append(
           'cursor',
-          previousPageData.data[previousPageData.data.length - 1].id
+          prevPage.data[prevPage.data.length - 1].id
         );
       }
       return url.toString();
