@@ -6,12 +6,10 @@ import { recordToMilliSeconds } from '../../utils/recordToMilliSeconds';
 const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
   const data = useMemo(
     () =>
-      [...records]
-        .reverse()
-        .map((time) => ({
-          x: time.createdAt.replace(/^\d+\//, ''),
-          y: time.dnf ? null : recordToMilliSeconds(time) / 1000,
-        })),
+      [...records].reverse().map((time) => ({
+        x: time.createdAt.replace(/^\d+\//, ''),
+        y: time.dnf ? null : recordToMilliSeconds(time) / 1000,
+      })),
     [records]
   );
   return (
