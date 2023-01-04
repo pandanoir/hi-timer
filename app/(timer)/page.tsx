@@ -30,9 +30,7 @@ import {
 } from '@chakra-ui/react';
 import {
   FC,
-  memo,
   useCallback,
-  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -42,19 +40,10 @@ import { Scrambow } from 'scrambow';
 import useSWR, { useSWRConfig } from 'swr';
 import { Timer } from './components/Timer';
 import 'pure-react-carousel/dist/react-carousel.es.css';
-import {
-  ButtonBack,
-  ButtonNext,
-  CarouselContext,
-  CarouselProvider,
-  Slide,
-  Slider,
-} from 'pure-react-carousel';
-import { ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons';
 import { AiFillDatabase } from 'react-icons/ai';
-import { css } from '@emotion/react';
 import { TimerRecord } from './types/TimerRecord';
 import { calcAo } from './utils/calcAo';
+import { ScrambleCarousel } from './components/ScrambleCarousel';
 
 type RecordReadApiResponse = {
   data: TimerRecord[];
@@ -197,89 +186,6 @@ const useTimerRecords = () => {
   } as const;
 };
 
-const CarouselIndex = ({
-  carouselIndex,
-  onCarouselIndexChange,
-}: {
-  carouselIndex: number;
-  onCarouselIndexChange: (carouselIndex: number) => void;
-}) => {
-  const carouselContext = useContext(CarouselContext);
-
-  useEffect(() => {
-    const listener = () => {
-      onCarouselIndexChange(carouselContext.state.currentSlide);
-    };
-    carouselContext.subscribe(listener);
-    return () => carouselContext.unsubscribe(listener);
-  }, [carouselContext, onCarouselIndexChange]);
-
-  useEffect(() => {
-    carouselContext.setStoreState({ currentSlide: carouselIndex });
-  }, [carouselIndex, carouselContext]);
-  return null;
-};
-
-const Carousel = memo(function Carousel({
-  scrambleHistory,
-  animationDisabled, // HACK: totalSlides が変化したときに不要なアニメーションが走るので、そのときにアニメーションを無効化する
-  carouselIndex,
-  onTransitionEnd,
-  onCarouselIndexChange,
-}: {
-  scrambleHistory: string[];
-  animationDisabled: boolean;
-  carouselIndex: number;
-  onTransitionEnd?: () => void;
-  onCarouselIndexChange: (carouselIndex: number) => void;
-}) {
-  return (
-    <CarouselProvider
-      naturalSlideWidth={50}
-      naturalSlideHeight={24}
-      isIntrinsicHeight
-      totalSlides={scrambleHistory.length}
-    >
-      <CarouselIndex
-        carouselIndex={carouselIndex}
-        onCarouselIndexChange={onCarouselIndexChange}
-      />
-      <HStack w="full">
-        <ButtonBack disabled={animationDisabled ? true : undefined}>
-          <ArrowLeftIcon
-            css={css`
-              button:disabled & {
-                opacity: 0.4;
-              }
-            `}
-          />
-        </ButtonBack>
-        <Slider
-          classNameAnimation={animationDisabled ? 'disabled' : undefined}
-          style={{ flex: '1' }}
-          onTransitionEnd={onTransitionEnd}
-        >
-          {scrambleHistory.map((scramble, index) => (
-            <Slide key={index} index={index} style={{ margin: '0 8px' }}>
-              <Text fontSize={['xl', '3xl']} textAlign="center">
-                {scramble}
-              </Text>
-            </Slide>
-          ))}
-        </Slider>
-        <ButtonNext disabled={animationDisabled ? true : undefined}>
-          <ArrowRightIcon
-            css={css`
-              button:disabled & {
-                opacity: 0.4;
-              }
-            `}
-          />
-        </ButtonNext>
-      </HStack>
-    </CarouselProvider>
-  );
-});
 const scrambler = new Scrambow();
 const TimerPage: FC<{ user: UserProfile }> = () => {
   const [usesInspection, setUsesInspection] = useState(true);
@@ -369,7 +275,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
             disabled={isTimerRecording}
           />
         </HStack>
-        <Carousel
+        <ScrambleCarousel
           carouselIndex={currentScramble}
           onCarouselIndexChange={onCarouselIndexChange}
           onTransitionEnd={onCarouselTransitionEnd}
