@@ -255,7 +255,7 @@ export const Timer: FC<
       ref={screenButtonRef}
     >
       <Text
-        fontSize="5xl"
+        fontSize={['5xl', '8xl']}
         fontWeight="bold"
         fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
       >
