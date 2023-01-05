@@ -2,7 +2,7 @@
 import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import {
   Card,
-  Flex,
+  Center,
   Spinner,
   Tab,
   TabList,
@@ -76,9 +76,9 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
               onLoadMoreClick={() => setSize((size) => size + 1)}
             />
           ) : (
-            <Flex justify="center">
+            <Center>
               <Spinner size="xl" />
-            </Flex>
+            </Center>
           )}
         </TabPanel>
         <TabPanel>

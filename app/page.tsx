@@ -521,7 +521,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 </List>
               </VStack>
             ) : (
-              <Box>No record exists.</Box>
+              'No record exists.'
             )}
           </ModalBody>
 
