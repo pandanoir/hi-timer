@@ -3,6 +3,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import {
   Button,
+  Fade,
   Heading,
   HStack,
   IconButton,
@@ -18,14 +19,14 @@ export const Header = () => {
       <Heading>
         <Link href="/">Hi-Timer</Link>
       </Heading>
-      <HStack>
-        <IconButton
-          onClick={toggleColorMode}
-          icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-          aria-label={'toggle color theme'}
-        />
-        {!isLoading &&
-          (user ? (
+      <Fade in={!isLoading}>
+        <HStack>
+          <IconButton
+            onClick={toggleColorMode}
+            icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            aria-label={'toggle color theme'}
+          />
+          {user ? (
             <Button as="a" href="/api/auth/logout">
               Logout
             </Button>
@@ -33,8 +34,9 @@ export const Header = () => {
             <Button as="a" href="/api/auth/login">
               Login
             </Button>
-          ))}
-      </HStack>
+          )}
+        </HStack>
+      </Fade>
     </HStack>
   );
 };
