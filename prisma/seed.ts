@@ -11,6 +11,7 @@ const main = async () => {
         penalty: false,
         dnf: false,
         scramble: scrambler.get()[0].scramble_string,
+        event: '3x3x3',
         userId,
       },
     });
