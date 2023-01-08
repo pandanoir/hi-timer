@@ -56,11 +56,10 @@ type RecordReadApiResponse = {
 const useTimerRecords = (event: string) => {
   const { mutate } = useSWRConfig();
   const { data, error } = useSWR<RecordReadApiResponse>(
-    '/api/record/read',
+    `/api/record/read?event=${event}`,
     async (key) => {
       const url = new URL(key, location.origin);
       url.searchParams.append('limit', '100');
-      url.searchParams.append('event', event);
       return (await fetch(url.toString())).json();
     }
   );
@@ -73,7 +72,7 @@ const useTimerRecords = (event: string) => {
   const update = (id: string, change: Partial<TimerRecord>) => {
     const index = records.findIndex((x) => x.id === id);
     mutate(
-      '/api/record/read',
+      `/api/record/read?event=${event}`,
       fetch('/api/record/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -107,7 +106,7 @@ const useTimerRecords = (event: string) => {
       record: Omit<TimerRecord, 'id' | 'createdAt'> & { createdAt: number }
     ) => {
       mutate(
-        '/api/record/read',
+        `/api/record/read?event=${event}`,
         fetch('/api/record/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -148,7 +147,7 @@ const useTimerRecords = (event: string) => {
     deleteRecord: (id: string) => {
       const index = records.findIndex((x) => x.id === id);
       mutate(
-        '/api/record/read',
+        `/api/record/read?event=${event}`,
         fetch('/api/record/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -169,7 +168,7 @@ const useTimerRecords = (event: string) => {
     },
     restoreDeletedRecord: (record: Omit<TimerRecord, 'id'>) => {
       mutate(
-        '/api/record/read',
+        `/api/record/read?event=${event}`,
         fetch('/api/record/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
