@@ -4,9 +4,9 @@ import { recordToMilliSeconds } from '../../utils/recordToMilliSeconds';
 
 import useSWRInfinite from 'swr/infinite';
 import { TimerRecord } from '../../types/TimerRecord';
-import { Button, Card, VStack } from '@chakra-ui/react';
+import { Button, Card, CardBody, VStack } from '@chakra-ui/react';
 const pageSize = 1000;
-const useDailyAverageInfinite = () => {
+const useDailyAverageInfinite = (event: string) => {
   const { data, error, size, setSize } = useSWRInfinite<{
     data: TimerRecord[];
     hasNextPage: boolean;
@@ -17,6 +17,7 @@ const useDailyAverageInfinite = () => {
       }
       const url = new URL('/api/record/read', location.origin);
       url.searchParams.append('limit', `${pageSize}`);
+      url.searchParams.append('event', event);
       if (prevPage) {
         url.searchParams.append(
           'cursor',
@@ -67,8 +68,8 @@ const useDailyAverageInfinite = () => {
   } as const;
 };
 
-const DailyAverageGraph: FC = () => {
-  const { averages, setSize, hasNextPage } = useDailyAverageInfinite();
+const DailyAverageGraph: FC<{ event: string }> = ({ event }) => {
+  const { averages, setSize, hasNextPage } = useDailyAverageInfinite(event);
   const data = useMemo(
     () =>
       averages
@@ -84,6 +85,15 @@ const DailyAverageGraph: FC = () => {
 
   if (!averages) {
     return null;
+  }
+  if (data.length === 0) {
+    return (
+      <Card w="full" h={96} bg="gray.50">
+        <CardBody color="black" textAlign="left" w="full">
+          No data exists
+        </CardBody>
+      </Card>
+    );
   }
   return (
     <VStack w="full">

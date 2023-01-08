@@ -53,13 +53,14 @@ type RecordReadApiResponse = {
   data: TimerRecord[];
 };
 
-const useTimerRecords = () => {
+const useTimerRecords = (event: string) => {
   const { mutate } = useSWRConfig();
   const { data, error } = useSWR<RecordReadApiResponse>(
     '/api/record/read',
     async (key) => {
       const url = new URL(key, location.origin);
       url.searchParams.append('limit', '100');
+      url.searchParams.append('event', event);
       return (await fetch(url.toString())).json();
     }
   );
@@ -270,7 +271,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     undoDNF,
     deleteRecord,
     restoreDeletedRecord,
-  } = useTimerRecords();
+  } = useTimerRecords(currentEvent);
 
   const prevEvent = useRef<string | null>(null);
   useEffect(() => {
