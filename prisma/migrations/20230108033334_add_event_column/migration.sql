@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `TimerRecord` ADD COLUMN `event` VARCHAR(191) NOT NULL DEFAULT '3x3x3';

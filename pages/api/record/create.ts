@@ -18,6 +18,7 @@ export default withApiAuthRequired(
         penalty: req.body.penalty,
         dnf: req.body.dnf,
         scramble: req.body.scramble,
+        event: req.body.event,
         createdAt: new Date(req.body.createdAt),
         userId: session.user.sub,
       },

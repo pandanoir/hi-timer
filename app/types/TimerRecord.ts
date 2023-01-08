@@ -5,4 +5,5 @@ export type TimerRecord = {
   createdAt: string;
   scramble: string;
   id: string;
+  event: string;
 };

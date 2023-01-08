@@ -20,4 +20,5 @@ model TimerRecord {
   dnf       Boolean
   scramble  String
   userId    String
+  event     String
 }

@@ -22,6 +22,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Select,
   Switch,
   Text,
   useDisclosure,
@@ -227,28 +228,38 @@ const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
 };
 
 const scrambler = new Scrambow();
-const TimerPage: FC<{ user: UserProfile }> = () => {
-  const [usesInspection, setUsesInspection] = useState(true);
 
-  {
-    const hasCalled = useRef(false);
-    useLayoutEffect(() => {
-      if (hasCalled.current) {
-        return;
-      }
-      hasCalled.current = true;
-      try {
-        setUsesInspection(
-          JSON.parse(localStorage.getItem('usesInspection') ?? 'true')
-        );
-      } catch {
-        void 0;
-      }
-    }, []);
-  }
+const useLocalStorageState = <T,>(init: T, key: string) => {
+  const [state, setState] = useState<T>(init);
+
+  const hasCalled = useRef(false);
+  useLayoutEffect(() => {
+    if (hasCalled.current) {
+      return;
+    }
+    hasCalled.current = true;
+    try {
+      setState(JSON.parse(localStorage.getItem(key) ?? `${init}`));
+    } catch {
+      void 0;
+    }
+  }, [init, key]);
+
   useEffect(() => {
-    localStorage.setItem('usesInspection', JSON.stringify(usesInspection));
-  }, [usesInspection]);
+    localStorage.setItem(key, JSON.stringify(state));
+  }, [key, state]);
+  return [state, setState] as const;
+};
+
+const TimerPage: FC<{ user: UserProfile }> = () => {
+  const [usesInspection, setUsesInspection] = useLocalStorageState(
+    true,
+    'usesInspection'
+  );
+  const [currentEvent, setCurrentEvent] = useLocalStorageState(
+    '3x3x3',
+    'currentEvent'
+  );
 
   const {
     records,
@@ -260,6 +271,16 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     deleteRecord,
     restoreDeletedRecord,
   } = useTimerRecords();
+
+  const prevEvent = useRef<string | null>(null);
+  useEffect(() => {
+    if (prevEvent.current === currentEvent) {
+      return;
+    }
+    prevEvent.current = currentEvent;
+    scrambler.setType(currentEvent);
+    setScrambleHistory(scrambler.get(50).map((x) => x.scramble_string));
+  }, [currentEvent]);
 
   const [isTimerRecording, setIsTimerRecording] = useState(false);
   const [scrambleHistory, setScrambleHistory] = useState(() =>
@@ -305,6 +326,20 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     <>
       <VStack flex="1" align="left" as="main">
         <HStack>
+          <Select
+            w="max-content"
+            variant="filled"
+            id="event"
+            value={currentEvent}
+            onChange={(e) => setCurrentEvent(e.target.value)}
+          >
+            <option value="3x3x3">3x3x3</option>
+            <option value="2x2x2">2x2x2</option>
+            <option value="4x4x4">4x4x4</option>
+            <option value="5x5x5">5x5x5</option>
+            <option value="6x6x6">6x6x6</option>
+            <option value="7x7x7">7x7x7</option>
+          </Select>
           <FormLabel userSelect="none" htmlFor="use inspection">
             use inspection:
           </FormLabel>
@@ -334,6 +369,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 penalty: inspectionTime !== null && inspectionTime >= 15000,
                 dnf: inspectionTime !== null && inspectionTime >= 17000,
                 scramble: scrambleHistory[currentScramble],
+                event: currentEvent,
                 createdAt: Date.now(),
               });
               setCurrentScramble((n) => n + 1);
