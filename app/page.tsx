@@ -1,8 +1,8 @@
 'use client';
-import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import {
   Alert,
   AlertDescription,
+  AlertIcon,
   Box,
   Button,
   CloseButton,
@@ -25,15 +25,17 @@ import {
   Select,
   Switch,
   Text,
+  Tooltip,
   useDisclosure,
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import { FC, useMemo, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-import { Timer } from './components/Timer';
-import 'pure-react-carousel/dist/react-carousel.es.css';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 import { AiFillDatabase } from 'react-icons/ai';
+import useSWR, { useSWRConfig } from 'swr';
+import 'pure-react-carousel/dist/react-carousel.es.css';
+import { Timer } from './components/Timer';
 import { TimerRecord } from './types/TimerRecord';
 import { calcAo } from './utils/calcAo';
 import { ScrambleCarousel } from './components/ScrambleCarousel';
@@ -219,27 +221,51 @@ const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
     </List>
   );
 };
-
-const TimerPage: FC = () => {
+const TimerPagePresenter: FC<
+  (
+    | {
+        records: TimerRecord[];
+        createNewRecord: (
+          record: Omit<TimerRecord, 'id' | 'createdAt'> & { createdAt: number }
+        ) => void;
+        imposePenalty: (id: string) => void;
+        toDNF: (id: string) => void;
+        undoPenalty: (id: string) => void;
+        undoDNF: (id: string) => void;
+        deleteRecord: (id: string) => void;
+        restoreDeletedRecord: (record: Omit<TimerRecord, 'id'>) => void;
+      }
+    | {
+        records: undefined;
+        createNewRecord: undefined;
+        imposePenalty: undefined;
+        toDNF: undefined;
+        undoPenalty: undefined;
+        undoDNF: undefined;
+        deleteRecord: undefined;
+        restoreDeletedRecord: undefined;
+      }
+  ) & {
+    currentEvent: string;
+    setCurrentEvent: Dispatch<SetStateAction<string>>;
+  }
+> = ({
+  records,
+  createNewRecord,
+  imposePenalty,
+  toDNF,
+  undoPenalty,
+  undoDNF,
+  deleteRecord,
+  restoreDeletedRecord,
+  currentEvent,
+  setCurrentEvent,
+}) => {
+  const user = useUser();
   const [usesInspection, setUsesInspection] = useLocalStorageState(
     true,
     'usesInspection'
   );
-  const [currentEvent, setCurrentEvent] = useLocalStorageState(
-    '3x3x3',
-    'currentEvent'
-  );
-
-  const {
-    records,
-    createNewRecord,
-    imposePenalty,
-    toDNF,
-    undoPenalty,
-    undoDNF,
-    deleteRecord,
-    restoreDeletedRecord,
-  } = useTimerRecords(currentEvent);
 
   const [isTimerRecording, setIsTimerRecording] = useState(false);
 
@@ -285,6 +311,14 @@ const TimerPage: FC = () => {
             onChange={({ target: { checked } }) => setUsesInspection(checked)}
             disabled={isTimerRecording}
           />
+          {!user.isLoading && !user.user && (
+            <Alert status="error" w="max-content">
+              <AlertIcon />
+              <Tooltip label="Data will be deleted on leaving or reloading this page">
+                anonymous mode
+              </Tooltip>
+            </Alert>
+          )}
         </HStack>
         <ScrambleCarousel
           carouselIndex={currentScramble}
@@ -512,4 +546,126 @@ const TimerPage: FC = () => {
   );
 };
 
-export default withPageAuthRequired(TimerPage);
+const TimerPageWithSWR: FC = () => {
+  const [currentEvent, setCurrentEvent] = useLocalStorageState(
+    '3x3x3',
+    'currentEvent'
+  );
+
+  return (
+    <TimerPagePresenter
+      {...useTimerRecords(currentEvent)}
+      currentEvent={currentEvent}
+      setCurrentEvent={setCurrentEvent}
+    />
+  );
+};
+const useTimerRecords2 = (event: string) => {
+  const [allRecords, setAllRecords] = useState<Record<string, TimerRecord[]>>({
+    [event]: [],
+  });
+  if (typeof allRecords[event] === 'undefined') {
+    allRecords[event] = [];
+  }
+  const records = allRecords[event];
+
+  const update = (id: string, change: Partial<TimerRecord>) => {
+    const index = records.findIndex((x) => x.id === id);
+    setAllRecords((allRecords) => {
+      const records = allRecords[event];
+      return {
+        ...allRecords,
+        [event]: [
+          ...records.slice(0, index),
+          { ...records[index], ...change },
+          ...records.slice(index + 1),
+        ],
+      };
+    });
+  };
+  return {
+    records,
+    error: undefined,
+    createNewRecord: (
+      record: Omit<TimerRecord, 'id' | 'createdAt'> & { createdAt: number }
+    ) => {
+      setAllRecords((allRecords) => {
+        const records = allRecords[event];
+        return {
+          ...allRecords,
+          [event]: [
+            {
+              ...record,
+              id:
+                records.length === 0
+                  ? '0'
+                  : `${Number(records[records.length - 1].id) + 1}`,
+              createdAt: new Date(record.createdAt).toISOString(),
+            },
+            ...records,
+          ],
+        };
+      });
+    },
+    imposePenalty: (id: string) => {
+      update(id, { penalty: true });
+    },
+    toDNF: (id: string) => {
+      update(id, { dnf: true });
+    },
+    undoPenalty: (id: string) => {
+      update(id, { penalty: false });
+    },
+    undoDNF: (id: string) => {
+      update(id, { dnf: false });
+    },
+    deleteRecord: (id: string) => {
+      const index = records.findIndex((x) => x.id === id);
+      setAllRecords((allRecords) => {
+        const records = allRecords[event];
+        return {
+          ...allRecords,
+          [event]: [...records.slice(0, index), ...records.slice(index + 1)],
+        };
+      });
+    },
+    restoreDeletedRecord: (record: Omit<TimerRecord, 'id'>) => {
+      setAllRecords((allRecords) => {
+        const records = allRecords[event];
+        return {
+          ...allRecords,
+          [event]: [
+            {
+              ...record,
+              id:
+                records.length === 0
+                  ? '0'
+                  : `${Number(records[records.length - 1].id) + 1}`,
+            },
+            ...records,
+          ],
+        };
+      });
+    },
+  } as const;
+};
+const AnonymousModeTimerPage: FC = () => {
+  const [currentEvent, setCurrentEvent] = useLocalStorageState(
+    '3x3x3',
+    'currentEvent'
+  );
+
+  return (
+    <TimerPagePresenter
+      {...useTimerRecords2(currentEvent)}
+      currentEvent={currentEvent}
+      setCurrentEvent={setCurrentEvent}
+    />
+  );
+};
+const TimerPage: FC = () => {
+  const { user } = useUser();
+  return user ? <TimerPageWithSWR /> : <AnonymousModeTimerPage />;
+};
+
+export default TimerPage;
