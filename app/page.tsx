@@ -29,16 +29,7 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import {
-  FC,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { Scrambow } from 'scrambow';
+import { FC, useMemo, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { Timer } from './components/Timer';
 import 'pure-react-carousel/dist/react-carousel.es.css';
@@ -48,6 +39,8 @@ import { calcAo } from './utils/calcAo';
 import { ScrambleCarousel } from './components/ScrambleCarousel';
 import { calcBestAo } from './utils/calcBestAo';
 import { recordToMilliSeconds } from './utils/recordToMilliSeconds';
+import { useLocalStorageState } from './hooks/useLocalStorageState';
+import { useScrambleHistory } from './hooks/useScrambleHistory';
 
 type RecordReadApiResponse = {
   data: TimerRecord[];
@@ -227,31 +220,7 @@ const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
   );
 };
 
-const scrambler = new Scrambow();
-
-const useLocalStorageState = <T,>(init: T, key: string) => {
-  const [state, setState] = useState<T>(init);
-
-  const hasCalled = useRef(false);
-  useLayoutEffect(() => {
-    if (hasCalled.current) {
-      return;
-    }
-    hasCalled.current = true;
-    try {
-      setState(JSON.parse(localStorage.getItem(key) ?? `${init}`));
-    } catch {
-      void 0;
-    }
-  }, [init, key]);
-
-  useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(state));
-  }, [key, state]);
-  return [state, setState] as const;
-};
-
-const TimerPage: FC<{ user: UserProfile }> = () => {
+const TimerPage: FC = () => {
   const [usesInspection, setUsesInspection] = useLocalStorageState(
     true,
     'usesInspection'
@@ -272,48 +241,15 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     restoreDeletedRecord,
   } = useTimerRecords(currentEvent);
 
-  const prevEvent = useRef<string | null>(null);
-  useEffect(() => {
-    if (prevEvent.current === currentEvent) {
-      return;
-    }
-    prevEvent.current = currentEvent;
-    scrambler.setType(currentEvent);
-    setScrambleHistory(scrambler.get(50).map((x) => x.scramble_string));
-  }, [currentEvent]);
-
   const [isTimerRecording, setIsTimerRecording] = useState(false);
-  const [scrambleHistory, setScrambleHistory] = useState(() =>
-    scrambler.get(50).map((x) => x.scramble_string)
-  );
-  const [onCarouselTransitionEnd, setOnCarouselTransitionEnd] = useState<
-    (() => void) | undefined
-  >(undefined);
-  const [carouselAnimationDisabled, setCarouselAnimationDisabled] =
-    useState(false);
-  const [currentScramble, setCurrentScramble] = useState(0);
-  const onCarouselIndexChange = useCallback(
-    (nextCarouselIndex: number) => {
-      setCurrentScramble(nextCarouselIndex);
-      if (scrambleHistory.length - nextCarouselIndex >= 10) {
-        return;
-      }
-      // pure-react-carousel は要素を増やすと不要なアニメーションが走る(https://github.com/express-labs/pure-react-carousel/issues/371)
-      // この問題へのワークアラウンドとして、要素を追加したときはアニメーションを一時的に無効化している
-      setOnCarouselTransitionEnd(() => () => {
-        setScrambleHistory((list) => [
-          ...list,
-          ...scrambler.get(50).map((x) => x.scramble_string),
-        ]);
-        setCarouselAnimationDisabled(true);
-        setTimeout(() => {
-          setCarouselAnimationDisabled(false);
-          setOnCarouselTransitionEnd(undefined);
-        }, 100);
-      });
-    },
-    [scrambleHistory]
-  );
+
+  const {
+    scrambleHistory,
+    currentScramble,
+    nextScramble,
+    onCarouselIndexChange,
+    workaround_for_pure_react_carousel,
+  } = useScrambleHistory(currentEvent);
 
   const {
     isOpen: isRecordModalOpen,
@@ -352,10 +288,14 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
         </HStack>
         <ScrambleCarousel
           carouselIndex={currentScramble}
-          onCarouselIndexChange={onCarouselIndexChange}
-          onTransitionEnd={onCarouselTransitionEnd}
           scrambleHistory={scrambleHistory}
-          animationDisabled={carouselAnimationDisabled}
+          onCarouselIndexChange={onCarouselIndexChange}
+          onTransitionEnd={
+            workaround_for_pure_react_carousel.onCarouselTransitionEnd
+          }
+          animationDisabled={
+            workaround_for_pure_react_carousel.carouselAnimationDisabled
+          }
         />
         <Box flex="1">
           <Timer
@@ -372,7 +312,7 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
                 event: currentEvent,
                 createdAt: Date.now(),
               });
-              setCurrentScramble((n) => n + 1);
+              nextScramble();
               setIsTimerRecording(false);
             }}
             onCancel={() => {
