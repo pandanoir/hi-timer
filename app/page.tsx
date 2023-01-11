@@ -314,7 +314,7 @@ const TimerPagePresenter: FC<
           {!user.isLoading && !user.user && (
             <Alert status="error" w="max-content">
               <AlertIcon />
-              <Tooltip label="Data will be deleted on leaving or reloading this page">
+              <Tooltip label="Please login. Data will be deleted on leaving or reloading this page">
                 anonymous mode
               </Tooltip>
             </Alert>
