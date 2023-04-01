@@ -221,6 +221,49 @@ const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
     </List>
   );
 };
+const RecordModal: FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  records: TimerRecord[] | undefined;
+}> = ({ records, isOpen, onClose }) => (
+  <Modal isOpen={isOpen} onClose={onClose} size="3xl">
+    <ModalOverlay />
+    <ModalContent>
+      <ModalHeader>100 most recent time records</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+        {records && records.length > 0 ? (
+          <VStack spacing={2} align="left">
+            <Button as="a" href="/records" w="max-content">
+              See more records
+            </Button>
+            <BestAverages records={records} />
+            <List>
+              {records.map(({ time, penalty, dnf, createdAt }) => {
+                const timeStr = `${Math.trunc(time) / 1000}sec${
+                  penalty ? ' + 2' : ''
+                }`;
+                return (
+                  <ListItem key={createdAt}>
+                    {dnf ? `DNF(${timeStr})` : timeStr}
+                  </ListItem>
+                );
+              })}
+            </List>
+          </VStack>
+        ) : (
+          'No record exists.'
+        )}
+      </ModalBody>
+      <ModalFooter>
+        <Button colorScheme="blue" mr={3} onClick={onClose}>
+          Close
+        </Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+);
+
 const TimerPagePresenter: FC<
   (
     | {
@@ -271,9 +314,7 @@ const TimerPagePresenter: FC<
     true,
     'usesInspection'
   );
-
   const [isTimerRecording, setIsTimerRecording] = useState(false);
-
   const {
     isOpen: isRecordModalOpen,
     onOpen: onRecordModalOpen,
@@ -350,7 +391,7 @@ const TimerPagePresenter: FC<
               setIsTimerRecording(false);
             }}
           >
-            {records && (
+            {!user.isLoading && records && (
               <VStack align="center">
                 {records[0] && (
                   <Text
@@ -399,146 +440,112 @@ const TimerPagePresenter: FC<
             )}
           </Timer>
         </Box>
-        <HStack justify="space-between">
-          <HStack spacing={2} flex="1">
-            {records?.[0] && (
-              <>
-                {!records[0].dnf && (
-                  <Button
-                    key="+2"
-                    onClick={() => {
-                      if (records[0].penalty) {
-                        undoPenalty(records[0].id);
-                      } else {
-                        imposePenalty(records[0].id);
-                      }
-                    }}
-                    disabled={isTimerRecording}
-                    variant="outline"
-                    colorScheme="blue"
-                  >
-                    {records[0].penalty ? 'undo +2' : '+2'}
-                  </Button>
-                )}
+        {!user.isLoading && records?.[0] && (
+          <HStack justify="space-between">
+            <HStack spacing={2} flex="1">
+              {!records[0].dnf && (
                 <Button
-                  key="DNF"
+                  key="+2"
                   onClick={() => {
-                    if (records[0].dnf) {
-                      undoDNF(records[0].id);
+                    if (records[0].penalty) {
+                      undoPenalty(records[0].id);
                     } else {
-                      toDNF(records[0].id);
+                      imposePenalty(records[0].id);
                     }
                   }}
                   disabled={isTimerRecording}
                   variant="outline"
                   colorScheme="blue"
                 >
-                  {records[0].dnf ? 'undo DNF' : 'DNF'}
+                  {records[0].penalty ? 'undo +2' : '+2'}
                 </Button>
-                <Button
-                  key="delete"
-                  onClick={() => {
-                    const deletedRecord = records[0];
-                    deleteRecord(records[0].id);
-                    toast({
-                      isClosable: true,
-                      render: ({ status, variant, onClose, isClosable }) => (
-                        <Alert
-                          addRole={false}
-                          status={status}
-                          variant={variant}
-                          alignItems="start"
-                          borderRadius="md"
-                          boxShadow="lg"
-                          paddingEnd={8}
-                          textAlign="start"
-                          width="auto"
+              )}
+              <Button
+                key="DNF"
+                onClick={() => {
+                  if (records[0].dnf) {
+                    undoDNF(records[0].id);
+                  } else {
+                    toDNF(records[0].id);
+                  }
+                }}
+                disabled={isTimerRecording}
+                variant="outline"
+                colorScheme="blue"
+              >
+                {records[0].dnf ? 'undo DNF' : 'DNF'}
+              </Button>
+              <Button
+                key="delete"
+                onClick={() => {
+                  const deletedRecord = records[0];
+                  deleteRecord(records[0].id);
+                  toast({
+                    isClosable: true,
+                    render: ({ status, variant, onClose, isClosable }) => (
+                      <Alert
+                        addRole={false}
+                        status={status}
+                        variant={variant}
+                        alignItems="start"
+                        borderRadius="md"
+                        boxShadow="lg"
+                        paddingEnd={8}
+                        textAlign="start"
+                        width="auto"
+                      >
+                        <AlertDescription
+                          flex="1"
+                          maxWidth="100%"
+                          display="block"
                         >
-                          <AlertDescription
-                            flex="1"
-                            maxWidth="100%"
-                            display="block"
-                          >
-                            <Flex align="center">
-                              <Text flex="1">deleted</Text>
-                              <Button
-                                variant="ghost"
-                                onClick={() => {
-                                  restoreDeletedRecord(deletedRecord);
-                                  onClose();
-                                }}
-                              >
-                                undo
-                              </Button>
-                            </Flex>
-                          </AlertDescription>
-                          {isClosable && (
-                            <CloseButton
-                              size="md"
-                              onClick={onClose}
-                              position="absolute"
-                              insetEnd={1}
-                              top={1}
-                            />
-                          )}
-                        </Alert>
-                      ),
-                    });
-                  }}
-                  disabled={isTimerRecording}
-                  variant="outline"
-                  colorScheme="red"
-                >
-                  delete
-                </Button>
-              </>
-            )}
+                          <Flex align="center">
+                            <Text flex="1">deleted</Text>
+                            <Button
+                              variant="ghost"
+                              onClick={() => {
+                                restoreDeletedRecord(deletedRecord);
+                                onClose();
+                              }}
+                            >
+                              undo
+                            </Button>
+                          </Flex>
+                        </AlertDescription>
+                        {isClosable && (
+                          <CloseButton
+                            size="md"
+                            onClick={onClose}
+                            position="absolute"
+                            insetEnd={1}
+                            top={1}
+                          />
+                        )}
+                      </Alert>
+                    ),
+                  });
+                }}
+                disabled={isTimerRecording}
+                variant="outline"
+                colorScheme="red"
+              >
+                delete
+              </Button>
+            </HStack>
+            <IconButton
+              onClick={onRecordModalOpen}
+              disabled={isTimerRecording}
+              icon={<Icon as={AiFillDatabase} />}
+              aria-label="open record list"
+            />
           </HStack>
-          <IconButton
-            onClick={onRecordModalOpen}
-            disabled={isTimerRecording}
-            icon={<Icon as={AiFillDatabase} />}
-            aria-label="open record list"
-          />
-        </HStack>
+        )}
       </VStack>
-      <Modal isOpen={isRecordModalOpen} onClose={onRecordModalClose} size="3xl">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>100 most recent time records</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {records && records.length > 0 ? (
-              <VStack spacing={2} align="left">
-                <Button as="a" href="/records" w="max-content">
-                  See more records
-                </Button>
-                <BestAverages records={records} />
-                <List>
-                  {records.map(({ time, penalty, dnf, createdAt }) => {
-                    const timeStr = `${Math.trunc(time) / 1000}sec${
-                      penalty ? ' + 2' : ''
-                    }`;
-                    return (
-                      <ListItem key={createdAt}>
-                        {dnf ? `DNF(${timeStr})` : timeStr}
-                      </ListItem>
-                    );
-                  })}
-                </List>
-              </VStack>
-            ) : (
-              'No record exists.'
-            )}
-          </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onRecordModalClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <RecordModal
+        isOpen={isRecordModalOpen}
+        onClose={onRecordModalClose}
+        records={records}
+      />
     </>
   );
 };
