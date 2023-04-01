@@ -16,7 +16,7 @@ export const useScrambleHistory = (currentEvent: string) => {
     }, [scrambler]);
   }
   {
-    const prevEvent = useRef<string | null>(null);
+    const prevEvent = useRef<string | null>(currentEvent);
     useEffect(() => {
       if (prevEvent.current === currentEvent) {
         return;

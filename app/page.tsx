@@ -23,6 +23,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Spinner,
   Switch,
   Text,
   Tooltip,
@@ -663,8 +664,33 @@ const AnonymousModeTimerPage: FC = () => {
     />
   );
 };
+const LoadingScreen = () => (
+  <VStack flex="1" align="left" as="main">
+    <HStack>
+      <Select w="max-content" variant="filled">
+        <option>3x3x3</option>
+      </Select>
+      <FormLabel userSelect="none" htmlFor="use inspection">
+        use inspection:
+      </FormLabel>
+    </HStack>
+    <ScrambleCarousel
+      carouselIndex={0}
+      scrambleHistory={[]}
+      onCarouselIndexChange={() => void 0}
+      onTransitionEnd={() => void 0}
+      animationDisabled={false}
+    />
+    <VStack h="full" align="center" justify="center" flex="1">
+      <Spinner size="xl" />
+    </VStack>
+  </VStack>
+);
 const TimerPage: FC = () => {
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
   return user ? <TimerPageWithSWR /> : <AnonymousModeTimerPage />;
 };
 
