@@ -23,7 +23,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
-  Spinner,
   Switch,
   Text,
   Tooltip,
@@ -249,7 +248,7 @@ const TimerPagePresenter: FC<
   ) & {
     currentEvent: string;
     setCurrentEvent: Dispatch<SetStateAction<string>>;
-  }
+  } & ReturnType<typeof useScrambleHistory>
 > = ({
   records,
   createNewRecord,
@@ -261,6 +260,11 @@ const TimerPagePresenter: FC<
   restoreDeletedRecord,
   currentEvent,
   setCurrentEvent,
+  scrambleHistory,
+  currentScramble,
+  nextScramble,
+  onCarouselIndexChange,
+  workaround_for_pure_react_carousel,
 }) => {
   const user = useUser();
   const [usesInspection, setUsesInspection] = useLocalStorageState(
@@ -269,14 +273,6 @@ const TimerPagePresenter: FC<
   );
 
   const [isTimerRecording, setIsTimerRecording] = useState(false);
-
-  const {
-    scrambleHistory,
-    currentScramble,
-    nextScramble,
-    onCarouselIndexChange,
-    workaround_for_pure_react_carousel,
-  } = useScrambleHistory(currentEvent);
 
   const {
     isOpen: isRecordModalOpen,
@@ -547,20 +543,14 @@ const TimerPagePresenter: FC<
   );
 };
 
-const TimerPageWithSWR: FC = () => {
-  const [currentEvent, setCurrentEvent] = useLocalStorageState(
-    '3x3x3',
-    'currentEvent'
-  );
-
-  return (
-    <TimerPagePresenter
-      {...useTimerRecords(currentEvent)}
-      currentEvent={currentEvent}
-      setCurrentEvent={setCurrentEvent}
-    />
-  );
-};
+const TimerPageWithSWR: FC<
+  {
+    setCurrentEvent: Dispatch<SetStateAction<string>>;
+    currentEvent: string;
+  } & ReturnType<typeof useScrambleHistory>
+> = (props) => (
+  <TimerPagePresenter {...useTimerRecords(props.currentEvent)} {...props} />
+);
 const useTimerRecords2 = (event: string) => {
   const [allRecords, setAllRecords] = useState<Record<string, TimerRecord[]>>({
     [event]: [],
@@ -650,48 +640,32 @@ const useTimerRecords2 = (event: string) => {
     },
   } as const;
 };
-const AnonymousModeTimerPage: FC = () => {
+const AnonymousModeTimerPage: FC<
+  {
+    setCurrentEvent: Dispatch<SetStateAction<string>>;
+    currentEvent: string;
+  } & ReturnType<typeof useScrambleHistory>
+> = (props) => (
+  <TimerPagePresenter {...useTimerRecords2(props.currentEvent)} {...props} />
+);
+const TimerPage: FC = () => {
+  const { user } = useUser();
   const [currentEvent, setCurrentEvent] = useLocalStorageState(
     '3x3x3',
     'currentEvent'
   );
-
-  return (
-    <TimerPagePresenter
-      {...useTimerRecords2(currentEvent)}
-      currentEvent={currentEvent}
-      setCurrentEvent={setCurrentEvent}
+  const scrambleHistory = useScrambleHistory(currentEvent);
+  return user ? (
+    <TimerPageWithSWR
+      {...scrambleHistory}
+      {...{ currentEvent, setCurrentEvent }}
+    />
+  ) : (
+    <AnonymousModeTimerPage
+      {...scrambleHistory}
+      {...{ currentEvent, setCurrentEvent }}
     />
   );
-};
-const LoadingScreen = () => (
-  <VStack flex="1" align="left" as="main">
-    <HStack>
-      <Select w="max-content" variant="filled">
-        <option>3x3x3</option>
-      </Select>
-      <FormLabel userSelect="none" htmlFor="use inspection">
-        use inspection:
-      </FormLabel>
-    </HStack>
-    <ScrambleCarousel
-      carouselIndex={0}
-      scrambleHistory={[]}
-      onCarouselIndexChange={() => void 0}
-      onTransitionEnd={() => void 0}
-      animationDisabled={false}
-    />
-    <VStack h="full" align="center" justify="center" flex="1">
-      <Spinner size="xl" />
-    </VStack>
-  </VStack>
-);
-const TimerPage: FC = () => {
-  const { user, isLoading } = useUser();
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-  return user ? <TimerPageWithSWR /> : <AnonymousModeTimerPage />;
 };
 
 export default TimerPage;
