@@ -2,6 +2,7 @@ import { Text, Button, VStack } from '@chakra-ui/react';
 import {
   ComponentProps,
   FC,
+  forwardRef,
   memo,
   PropsWithChildren,
   useCallback,
@@ -36,8 +37,12 @@ export const usePreventDefault = <T extends HTMLElement>(
   return ref;
 };
 
-const ScreenButton = (props: ComponentProps<typeof VStack>) => (
-  <VStack h="full" align="center" justify="center" {...props} />
+const ScreenButton = forwardRef<HTMLDivElement, ComponentProps<typeof VStack>>(
+  function ScreenButton(props, ref) {
+    return (
+      <VStack h="full" align="center" justify="center" ref={ref} {...props} />
+    );
+  }
 );
 
 export const Timer: FC<
