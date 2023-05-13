@@ -2,13 +2,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Scrambow } from 'scrambow';
 
 export const useScrambleHistory = (currentEvent: string) => {
-  const scrambler = useState(() => new Scrambow())[0];
+  const [scrambler, setScrambler] = useState<Scrambow | undefined>();
   const [scrambleHistory, setScrambleHistory] = useState<string[]>([]);
   const [currentScramble, setCurrentScramble] = useState(0);
+  useEffect(() => {
+    if (scrambler) {
+      return;
+    }
+    setScrambler(new Scrambow());
+  }, [scrambler]);
   {
     const hasCalled = useRef(false);
     useEffect(() => {
-      if (hasCalled.current) {
+      if (hasCalled.current || !scrambler) {
         return;
       }
       hasCalled.current = true;
@@ -18,7 +24,7 @@ export const useScrambleHistory = (currentEvent: string) => {
   {
     const prevEvent = useRef<string | null>(currentEvent);
     useEffect(() => {
-      if (prevEvent.current === currentEvent) {
+      if (prevEvent.current === currentEvent || !scrambler) {
         return;
       }
       prevEvent.current = currentEvent;
@@ -35,7 +41,7 @@ export const useScrambleHistory = (currentEvent: string) => {
   const onCarouselIndexChange = useCallback(
     (nextCarouselIndex: number) => {
       setCurrentScramble(nextCarouselIndex);
-      if (scrambleHistory.length - nextCarouselIndex >= 10) {
+      if (!scrambler || scrambleHistory.length - nextCarouselIndex >= 10) {
         return;
       }
       // pure-react-carousel は要素を増やすと不要なアニメーションが走る(https://github.com/express-labs/pure-react-carousel/issues/371)
