@@ -8,6 +8,7 @@ import { useLocalStorageState } from './hooks/useLocalStorageState';
 import { useScrambleHistory } from './hooks/useScrambleHistory';
 import { TimerPagePresenter } from './components/TimerPagePresenter';
 import { redirect } from 'next/navigation';
+import { Center, Spinner } from '@chakra-ui/react';
 
 type RecordReadApiResponse = {
   data: TimerRecord[];
@@ -256,7 +257,11 @@ const TimerPage: FC = () => {
   );
   const scrambleHistory = useScrambleHistory(currentEvent);
   if (isLoading) {
-    return null;
+    return (
+      <Center height="100vh">
+        <Spinner size="xl" />
+      </Center>
+    );
   }
   if (!user) {
     redirect('/anonymous');
