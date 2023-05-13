@@ -1,6 +1,6 @@
 'use client';
 import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
-import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useLayoutEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import 'pure-react-carousel/dist/react-carousel.es.css';
 import { TimerRecord } from './types/TimerRecord';
@@ -256,6 +256,15 @@ const TimerPage: FC = () => {
     'currentEvent'
   );
   const scrambleHistory = useScrambleHistory(currentEvent);
+  useLayoutEffect(() => {
+    const $link = document.createElement('link');
+    $link.rel = 'preload';
+    $link.href = `/api/record/read?event=${currentEvent}&limit=100`;
+    $link.as = 'fetch';
+    document.head.appendChild($link);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (isLoading) {
     return (
       <Center height="100vh">
