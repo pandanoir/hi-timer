@@ -21,7 +21,7 @@ const useTimerRecords = (event: string) => {
     async (key) => {
       const url = new URL(key, location.origin);
       url.searchParams.append('limit', '100');
-      return (await fetch(url.toString(), { mode: 'no-cors' })).json(); // preload した値を使うために mode: no-cors にしている
+      return (await fetch(url.toString())).json();
     }
   );
 
