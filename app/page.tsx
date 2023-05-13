@@ -256,14 +256,6 @@ const TimerPage: FC = () => {
     'currentEvent'
   );
   const scrambleHistory = useScrambleHistory(currentEvent);
-  useLayoutEffect(() => {
-    const $link = document.createElement('link');
-    $link.rel = 'preload';
-    $link.href = `/api/record/read?event=${currentEvent}&limit=100`;
-    $link.as = 'fetch';
-    document.head.appendChild($link);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   if (isLoading) {
     return (
