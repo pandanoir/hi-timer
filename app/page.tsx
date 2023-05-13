@@ -7,6 +7,7 @@ import { TimerRecord } from './types/TimerRecord';
 import { useLocalStorageState } from './hooks/useLocalStorageState';
 import { useScrambleHistory } from './hooks/useScrambleHistory';
 import { TimerPagePresenter } from './components/TimerPagePresenter';
+import { redirect } from 'next/navigation';
 
 type RecordReadApiResponse = {
   data: TimerRecord[];
@@ -247,29 +248,23 @@ const useTimerRecords2 = (event: string) => {
     },
   } as const;
 };
-const AnonymousModeTimerPage: FC<
-  {
-    setCurrentEvent: Dispatch<SetStateAction<string>>;
-    currentEvent: string;
-  } & ReturnType<typeof useScrambleHistory>
-> = (props) => (
-  <TimerPagePresenter {...useTimerRecords2(props.currentEvent)} {...props} />
-);
 const TimerPage: FC = () => {
-  const { user } = useUser();
+  const { isLoading, user } = useUser();
   const [currentEvent, setCurrentEvent] = useLocalStorageState(
     '3x3x3',
     'currentEvent'
   );
   const scrambleHistory = useScrambleHistory(currentEvent);
-  return user ? (
+  if (isLoading) {
+    return null;
+  }
+  if (!user) {
+    redirect('/anonymous');
+    return null;
+  }
+  return (
     <TimerPageWithSWR
       user={user}
-      {...scrambleHistory}
-      {...{ currentEvent, setCurrentEvent }}
-    />
-  ) : (
-    <AnonymousModeTimerPage
       {...scrambleHistory}
       {...{ currentEvent, setCurrentEvent }}
     />
