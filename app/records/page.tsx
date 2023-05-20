@@ -125,4 +125,8 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
     </VStack>
   );
 };
-export default withPageAuthRequired(TimerPage);
+
+// HACK: 単に withPageAuthRequired(TimerPage) を export すると TypeError になるのでラップしている
+export default function Page() {
+  return withPageAuthRequired(TimerPage)({});
+}
