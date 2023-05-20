@@ -9,18 +9,11 @@ export const useScrambleHistory = (currentEvent: string) => {
     if (scrambler) {
       return;
     }
-    setScrambler(new Scrambow());
-  }, [scrambler]);
-  {
-    const hasCalled = useRef(false);
-    useEffect(() => {
-      if (hasCalled.current || !scrambler) {
-        return;
-      }
-      hasCalled.current = true;
-      setScrambleHistory(scrambler.get(50).map((x) => x.scramble_string));
-    }, [scrambler]);
-  }
+    const newScrambler = new Scrambow();
+    newScrambler.setType(currentEvent);
+    setScrambler(newScrambler);
+    setScrambleHistory(newScrambler.get(50).map((x) => x.scramble_string));
+  }, [currentEvent, scrambler]);
   {
     const prevEvent = useRef<string | null>(currentEvent);
     useEffect(() => {

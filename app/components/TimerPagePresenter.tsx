@@ -67,12 +67,12 @@ export const TimerPagePresenter: FC<
         restoreDeletedRecord: undefined;
       }
   ) & {
-    user?: UserProfile;
+    isAnonymousMode: boolean;
     currentEvent: string;
     setCurrentEvent: Dispatch<SetStateAction<string>>;
   } & ReturnType<typeof useScrambleHistory>
 > = ({
-  user,
+  isAnonymousMode,
   records,
   createNewRecord,
   imposePenalty,
@@ -127,7 +127,7 @@ export const TimerPagePresenter: FC<
           onChange={({ target: { checked } }) => setUsesInspection(checked)}
           disabled={isTimerRecording}
         />
-        {!user && (
+        {isAnonymousMode && (
           <Alert status="error" w="max-content">
             <AlertIcon />
             <Tooltip label="Please login. Data will be deleted on leaving or reloading this page">

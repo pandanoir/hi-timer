@@ -103,6 +103,7 @@ const TimerPage: FC = () => {
 
   return (
     <TimerPagePresenter
+      isAnonymousMode
       {...useTimerRecords(currentEvent)}
       {...useScrambleHistory(currentEvent)}
       currentEvent={currentEvent}
