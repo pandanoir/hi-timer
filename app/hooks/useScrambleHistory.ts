@@ -12,7 +12,7 @@ export const useScrambleHistory = (currentEvent: string) => {
     const newScrambler = new Scrambow();
     newScrambler.setType(currentEvent);
     setScrambler(newScrambler);
-    setScrambleHistory(newScrambler.get(50).map((x) => x.scramble_string));
+    setScrambleHistory(newScrambler.get(10).map((x) => x.scramble_string));
   }, [currentEvent, scrambler]);
   {
     const prevEvent = useRef<string | null>(currentEvent);
@@ -34,7 +34,7 @@ export const useScrambleHistory = (currentEvent: string) => {
   const onCarouselIndexChange = useCallback(
     (nextCarouselIndex: number) => {
       setCurrentScramble(nextCarouselIndex);
-      if (!scrambler || scrambleHistory.length - nextCarouselIndex >= 10) {
+      if (!scrambler || scrambleHistory.length - nextCarouselIndex >= 8) {
         return;
       }
       // pure-react-carousel は要素を増やすと不要なアニメーションが走る(https://github.com/express-labs/pure-react-carousel/issues/371)
