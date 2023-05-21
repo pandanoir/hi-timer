@@ -37,12 +37,14 @@ export const usePreventDefault = <T extends HTMLElement>(
   return ref;
 };
 
-const ScreenButton = forwardRef<HTMLDivElement, ComponentProps<typeof VStack>>(
-  function ScreenButton(props, ref) {
-    return (
-      <VStack h="full" align="center" justify="center" ref={ref} {...props} />
-    );
-  }
+const ScreenButton = (props: ComponentProps<typeof VStack>) => (
+  <VStack
+    h="full"
+    align="center"
+    justify="center"
+    {...props}
+    style={{ touchAction: 'none' }}
+  />
 );
 
 export const Timer: FC<
@@ -174,7 +176,6 @@ export const Timer: FC<
       prevTimerState.current = timer.state;
     }, [onStart, timer.state]);
   }
-  const screenButtonRef = usePreventDefault<HTMLDivElement>('touchstart');
 
   if (timer.state === 'inspecting' || timer.state === 'before start') {
     let buttonText = 'start';
@@ -196,7 +197,6 @@ export const Timer: FC<
         key={timer.state}
         onPointerDown={on}
         onPointerUp={onReleaseStartButton}
-        ref={screenButtonRef}
       >
         {timer.state === 'before start' && children}
         <Button
@@ -234,7 +234,6 @@ export const Timer: FC<
         }
         onInspectionStartButtonRelease();
       }}
-      ref={screenButtonRef}
     >
       {children}
       <Button
@@ -254,11 +253,7 @@ export const Timer: FC<
       </Button>
     </ScreenButton>
   ) : timer.state === 'recording' ? (
-    <ScreenButton
-      key={timer.state}
-      onPointerDown={timer.stop}
-      ref={screenButtonRef}
-    >
+    <ScreenButton key={timer.state} onPointerDown={timer.stop}>
       <Text
         fontSize={['5xl', '8xl']}
         fontWeight="bold"
