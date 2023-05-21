@@ -15,11 +15,11 @@ import {
 } from '@chakra-ui/react';
 import { FC, lazy, Suspense, useMemo, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
-import { TimerRecord } from '../types/TimerRecord';
-import { RecordTable } from './components/RecordTable';
+import { TimerRecord } from '../_types/TimerRecord';
+import { RecordTable } from './RecordTable';
 
-const RecordGraph = lazy(() => import('./components/RecordGraph'));
-const DailyAverageGraph = lazy(() => import('./components/DailyAverageGraph'));
+const RecordGraph = lazy(() => import('./RecordGraph'));
+const DailyAverageGraph = lazy(() => import('./DailyAverageGraph'));
 const pageSize = 100;
 const useTimerRecordsInfinite = (event: string) => {
   const { data, error, size, setSize } = useSWRInfinite<{

@@ -29,18 +29,17 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import { UserProfile } from '@auth0/nextjs-auth0/client';
 import { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 import { AiFillDatabase } from 'react-icons/ai';
+import { TimerRecord } from '../_types/TimerRecord';
+import { calcAo } from '../_utils/calcAo';
+import { calcBestAo } from '../_utils/calcBestAo';
 import 'pure-react-carousel/dist/react-carousel.es.css';
 import { Timer } from './Timer';
 import { ScrambleCarousel } from './ScrambleCarousel';
-import { TimerRecord } from '../types/TimerRecord';
-import { calcAo } from '../utils/calcAo';
-import { calcBestAo } from '../utils/calcBestAo';
-import { recordToMilliSeconds } from '../utils/recordToMilliSeconds';
-import { useLocalStorageState } from '../hooks/useLocalStorageState';
-import { useScrambleHistory } from '../hooks/useScrambleHistory';
+import { recordToMilliSeconds } from '../_utils/recordToMilliSeconds';
+import { useLocalStorageState } from './useLocalStorageState';
+import { useScrambleHistory } from './useScrambleHistory';
 
 export const TimerPagePresenter: FC<
   (

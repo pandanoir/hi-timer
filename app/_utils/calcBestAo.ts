@@ -1,4 +1,4 @@
-import { TimerRecord } from '../types/TimerRecord';
+import { TimerRecord } from '../_types/TimerRecord';
 import { calcAo } from './calcAo';
 
 export const calcBestAo = (records: TimerRecord[], size: number) => {

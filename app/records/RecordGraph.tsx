@@ -1,7 +1,7 @@
 import { ResponsiveLine } from '@nivo/line';
 import { FC, useMemo } from 'react';
-import { TimerRecord } from '../../types/TimerRecord';
-import { recordToMilliSeconds } from '../../utils/recordToMilliSeconds';
+import { TimerRecord } from '../_types/TimerRecord';
+import { recordToMilliSeconds } from '../_utils/recordToMilliSeconds';
 
 const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
   const data = useMemo(

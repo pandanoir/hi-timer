@@ -7,7 +7,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import './global.css';
-import { Header } from './components/Header';
+import { Header } from './Header';
 
 const manager = createLocalStorageManager('hi-timer-color-mode-manager');
 export default function RootLayout({ children }: PropsWithChildren) {

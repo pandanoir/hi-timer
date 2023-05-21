@@ -1,6 +1,6 @@
 const Head = () => (
   <>
-    <title>Hi-Timer dayo</title>
+    <title>Hi-Timer</title>
     <link
       rel="preload"
       href="/api/auth/me"

@@ -1,4 +1,4 @@
-import { TimerRecord } from '../types/TimerRecord';
+import { TimerRecord } from '../_types/TimerRecord';
 import { recordToMilliSeconds } from './recordToMilliSeconds';
 
 export const calcAo = (records: TimerRecord[]) => {
