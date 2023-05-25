@@ -1,35 +1,18 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getSession } from '../../getSession';
+import { readBody } from '../../readBody';
 
 export const POST = async (req: Request) => {
   const session = await getSession();
   if (!session?.user) {
     throw new Error('authorization required');
   }
-
-  const body = JSON.parse(
-    await new Promise<string>((resolve) => {
-      let text = '';
-      const decoder = new TextDecoder();
-      const reader = req.body?.getReader();
-
-      reader?.read().then(function readChunk({ done, value }) {
-        if (done) {
-          resolve(text);
-          return;
-        }
-
-        text += decoder.decode(value);
-        reader?.read().then(readChunk);
-      });
-    })
-  );
-
+  const body = JSON.parse(await readBody(req));
   if (
     (
       await prisma.timerRecord.findFirst({
-        where: { id: body.id as string },
+        where: { id: body.id },
       })
     )?.userId !== session.user.sub
   ) {
