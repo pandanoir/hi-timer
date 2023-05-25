@@ -27,6 +27,7 @@
     "@types/react-dom": "18.0.10",
     "@typescript-eslint/eslint-plugin": "5.47.1",
     "framer-motion": "6.5.1",
+    "lizod": "0.2.2",
     "next": "13.4.3",
     "patch-package": "6.5.0",
     "prisma": "4.8.0",
@@ -37,7 +38,7 @@
     "react-icons": "4.7.1",
     "scrambow": "1.7.0",
     "swr": "2.0.0",
-    "typescript": "4.9.4"
+    "typescript": "5.0.4"
   },
   "devDependencies": {
     "eslint": "8.30.0",

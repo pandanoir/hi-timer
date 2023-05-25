@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getSession } from '../../getSession';
 import { readBody } from '../../readBody';
+import { $object, $string } from 'lizod';
+
+const validate = $object({ id: $string });
 
 export const POST = async (req: Request) => {
   const session = await getSession();
@@ -9,6 +12,9 @@ export const POST = async (req: Request) => {
     throw new Error('authorization required');
   }
   const body = JSON.parse(await readBody(req));
+  if (!validate(body)) {
+    throw new Error('request body is invalid');
+  }
   if (
     (
       await prisma.timerRecord.findFirst({
