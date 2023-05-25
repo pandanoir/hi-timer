@@ -1,5 +1,8 @@
 'use client';
-import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import {
+  UserProfile,
+  withPageAuthRequired,
+} from '@auth0/nextjs-auth0/dist/client';
 import {
   Card,
   CardBody,

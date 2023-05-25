@@ -2,7 +2,6 @@ import { Text, Button, VStack } from '@chakra-ui/react';
 import {
   ComponentProps,
   FC,
-  forwardRef,
   memo,
   PropsWithChildren,
   useCallback,
