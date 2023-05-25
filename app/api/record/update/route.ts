@@ -2,7 +2,15 @@ import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getSession } from '../../getSession';
 import { readBody } from '../../readBody';
-import { $boolean, $number, $object, $string, $undefined, $union } from 'lizod';
+import {
+  $boolean,
+  $number,
+  $object,
+  $string,
+  $undefined,
+  $union,
+  Infer,
+} from 'lizod';
 
 const validate = $object({
   time: $union([$number, $undefined]),
@@ -13,6 +21,8 @@ const validate = $object({
   event: $union([$string, $undefined]),
   id: $string,
 });
+export type RequestBody = Infer<typeof validate>;
+
 export const POST = async (req: Request) => {
   const session = await getSession();
   if (!session?.user) {

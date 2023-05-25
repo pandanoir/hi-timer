@@ -27,7 +27,7 @@
     "@types/react-dom": "18.0.10",
     "@typescript-eslint/eslint-plugin": "5.47.1",
     "framer-motion": "6.5.1",
-    "lizod": "0.2.2",
+    "lizod": "0.2.3",
     "next": "13.4.3",
     "patch-package": "6.5.0",
     "prisma": "4.8.0",

@@ -1,5 +1,5 @@
 'use client';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@auth0/nextjs-auth0/dist/client';
 import { Dispatch, FC, SetStateAction } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import 'pure-react-carousel/dist/react-carousel.es.css';
@@ -8,6 +8,9 @@ import { useLocalStorageState } from './useLocalStorageState';
 import { useScrambleHistory } from './useScrambleHistory';
 import { TimerPagePresenter } from './TimerPagePresenter';
 import { redirect } from 'next/navigation';
+import { RequestBody as CreateRequestBody } from '../api/record/create/route';
+import { RequestBody as DeleteRequestBody } from '../api/record/delete/route';
+import { RequestBody as UpdateRequestBody } from '../api/record/update/route';
 
 type RecordReadApiResponse = {
   data: TimerRecord[];
@@ -29,7 +32,10 @@ const useTimerRecords = (event: string) => {
   }
   const records = data.data;
 
-  const update = (id: string, change: Partial<TimerRecord>) => {
+  const update = (
+    id: string,
+    change: Partial<Omit<UpdateRequestBody, 'id'>>
+  ) => {
     const index = records.findIndex((x) => x.id === id);
     mutate(
       `/api/record/read?event=${event}`,
@@ -62,15 +68,13 @@ const useTimerRecords = (event: string) => {
   return {
     records,
     error,
-    createNewRecord: (
-      record: Omit<TimerRecord, 'id' | 'createdAt'> & { createdAt: number }
-    ) => {
+    createNewRecord: (record: CreateRequestBody) => {
       mutate(
         `/api/record/read?event=${event}`,
         fetch('/api/record/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(record),
+          body: JSON.stringify(record satisfies CreateRequestBody),
         }).then(
           async (res) =>
             ({
@@ -111,7 +115,7 @@ const useTimerRecords = (event: string) => {
         fetch('/api/record/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id }),
+          body: JSON.stringify({ id } satisfies DeleteRequestBody),
         }).then(
           () =>
             ({

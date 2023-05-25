@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getSession } from '../../getSession';
 import { readBody } from '../../readBody';
-import { $object, $string } from 'lizod';
+import { $object, $string, Infer } from 'lizod';
 
 const validate = $object({ id: $string });
+export type RequestBody = Infer<typeof validate>;
 
 export const POST = async (req: Request) => {
   const session = await getSession();

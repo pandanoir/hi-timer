@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getSession } from '../../getSession';
 import { readBody } from '../../readBody';
-import { $boolean, $number, $object, $string } from 'lizod';
+import { $boolean, $number, $object, $string, Infer } from 'lizod';
+
 const validate = $object({
   time: $number,
   penalty: $boolean,
@@ -11,6 +12,7 @@ const validate = $object({
   event: $string,
   createdAt: $number,
 });
+export type RequestBody = Infer<typeof validate>;
 
 export const POST = async (req: Request) => {
   const session = await getSession();
