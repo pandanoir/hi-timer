@@ -1,5 +1,5 @@
 'use client';
-import { ComponentProps, PropsWithChildren } from 'react';
+import { PropsWithChildren } from 'react';
 import { UserProfile, UserProvider } from '@auth0/nextjs-auth0/client';
 import {
   ChakraProvider,
@@ -9,18 +9,31 @@ import {
 import './global.css';
 import { Header } from './Header';
 import { SWRConfig } from 'swr';
+import { unstable_serialize } from 'swr/infinite';
 
 const manager = createLocalStorageManager('hi-timer-color-mode-manager');
 export const RootLayout = ({
   children,
-  swrConfig,
+  initialRecordData,
   user,
 }: PropsWithChildren<{
-  swrConfig: ComponentProps<typeof SWRConfig>['value'];
+  initialRecordData: unknown;
   user?: UserProfile;
 }>) => {
   return (
-    <SWRConfig value={swrConfig}>
+    <SWRConfig
+      value={{
+        fallback: {
+          '/api/record/read?event=3x3x3': initialRecordData,
+          '/api/record/read?event=3x3x3&limit=100': initialRecordData,
+          '/api/record/read?limit=100&event=3x3x3': initialRecordData,
+          [unstable_serialize(() => '/api/record/read?event=3x3x3&limit=100')]:
+            [initialRecordData],
+          [unstable_serialize(() => '/api/record/read?limit=100&event=3x3x3')]:
+            [initialRecordData],
+        },
+      }}
+    >
       <ChakraProvider colorModeManager={manager}>
         <UserProvider user={user}>
           <VStack align="left" height="100dvh" pb="env(safe-area-inset-bottom)">

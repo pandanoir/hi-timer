@@ -19,9 +19,7 @@ export default async function Layout({ children }: PropsWithChildren) {
     <html>
       <body>
         <RootLayout
-          swrConfig={{
-            fallback: { '/api/record/read?event=3x3x3': await recordPromise },
-          }}
+          initialRecordData={await recordPromise}
           user={await userPromise}
         >
           {children}
