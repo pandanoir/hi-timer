@@ -15,18 +15,19 @@ const useDailyAverageInfinite = (event: string) => {
       if (prevPage?.hasNextPage === false) {
         return null;
       }
-      const url = new URL('/api/record/read', location.origin);
-      url.searchParams.append('limit', `${pageSize}`);
-      url.searchParams.append('event', event);
+      const searchParams = new URLSearchParams();
+      searchParams.append('event', event);
+      searchParams.append('limit', `${pageSize}`);
       if (prevPage) {
-        url.searchParams.append(
+        searchParams.append(
           'cursor',
           prevPage.data[prevPage.data.length - 1].id
         );
       }
-      return url.toString();
+      return `/api/record/read?${searchParams.toString()}`;
     },
-    async (url) => (await fetch(url)).json()
+    async (url) =>
+      (await fetch(new URL(url, location.origin).toString())).json()
   );
   const records = data?.map(({ data }) => data);
 
