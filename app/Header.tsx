@@ -1,5 +1,5 @@
 'use client';
-import { useUser } from '@auth0/nextjs-auth0/dist/client';
+import { useUser } from '@auth0/nextjs-auth0/client';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import {
   Button,

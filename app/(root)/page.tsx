@@ -1,5 +1,5 @@
 'use client';
-import { useUser } from '@auth0/nextjs-auth0/dist/client';
+import { useUser } from '@auth0/nextjs-auth0/client';
 import { Dispatch, FC, SetStateAction } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import 'pure-react-carousel/dist/react-carousel.es.css';
