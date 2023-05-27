@@ -14,7 +14,8 @@ export default async function Layout({ children }: PropsWithChildren) {
     .then(({ GET }) =>
       GET(new Request('http://localhost/api/record/read?event=3x3x3&limit=100'))
     )
-    .then((res) => res.json());
+    .then((res) => res.json())
+    .catch(() => undefined);
   return (
     <html>
       <body>
