@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getSession } from '../../getSession';
+import { TimerRecord } from '@prisma/client';
 
+type Response = {
+  data: TimerRecord[];
+  hasNextPage: boolean;
+};
 export const GET = async (req: Request) => {
   const session = await getSession();
   if (!session?.user) {
@@ -26,5 +31,9 @@ export const GET = async (req: Request) => {
     posts.pop();
   }
 
-  return NextResponse.json({ data: posts, hasNextPage });
+  return NextResponse.json({ data: posts, hasNextPage } satisfies Response);
 };
+export const fetchRecordInServerSide = () =>
+  GET(new Request('http://localhost/api/record/read?event=3x3x3&limit=100'))
+    .then((res) => res.json() as Promise<Response>)
+    .catch(() => undefined);

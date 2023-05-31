@@ -3,16 +3,12 @@ import { setTimeout } from 'timers/promises';
 import { redirect } from 'next/navigation';
 import { SWRConfigClient } from '../SWRConfigClient';
 import { getSession } from '../api/getSession';
+import { fetchRecordInServerSide } from '../api/record/read/route';
 
 export default async function Layout({ children }: PropsWithChildren) {
   const timeout = setTimeout(100, 'timeout' as const);
   const userPromise = getSession().then((session) => session?.user);
-  const recordPromise = import('../api/record/read/route')
-    .then(({ GET }) =>
-      GET(new Request('http://localhost/api/record/read?event=3x3x3&limit=100'))
-    )
-    .then((res) => res.json())
-    .catch(() => undefined);
+  const recordPromise = fetchRecordInServerSide();
 
   if (typeof (await Promise.race([userPromise, timeout])) === 'undefined') {
     redirect('/anonymous');
