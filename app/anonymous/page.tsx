@@ -1,10 +1,10 @@
 'use client';
 import { FC, useState } from 'react';
 import 'pure-react-carousel/dist/react-carousel.es.css';
-import { TimerRecord } from '../../_types/TimerRecord';
-import { useLocalStorageState } from '../useLocalStorageState';
-import { useScrambleHistory } from '../useScrambleHistory';
-import { TimerPagePresenter } from '../TimerPagePresenter';
+import { TimerRecord } from '../_types/TimerRecord';
+import { useLocalStorageState } from '../(root)/useLocalStorageState';
+import { useScrambleHistory } from '../(root)/useScrambleHistory';
+import { TimerPagePresenter } from '../(root)/TimerPagePresenter';
 
 const useTimerRecords = (event: string) => {
   const [allRecords, setAllRecords] = useState<Record<string, TimerRecord[]>>({
