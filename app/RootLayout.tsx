@@ -19,29 +19,29 @@ export const RootLayout = ({
 }: PropsWithChildren<{
   initialRecordData: unknown;
   user?: UserProfile;
-}>) => {
-  return (
-    <SWRConfig
-      value={{
-        fallback: {
-          '/api/record/read?event=3x3x3': initialRecordData,
-          '/api/record/read?event=3x3x3&limit=100': initialRecordData,
-          '/api/record/read?limit=100&event=3x3x3': initialRecordData,
-          [unstable_serialize(() => '/api/record/read?event=3x3x3&limit=100')]:
-            [initialRecordData],
-          [unstable_serialize(() => '/api/record/read?limit=100&event=3x3x3')]:
-            [initialRecordData],
-        },
-      }}
-    >
-      <ChakraProvider colorModeManager={manager}>
-        <UserProvider user={user}>
-          <VStack align="left" height="100dvh" pb="env(safe-area-inset-bottom)">
-            <Header />
-            {children}
-          </VStack>
-        </UserProvider>
-      </ChakraProvider>
-    </SWRConfig>
-  );
-};
+}>) => (
+  <SWRConfig
+    value={{
+      fallback: {
+        '/api/record/read?event=3x3x3': initialRecordData,
+        '/api/record/read?event=3x3x3&limit=100': initialRecordData,
+        '/api/record/read?limit=100&event=3x3x3': initialRecordData,
+        [unstable_serialize(() => '/api/record/read?event=3x3x3&limit=100')]: [
+          initialRecordData,
+        ],
+        [unstable_serialize(() => '/api/record/read?limit=100&event=3x3x3')]: [
+          initialRecordData,
+        ],
+      },
+    }}
+  >
+    <ChakraProvider colorModeManager={manager}>
+      <UserProvider user={user}>
+        <VStack align="left" height="100dvh" pb="env(safe-area-inset-bottom)">
+          <Header />
+          {children}
+        </VStack>
+      </UserProvider>
+    </ChakraProvider>
+  </SWRConfig>
+);
