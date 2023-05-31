@@ -5,7 +5,7 @@ import { fetchRecordInServerSide } from '../api/record/read/route';
 const unstable_serialize = (key: () => string) => `$inf$${key()}`; // import 'swr' すると 'use client' をつけてないって怒られるので自前実装している
 
 export default async function Layout({ children }: PropsWithChildren) {
-  const timeout = setTimeout(100, 'timeout' as const);
+  const timeout = setTimeout(300, 'timeout' as const);
   const recordPromise = fetchRecordInServerSide();
 
   const initialRecordData = await Promise.race([
