@@ -12,15 +12,6 @@ import {
   HStack,
   Icon,
   IconButton,
-  List,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Switch,
   Text,
@@ -29,17 +20,16 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useState } from 'react';
 import { AiFillDatabase } from 'react-icons/ai';
 import { TimerRecord } from '../_types/TimerRecord';
 import { calcAo } from '../_utils/calcAo';
-import { calcBestAo } from '../_utils/calcBestAo';
 import 'pure-react-carousel/dist/react-carousel.es.css';
 import { Timer } from './Timer';
 import { ScrambleCarousel } from './ScrambleCarousel';
-import { recordToMilliSeconds } from '../_utils/recordToMilliSeconds';
 import { useLocalStorageState } from './useLocalStorageState';
 import { useScrambleHistory } from './useScrambleHistory';
+import { RecordModal } from './RecordModal';
 
 export const TimerPagePresenter: FC<
   (
@@ -135,6 +125,7 @@ export const TimerPagePresenter: FC<
           </Alert>
         )}
       </HStack>
+
       <ScrambleCarousel
         carouselIndex={currentScramble}
         scrambleHistory={scrambleHistory}
@@ -146,6 +137,7 @@ export const TimerPagePresenter: FC<
           workaround_for_pure_react_carousel.carouselAnimationDisabled
         }
       />
+
       <Box flex="1">
         <Timer
           usesInspection={usesInspection}
@@ -217,6 +209,7 @@ export const TimerPagePresenter: FC<
           )}
         </Timer>
       </Box>
+
       {records?.[0] && (
         <HStack justify="space-between">
           <HStack spacing={2} flex="1">
@@ -317,6 +310,7 @@ export const TimerPagePresenter: FC<
           />
         </HStack>
       )}
+
       <RecordModal
         isOpen={isRecordModalOpen}
         onClose={onRecordModalClose}
@@ -325,81 +319,3 @@ export const TimerPagePresenter: FC<
     </VStack>
   );
 };
-const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
-  const bestRecords = useMemo<Record<string, number>>(() => {
-    const bestAverages: Record<string, number> = {};
-    const latestRecords = records.flat().slice(0, 100);
-    if (latestRecords.length >= 1) {
-      bestAverages.best = latestRecords
-        .map(recordToMilliSeconds)
-        .sort((a, b) => a - b)[0];
-    }
-    if (latestRecords.length >= 5) {
-      bestAverages.ao5 = calcBestAo(latestRecords, 5);
-    }
-    if (latestRecords.length >= 12) {
-      bestAverages.ao12 = calcBestAo(latestRecords, 12);
-    }
-    if (latestRecords.length >= 100) {
-      bestAverages.ao100 = calcAo(latestRecords);
-    }
-    return bestAverages;
-  }, [records]);
-  return (
-    <List>
-      {Object.entries(bestRecords).map(([ao, val]) => (
-        <ListItem key={ao}>
-          {ao === 'best' ? 'best: ' : `best ${ao}: `}
-          {Number.isFinite(val)
-            ? `${Math.trunc(val / 1000)}.${`${Math.trunc(val % 1000)}`.padStart(
-                3,
-                '0'
-              )}`
-            : 'DNF'}
-        </ListItem>
-      ))}
-    </List>
-  );
-};
-const RecordModal: FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  records: TimerRecord[] | undefined;
-}> = ({ records, isOpen, onClose }) => (
-  <Modal isOpen={isOpen} onClose={onClose} size="3xl">
-    <ModalOverlay />
-    <ModalContent>
-      <ModalHeader>100 most recent time records</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        {records && records.length > 0 ? (
-          <VStack spacing={2} align="left">
-            <Button as="a" href="/records" w="max-content">
-              See more records
-            </Button>
-            <BestAverages records={records} />
-            <List>
-              {records.map(({ time, penalty, dnf, createdAt }) => {
-                const timeStr = `${Math.trunc(time) / 1000}sec${
-                  penalty ? ' + 2' : ''
-                }`;
-                return (
-                  <ListItem key={createdAt}>
-                    {dnf ? `DNF(${timeStr})` : timeStr}
-                  </ListItem>
-                );
-              })}
-            </List>
-          </VStack>
-        ) : (
-          'No record exists.'
-        )}
-      </ModalBody>
-      <ModalFooter>
-        <Button colorScheme="blue" mr={3} onClick={onClose}>
-          Close
-        </Button>
-      </ModalFooter>
-    </ModalContent>
-  </Modal>
-);
