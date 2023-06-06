@@ -10,14 +10,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Layout({ children }: PropsWithChildren) {
-  const timeout = setTimeout(100, 'timeout' as const);
+  const timeout = setTimeout(100, 'timeout' as const).then(() => undefined);
   const userPromise = getSession().then((session) => session?.user);
 
-  const user = await Promise.race([userPromise, timeout]);
   return (
     <html>
       <body>
-        <RootLayout user={user === 'timeout' ? undefined : user}>
+        <RootLayout user={await Promise.race([userPromise, timeout])}>
           {children}
         </RootLayout>
       </body>
