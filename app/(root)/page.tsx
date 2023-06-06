@@ -11,6 +11,7 @@ import { redirect } from 'next/navigation';
 import { RequestBody as CreateRequestBody } from '../api/record/create/route';
 import { RequestBody as DeleteRequestBody } from '../api/record/delete/route';
 import { RequestBody as UpdateRequestBody } from '../api/record/update/route';
+import { appendSearchParamsByEntries } from '../_utils/appendSearchParamsByEntries';
 
 type RecordReadApiResponse = {
   data: TimerRecord[];
@@ -18,11 +19,13 @@ type RecordReadApiResponse = {
 
 const useTimerRecords = (event: string) => {
   const { mutate } = useSWRConfig();
-  const { data, error } = useSWR<RecordReadApiResponse>(
-    `/api/record/read?event=${event}`,
-    async (key) => {
-      const url = new URL(key, location.origin);
-      url.searchParams.append('limit', '100');
+
+  const { data, error } = useSWR(
+    { url: '/api/record/read', query: { event, limit: '100' } },
+    async (key): Promise<RecordReadApiResponse> => {
+      const url = new URL(key.url, location.origin);
+      appendSearchParamsByEntries(url, Object.entries(key.query));
+      url.searchParams.sort();
       return (await fetch(url.toString())).json();
     }
   );
@@ -38,7 +41,7 @@ const useTimerRecords = (event: string) => {
   ) => {
     const index = records.findIndex((x) => x.id === id);
     mutate(
-      `/api/record/read?event=${event}`,
+      { url: '/api/record/read', query: { event } },
       fetch('/api/record/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -70,7 +73,7 @@ const useTimerRecords = (event: string) => {
     error,
     createNewRecord: (record: CreateRequestBody) => {
       mutate(
-        `/api/record/read?event=${event}`,
+        { url: '/api/record/read', query: { event } },
         fetch('/api/record/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -111,7 +114,7 @@ const useTimerRecords = (event: string) => {
     deleteRecord: (id: string) => {
       const index = records.findIndex((x) => x.id === id);
       mutate(
-        `/api/record/read?event=${event}`,
+        { url: '/api/record/read', query: { event } },
         fetch('/api/record/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -132,7 +135,7 @@ const useTimerRecords = (event: string) => {
     },
     restoreDeletedRecord: (record: Omit<TimerRecord, 'id'>) => {
       mutate(
-        `/api/record/read?event=${event}`,
+        { url: '/api/record/read', query: { event } },
         fetch('/api/record/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

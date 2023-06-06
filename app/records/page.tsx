@@ -17,32 +17,33 @@ import { FC, lazy, Suspense, useMemo, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { TimerRecord } from '../_types/TimerRecord';
 import { RecordTable } from './RecordTable';
+import { appendSearchParamsByEntries } from '../_utils/appendSearchParamsByEntries';
 
 const RecordGraph = lazy(() => import('./RecordGraph'));
 const DailyAverageGraph = lazy(() => import('./DailyAverageGraph'));
 const pageSize = 100;
+type RecordPage = { data: TimerRecord[]; hasNextPage: boolean };
 const useTimerRecordsInfinite = (event: string) => {
-  const { data, error, size, setSize } = useSWRInfinite<{
-    data: TimerRecord[];
-    hasNextPage: boolean;
-  }>(
-    (_pageIndex, prevPage) => {
+  const { data, error, size, setSize } = useSWRInfinite(
+    (_pageIndex, prevPage: RecordPage | null) => {
       if (prevPage?.hasNextPage === false) {
         return null;
       }
-      const searchParams = new URLSearchParams();
-      searchParams.append('event', event);
-      searchParams.append('limit', `${pageSize}`);
-      if (prevPage) {
-        searchParams.append(
-          'cursor',
-          prevPage.data[prevPage.data.length - 1].id
-        );
-      }
-      return `/api/record/read?${searchParams.toString()}`;
+      return {
+        url: '/api/record/read',
+        query: {
+          event,
+          limit: `${pageSize}`,
+          cursor: prevPage?.data[prevPage.data.length - 1].id,
+        },
+      };
     },
-    async (url) =>
-      (await fetch(new URL(url, location.origin).toString())).json()
+    async (key): Promise<RecordPage> => {
+      const url = new URL(key.url, location.origin);
+      appendSearchParamsByEntries(url, Object.entries(key.query));
+      url.searchParams.sort();
+      return (await fetch(url.toString())).json();
+    }
   );
   const records = useMemo(() => data?.map(({ data }) => data), [data]);
 
