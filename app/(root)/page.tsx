@@ -41,7 +41,7 @@ const useTimerRecords = (event: string) => {
   ) => {
     const index = records.findIndex((x) => x.id === id);
     mutate(
-      { url: '/api/record/read', query: { event } },
+      { url: '/api/record/read', query: { event, limit: '100' } },
       fetch('/api/record/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -73,7 +73,7 @@ const useTimerRecords = (event: string) => {
     error,
     createNewRecord: (record: CreateRequestBody) => {
       mutate(
-        { url: '/api/record/read', query: { event } },
+        { url: '/api/record/read', query: { event, limit: '100' } },
         fetch('/api/record/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -114,7 +114,7 @@ const useTimerRecords = (event: string) => {
     deleteRecord: (id: string) => {
       const index = records.findIndex((x) => x.id === id);
       mutate(
-        { url: '/api/record/read', query: { event } },
+        { url: '/api/record/read', query: { event, limit: '100' } },
         fetch('/api/record/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -135,7 +135,7 @@ const useTimerRecords = (event: string) => {
     },
     restoreDeletedRecord: (record: Omit<TimerRecord, 'id'>) => {
       mutate(
-        { url: '/api/record/read', query: { event } },
+        { url: '/api/record/read', query: { event, limit: '100' } },
         fetch('/api/record/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
