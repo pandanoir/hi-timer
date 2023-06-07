@@ -3,14 +3,12 @@ import { FC, useMemo } from 'react';
 import { recordToMilliSeconds } from '../_utils/recordToMilliSeconds';
 
 import useSWRInfinite from 'swr/infinite';
-import { TimerRecord } from '../_types/TimerRecord';
 import { Button, Card, CardBody, VStack } from '@chakra-ui/react';
-import { appendSearchParamsByEntries } from '../_utils/appendSearchParamsByEntries';
+import { RecordPage, fetchRecordPage } from '../_utils/fetchRecordPage';
 const pageSize = 1000;
 
-type RecordPage = { data: TimerRecord[]; hasNextPage: boolean };
 const useDailyAverageInfinite = (event: string) => {
-  const { data, error, size, setSize } = useSWRInfinite(
+  const { data, error, size, setSize } = useSWRInfinite<RecordPage>(
     (_pageIndex, prevPage: RecordPage | null) => {
       if (prevPage?.hasNextPage === false) {
         return null;
@@ -22,14 +20,9 @@ const useDailyAverageInfinite = (event: string) => {
           limit: `${pageSize}`,
           cursor: prevPage?.data[prevPage.data.length - 1].id,
         },
-      };
+      } satisfies Parameters<typeof fetchRecordPage>[0];
     },
-    async (key): Promise<RecordPage> => {
-      const url = new URL(key.url, location.origin);
-      appendSearchParamsByEntries(url, Object.entries(key.query));
-      url.searchParams.sort();
-      return (await fetch(url.toString())).json();
-    }
+    fetchRecordPage
   );
   const records = data?.map(({ data }) => data);
 

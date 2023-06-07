@@ -11,23 +11,13 @@ import { redirect } from 'next/navigation';
 import { RequestBody as CreateRequestBody } from '../api/record/create/route';
 import { RequestBody as DeleteRequestBody } from '../api/record/delete/route';
 import { RequestBody as UpdateRequestBody } from '../api/record/update/route';
-import { appendSearchParamsByEntries } from '../_utils/appendSearchParamsByEntries';
-
-type RecordReadApiResponse = {
-  data: TimerRecord[];
-};
+import { RecordPage, fetchRecordPage } from '../_utils/fetchRecordPage';
 
 const useTimerRecords = (event: string) => {
   const { mutate } = useSWRConfig();
-
   const { data, error } = useSWR(
     { url: '/api/record/read', query: { event, limit: '100' } },
-    async (key): Promise<RecordReadApiResponse> => {
-      const url = new URL(key.url, location.origin);
-      appendSearchParamsByEntries(url, Object.entries(key.query));
-      url.searchParams.sort();
-      return (await fetch(url.toString())).json();
-    }
+    fetchRecordPage
   );
 
   if (!data) {
@@ -54,7 +44,7 @@ const useTimerRecords = (event: string) => {
               await res.json(),
               ...records.slice(index + 1),
             ],
-          } satisfies RecordReadApiResponse)
+          } satisfies Omit<RecordPage, 'hasNextPage'>)
       ),
       {
         optimisticData: {
@@ -63,7 +53,7 @@ const useTimerRecords = (event: string) => {
             { ...records[index], ...change },
             ...records.slice(index + 1),
           ],
-        } satisfies RecordReadApiResponse,
+        } satisfies Omit<RecordPage, 'hasNextPage'>,
         rollbackOnError: true,
       }
     );
@@ -80,9 +70,10 @@ const useTimerRecords = (event: string) => {
           body: JSON.stringify(record satisfies CreateRequestBody),
         }).then(
           async (res) =>
-            ({
-              data: [await res.json(), ...records],
-            } satisfies RecordReadApiResponse)
+            ({ data: [await res.json(), ...records] } satisfies Omit<
+              RecordPage,
+              'hasNextPage'
+            >)
         ),
         {
           optimisticData: {
@@ -94,7 +85,7 @@ const useTimerRecords = (event: string) => {
               },
               ...records,
             ],
-          } satisfies RecordReadApiResponse,
+          } satisfies Omit<RecordPage, 'hasNextPage'>,
           rollbackOnError: true,
         }
       );
@@ -123,12 +114,12 @@ const useTimerRecords = (event: string) => {
           () =>
             ({
               data: [...records.slice(0, index), ...records.slice(index + 1)],
-            } satisfies RecordReadApiResponse)
+            } satisfies Omit<RecordPage, 'hasNextPage'>)
         ),
         {
           optimisticData: {
             data: [...records.slice(0, index), ...records.slice(index + 1)],
-          } satisfies RecordReadApiResponse,
+          } satisfies Omit<RecordPage, 'hasNextPage'>,
           rollbackOnError: true,
         }
       );
@@ -142,14 +133,15 @@ const useTimerRecords = (event: string) => {
           body: JSON.stringify(record),
         }).then(
           async (res) =>
-            ({
-              data: [await res.json(), ...records],
-            } satisfies RecordReadApiResponse)
+            ({ data: [await res.json(), ...records] } satisfies Omit<
+              RecordPage,
+              'hasNextPage'
+            >)
         ),
         {
           optimisticData: {
             data: [{ ...record, id: 'temp' }, ...records],
-          } satisfies RecordReadApiResponse,
+          } satisfies Omit<RecordPage, 'hasNextPage'>,
           rollbackOnError: true,
         }
       );

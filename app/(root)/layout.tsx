@@ -28,7 +28,7 @@ export default async function Layout({ children }: PropsWithChildren) {
       }}
       keyValues={[
         [
-          { url: '/api/record/read', query: { event: '3x3x3' } },
+          { url: '/api/record/read', query: { event: '3x3x3', limit: '100' } },
           initialRecordData,
         ],
       ]}

@@ -15,14 +15,12 @@ import {
 } from '@chakra-ui/react';
 import { FC, lazy, Suspense, useMemo, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
-import { TimerRecord } from '../_types/TimerRecord';
 import { RecordTable } from './RecordTable';
-import { appendSearchParamsByEntries } from '../_utils/appendSearchParamsByEntries';
+import { RecordPage, fetchRecordPage } from '../_utils/fetchRecordPage';
 
 const RecordGraph = lazy(() => import('./RecordGraph'));
 const DailyAverageGraph = lazy(() => import('./DailyAverageGraph'));
 const pageSize = 100;
-type RecordPage = { data: TimerRecord[]; hasNextPage: boolean };
 const useTimerRecordsInfinite = (event: string) => {
   const { data, error, size, setSize } = useSWRInfinite(
     (_pageIndex, prevPage: RecordPage | null) => {
@@ -36,14 +34,9 @@ const useTimerRecordsInfinite = (event: string) => {
           limit: `${pageSize}`,
           cursor: prevPage?.data[prevPage.data.length - 1].id,
         },
-      };
+      } satisfies Parameters<typeof fetchRecordPage>[0];
     },
-    async (key): Promise<RecordPage> => {
-      const url = new URL(key.url, location.origin);
-      appendSearchParamsByEntries(url, Object.entries(key.query));
-      url.searchParams.sort();
-      return (await fetch(url.toString())).json();
-    }
+    fetchRecordPage
   );
   const records = useMemo(() => data?.map(({ data }) => data), [data]);
 
