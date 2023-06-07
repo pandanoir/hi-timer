@@ -186,17 +186,7 @@ export const Timer: FC<
 
   const bg = useColorModeValue('whiteAlpha.700', 'blackAlpha.600');
 
-  if (timer.state === 'inspecting' || timer.state === 'before start') {
-    let buttonText = 'start';
-    if (timer.state === 'inspecting') {
-      buttonText =
-        timer.elapsedInspectionTime < 15000
-          ? `${15 - Math.trunc(timer.elapsedInspectionTime / 1000)}sec`
-          : timer.elapsedInspectionTime < 17000
-          ? '+2'
-          : 'DNF';
-    }
-
+  if (timer.state === 'before start') {
     // 押してる秒数に応じて色が変わる
     const colorScheme =
       isReadyToStart !== null ? (isReadyToStart ? 'pink' : 'teal') : undefined;
@@ -207,30 +197,55 @@ export const Timer: FC<
         onPointerDown={on}
         onPointerUp={onReleaseStartButton}
       >
-        {timer.state === 'before start' && children}
+        {children}
         <Button
           onPointerDown={on}
           onPointerUp={onReleaseStartButton}
           colorScheme={colorScheme}
         >
-          {buttonText}
+          start
         </Button>
-        {timer.state === 'inspecting' && (
-          <Button
-            onPointerDown={(event) => {
-              event.stopPropagation();
-            }}
-            onClick={() => {
-              onCancel();
-              off();
-              timer.cancel();
-            }}
-            colorScheme="red"
-          >
-            cancel
-          </Button>
-        )}
       </ScreenButton>
+    );
+  }
+  if (timer.state === 'inspecting') {
+    // 押してる秒数に応じて色が変わる
+    const colorScheme =
+      isReadyToStart !== null ? (isReadyToStart ? 'pink' : 'teal') : undefined;
+
+    return (
+      <Modal isOpen onClose={() => void 0} size="full">
+        <ModalOverlay bg={bg} />
+        <ModalContent bg="transparent" boxShadow="none" m="0">
+          <ScreenButton
+            key={timer.state}
+            onPointerDown={on}
+            onPointerUp={onReleaseStartButton}
+            h="100dvh"
+          >
+            <Button colorScheme={colorScheme}>
+              {timer.elapsedInspectionTime < 15000
+                ? `${15 - Math.trunc(timer.elapsedInspectionTime / 1000)}sec`
+                : timer.elapsedInspectionTime < 17000
+                ? '+2'
+                : 'DNF'}
+            </Button>
+            <Button
+              onPointerDown={(event) => {
+                event.stopPropagation();
+              }}
+              onClick={() => {
+                onCancel();
+                off();
+                timer.cancel();
+              }}
+              colorScheme="red"
+            >
+              cancel
+            </Button>
+          </ScreenButton>
+        </ModalContent>
+      </Modal>
     );
   }
   return timer.state === 'before inspection' ? (
@@ -262,24 +277,22 @@ export const Timer: FC<
       </Button>
     </ScreenButton>
   ) : timer.state === 'recording' ? (
-    <Modal isOpen onClose={timer.stop}>
+    <Modal isOpen onClose={timer.stop} isCentered>
       <ModalOverlay bg={bg} />
       <ModalContent bg="transparent" boxShadow="none" m="0">
-        <VStack align="center" h="100dvh">
-          <ScreenButton key={timer.state} onPointerDown={timer.stop}>
-            <Text
-              fontSize={['5xl', '8xl']}
-              fontWeight="bold"
-              fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
-            >
-              {typeof timer.elapsedTime === 'number' &&
-                `${Math.trunc(timer.elapsedTime / 1000)}.${`${
-                  timer.elapsedTime % 1000
-                }`.padStart(3, '0')}sec`}
-            </Text>
-            <Button onPointerDown={timer.stop}>stop</Button>
-          </ScreenButton>
-        </VStack>
+        <ScreenButton key={timer.state} onPointerDown={timer.stop}>
+          <Text
+            fontSize={['5xl', '8xl']}
+            fontWeight="bold"
+            fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
+          >
+            {typeof timer.elapsedTime === 'number' &&
+              `${Math.trunc(timer.elapsedTime / 1000)}.${`${
+                timer.elapsedTime % 1000
+              }`.padStart(3, '0')}sec`}
+          </Text>
+          <Button onPointerDown={timer.stop}>stop</Button>
+        </ScreenButton>
       </ModalContent>
     </Modal>
   ) : (
