@@ -1,4 +1,12 @@
-import { Text, Button, VStack } from '@chakra-ui/react';
+import {
+  Text,
+  Button,
+  VStack,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import {
   ComponentProps,
   FC,
@@ -176,6 +184,8 @@ export const Timer: FC<
     }, [onStart, timer.state]);
   }
 
+  const bg = useColorModeValue('whiteAlpha.700', 'blackAlpha.600');
+
   if (timer.state === 'inspecting' || timer.state === 'before start') {
     let buttonText = 'start';
     if (timer.state === 'inspecting') {
@@ -252,19 +262,26 @@ export const Timer: FC<
       </Button>
     </ScreenButton>
   ) : timer.state === 'recording' ? (
-    <ScreenButton key={timer.state} onPointerDown={timer.stop}>
-      <Text
-        fontSize={['5xl', '8xl']}
-        fontWeight="bold"
-        fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
-      >
-        {typeof timer.elapsedTime === 'number' &&
-          `${Math.trunc(timer.elapsedTime / 1000)}.${`${
-            timer.elapsedTime % 1000
-          }`.padStart(3, '0')}sec`}
-      </Text>
-      <Button onPointerDown={timer.stop}>stop</Button>
-    </ScreenButton>
+    <Modal isOpen onClose={timer.stop}>
+      <ModalOverlay bg={bg} />
+      <ModalContent bg="transparent" boxShadow="none" m="0">
+        <VStack align="center" h="100dvh">
+          <ScreenButton key={timer.state} onPointerDown={timer.stop}>
+            <Text
+              fontSize={['5xl', '8xl']}
+              fontWeight="bold"
+              fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
+            >
+              {typeof timer.elapsedTime === 'number' &&
+                `${Math.trunc(timer.elapsedTime / 1000)}.${`${
+                  timer.elapsedTime % 1000
+                }`.padStart(3, '0')}sec`}
+            </Text>
+            <Button onPointerDown={timer.stop}>stop</Button>
+          </ScreenButton>
+        </VStack>
+      </ModalContent>
+    </Modal>
   ) : (
     (timer satisfies never, null)
   );
