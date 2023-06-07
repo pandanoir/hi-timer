@@ -10,8 +10,8 @@ const validate = $object({
       createdAt: $string,
       scramble: $string,
       id: $string,
-      event: $string,
       userId: $string,
+      event: $string,
     })
   ),
   hasNextPage: $boolean,
@@ -29,6 +29,7 @@ export const fetchRecordPage = async (key: {
   if (!validate(res)) {
     throw new Error('invalid response');
   }
-  return res;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return { ...res, data: res.data.map(({ userId: _, ...x }) => x) };
 };
-export type RecordPage = Awaited<typeof fetchRecordPage>;
+export type RecordPage = Awaited<ReturnType<typeof fetchRecordPage>>;
