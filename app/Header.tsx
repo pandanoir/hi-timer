@@ -27,14 +27,16 @@ export const Header = () => {
             aria-label={'toggle color theme'}
             variant="outline"
           />
-          <Button
-            as="a"
-            href="/records"
-            variant="outline"
-            display={{ base: 'none', md: 'inline-flex' }}
-          >
-            Records
-          </Button>
+          {user && (
+            <Button
+              as="a"
+              href="/records"
+              variant="outline"
+              display={{ base: 'none', md: 'inline-flex' }}
+            >
+              Records
+            </Button>
+          )}
           {user ? (
             <Button as="a" href="/api/auth/logout">
               Logout
