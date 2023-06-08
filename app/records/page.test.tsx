@@ -2,11 +2,10 @@
  * @jest-environment jsdom
  */
 import 'whatwg-fetch';
-import { render } from '@testing-library/react';
 import RecordPage from './page';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
-import { ChakraProvider } from '@chakra-ui/react';
 import { SWRConfig, unstable_serialize } from 'swr';
+import { render } from '../../__tests__/render';
 
 describe('RecordPage', () => {
   test('snapshot', async () => {
@@ -23,9 +22,7 @@ describe('RecordPage', () => {
           sid: '000000000000000000000000-0000000',
         }}
       >
-        <ChakraProvider>
-          <RecordPage />
-        </ChakraProvider>
+        <RecordPage />
       </UserProvider>
     );
     await findByRole('combobox');
@@ -94,9 +91,7 @@ describe('RecordPage', () => {
             sid: '000000000000000000000000-0000000',
           }}
         >
-          <ChakraProvider>
-            <RecordPage />
-          </ChakraProvider>
+          <RecordPage />
         </UserProvider>
       </SWRConfig>
     );

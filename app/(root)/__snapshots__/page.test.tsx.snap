@@ -1,0 +1,379 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TimerPage snapshot 1`] = `
+<DocumentFragment>
+  <main
+    class="chakra-stack css-1wnpsqa"
+  >
+    <div
+      class="chakra-stack css-84zodg"
+    >
+      <div
+        class="chakra-select__wrapper css-dsdwpa"
+      >
+        <select
+          class="chakra-select css-1icl0uu"
+          id="event"
+        >
+          <option
+            value="3x3x3"
+          >
+            3x3x3
+          </option>
+          <option
+            value="2x2x2"
+          >
+            2x2x2
+          </option>
+          <option
+            value="4x4x4"
+          >
+            4x4x4
+          </option>
+          <option
+            value="5x5x5"
+          >
+            5x5x5
+          </option>
+          <option
+            value="6x6x6"
+          >
+            6x6x6
+          </option>
+          <option
+            value="7x7x7"
+          >
+            7x7x7
+          </option>
+        </select>
+        <div
+          class="chakra-select__icon-wrapper css-iohxn1"
+        >
+          <svg
+            aria-hidden="true"
+            class="chakra-select__icon"
+            focusable="false"
+            role="presentation"
+            style="width: 1em; height: 1em; color: currentColor;"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              fill="currentColor"
+            />
+          </svg>
+        </div>
+      </div>
+      <label
+        class="chakra-form__label css-7jx72b"
+        for="use inspection"
+      >
+        use inspection:
+      </label>
+      <label
+        class="chakra-switch css-ghot30"
+        data-checked=""
+      >
+        <input
+          aria-disabled="false"
+          checked=""
+          class="chakra-switch__input"
+          id="use inspection"
+          style="border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 1px; width: 1px; margin: -1px; padding: 0px; overflow: hidden; white-space: nowrap; position: absolute;"
+          type="checkbox"
+          value=""
+        />
+        <span
+          aria-hidden="true"
+          class="chakra-switch__track css-p27qcy"
+          data-checked=""
+        >
+          <span
+            class="chakra-switch__thumb css-7roig"
+            data-checked=""
+          />
+        </span>
+      </label>
+    </div>
+    <div
+      class="carousel"
+    >
+      <div
+        class="chakra-stack css-1d0c3h9"
+      >
+        <button
+          aria-label="previous"
+          class="buttonBack___1mlaL carousel__back-button"
+          disabled=""
+          type="button"
+        >
+          <svg
+            class="chakra-icon css-1wm76gt"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <g
+              fill="currentColor"
+            >
+              <path
+                d="M10.416,12a2.643,2.643,0,0,1,.775-1.875L20.732.584a1.768,1.768,0,0,1,2.5,2.5l-8.739,8.739a.25.25,0,0,0,0,.354l8.739,8.739a1.768,1.768,0,0,1-2.5,2.5l-9.541-9.541A2.643,2.643,0,0,1,10.416,12Z"
+              />
+              <path
+                d="M.25,12a2.643,2.643,0,0,1,.775-1.875L10.566.584a1.768,1.768,0,0,1,2.5,2.5L4.327,11.823a.25.25,0,0,0,0,.354l8.739,8.739a1.768,1.768,0,0,1-2.5,2.5L1.025,13.875A2.643,2.643,0,0,1,.25,12Z"
+              />
+            </g>
+          </svg>
+        </button>
+        <div
+          aria-label="slider"
+          aria-live="polite"
+          class="horizontalSlider___281Ls carousel__slider carousel__slider--horizontal"
+          role="listbox"
+          style="flex: 1;"
+          tabindex="0"
+        >
+          <div
+            class="carousel__slider-tray-wrapper carousel__slider-tray-wrap--horizontal"
+          >
+            <div
+              class="sliderTray___-vHFQ sliderAnimation___300FY carousel__slider-tray carousel__slider-tray--horizontal"
+              style="display: flex; align-items: stretch; width: 1000%; transform: translateX(0%) translateX(0px); flex-direction: row;"
+            >
+              <div
+                aria-label="slide"
+                aria-selected="true"
+                class="slide___3-Nqo slideHorizontal___1NzNV carousel__slide carousel__slide--visible"
+                role="option"
+                style="margin: 0px 8px; width: 10%;"
+                tabindex="0"
+              >
+                <div
+                  class="slideInner___2mfX9 carousel__inner-slide"
+                  style="position: unset;"
+                >
+                  <p
+                    class="chakra-text css-1ptu84h"
+                  >
+                    R2 D' L2 B2 D  B2 U' R2 U' R2 B2 F  L' U  B  U  B  L  U  R  B' 
+                  </p>
+                </div>
+              </div>
+              <div
+                aria-label="slide"
+                aria-selected="false"
+                class="slide___3-Nqo slideHorizontal___1NzNV carousel__slide carousel__slide--hidden"
+                role="option"
+                style="margin: 0px 8px; width: 10%;"
+                tabindex="-1"
+              >
+                <div
+                  class="slideInner___2mfX9 carousel__inner-slide"
+                  style="position: unset;"
+                >
+                  <p
+                    class="chakra-text css-1ptu84h"
+                  >
+                    U' L2 U  R2 B2 D2 B2 U  L2 U  B2 U  B  D2 U2 B' D  U2 R' F' R  U' 
+                  </p>
+                </div>
+              </div>
+              <div
+                aria-label="slide"
+                aria-selected="false"
+                class="slide___3-Nqo slideHorizontal___1NzNV carousel__slide carousel__slide--hidden"
+                role="option"
+                style="margin: 0px 8px; width: 10%;"
+                tabindex="-1"
+              >
+                <div
+                  class="slideInner___2mfX9 carousel__inner-slide"
+                  style="position: unset;"
+                >
+                  <p
+                    class="chakra-text css-1ptu84h"
+                  >
+                    B2 D2 L2 D  R2 B2 F2 U2 B2 R2 F2 D  B' D' F' U' B2 D2 L  D2 
+                  </p>
+                </div>
+              </div>
+              <div
+                aria-label="slide"
+                aria-selected="false"
+                class="slide___3-Nqo slideHorizontal___1NzNV carousel__slide carousel__slide--hidden"
+                role="option"
+                style="margin: 0px 8px; width: 10%;"
+                tabindex="-1"
+              >
+                <div
+                  class="slideInner___2mfX9 carousel__inner-slide"
+                  style="position: unset;"
+                >
+                  <p
+                    class="chakra-text css-1ptu84h"
+                  >
+                    U2 R2 D' F2 D  L2 D  B2 F2 D' B2 D' L' D' B' R  F  L  B' R' 
+                  </p>
+                </div>
+              </div>
+              <div
+                aria-label="slide"
+                aria-selected="false"
+                class="slide___3-Nqo slideHorizontal___1NzNV carousel__slide carousel__slide--hidden"
+                role="option"
+                style="margin: 0px 8px; width: 10%;"
+                tabindex="-1"
+              >
+                <div
+                  class="slideInner___2mfX9 carousel__inner-slide"
+                  style="position: unset;"
+                >
+                  <p
+                    class="chakra-text css-1ptu84h"
+                  >
+                    D' F2 U' L2 U' F2 D  U2 B2 U  F2 L2 B' R' D2 R' B2 D2 F  D2 R  
+                  </p>
+                </div>
+              </div>
+              <div
+                aria-label="slide"
+                aria-selected="false"
+                class="slide___3-Nqo slideHorizontal___1NzNV carousel__slide carousel__slide--hidden"
+                role="option"
+                style="margin: 0px 8px; width: 10%;"
+                tabindex="-1"
+              >
+                <div
+                  class="slideInner___2mfX9 carousel__inner-slide"
+                  style="position: unset;"
+                >
+                  <p
+                    class="chakra-text css-1ptu84h"
+                  >
+                    R2 U' F2 U  F2 R2 U' R2 B2 U2 L2 D2 B  U  F  L' U' F' R  D' B  U' 
+                  </p>
+                </div>
+              </div>
+              <div
+                aria-label="slide"
+                aria-selected="false"
+                class="slide___3-Nqo slideHorizontal___1NzNV carousel__slide carousel__slide--hidden"
+                role="option"
+                style="margin: 0px 8px; width: 10%;"
+                tabindex="-1"
+              >
+                <div
+                  class="slideInner___2mfX9 carousel__inner-slide"
+                  style="position: unset;"
+                >
+                  <p
+                    class="chakra-text css-1ptu84h"
+                  >
+                    R2 D2 U' B2 R2 U  F2 U' F2 U2 R2 U2 F' U  L' D' B2 L  U' B2 R  F  
+                  </p>
+                </div>
+              </div>
+              <div
+                aria-label="slide"
+                aria-selected="false"
+                class="slide___3-Nqo slideHorizontal___1NzNV carousel__slide carousel__slide--hidden"
+                role="option"
+                style="margin: 0px 8px; width: 10%;"
+                tabindex="-1"
+              >
+                <div
+                  class="slideInner___2mfX9 carousel__inner-slide"
+                  style="position: unset;"
+                >
+                  <p
+                    class="chakra-text css-1ptu84h"
+                  >
+                    R2 U  F2 L2 D  U2 B2 D' L2 U' B2 F2 R' F' U2 L  D' L2 B2 D2 B' 
+                  </p>
+                </div>
+              </div>
+              <div
+                aria-label="slide"
+                aria-selected="false"
+                class="slide___3-Nqo slideHorizontal___1NzNV carousel__slide carousel__slide--hidden"
+                role="option"
+                style="margin: 0px 8px; width: 10%;"
+                tabindex="-1"
+              >
+                <div
+                  class="slideInner___2mfX9 carousel__inner-slide"
+                  style="position: unset;"
+                >
+                  <p
+                    class="chakra-text css-1ptu84h"
+                  >
+                    F  R' U  R2 L' F' R  D' B' D' R2 L2 F2 U2 L2 D' F2 U  F2 U  L2 
+                  </p>
+                </div>
+              </div>
+              <div
+                aria-label="slide"
+                aria-selected="false"
+                class="slide___3-Nqo slideHorizontal___1NzNV carousel__slide carousel__slide--hidden"
+                role="option"
+                style="margin: 0px 8px; width: 10%;"
+                tabindex="-1"
+              >
+                <div
+                  class="slideInner___2mfX9 carousel__inner-slide"
+                  style="position: unset;"
+                >
+                  <p
+                    class="chakra-text css-1ptu84h"
+                  >
+                    R' B' R' U2 D' R2 U  B' L  F  U2 F2 R2 D2 L2 F2 U2 B  U2 F' L2 
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button
+          aria-label="next"
+          class="buttonNext___2mOCa carousel__next-button"
+          type="button"
+        >
+          <svg
+            class="chakra-icon css-1wm76gt"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <g
+              fill="currentColor"
+            >
+              <path
+                d="M13.584,12a2.643,2.643,0,0,1-.775,1.875L3.268,23.416a1.768,1.768,0,0,1-2.5-2.5l8.739-8.739a.25.25,0,0,0,0-.354L.768,3.084a1.768,1.768,0,0,1,2.5-2.5l9.541,9.541A2.643,2.643,0,0,1,13.584,12Z"
+              />
+              <path
+                d="M23.75,12a2.643,2.643,0,0,1-.775,1.875l-9.541,9.541a1.768,1.768,0,0,1-2.5-2.5l8.739-8.739a.25.25,0,0,0,0-.354L10.934,3.084a1.768,1.768,0,0,1,2.5-2.5l9.541,9.541A2.643,2.643,0,0,1,23.75,12Z"
+              />
+            </g>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      class="css-1rr4qq7"
+    >
+      <div
+        class="chakra-stack css-191yzw1"
+      >
+        <button
+          class="chakra-button css-i857na"
+          type="button"
+        >
+          inspection start
+        </button>
+      </div>
+    </div>
+  </main>
+  <span
+    hidden=""
+    id="__chakra_env"
+  />
+</DocumentFragment>
+`;

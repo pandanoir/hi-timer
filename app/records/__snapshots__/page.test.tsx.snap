@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`RecordPage snapshot with prefetch data 1`] = `
+exports[`RecordPage snapshot 1`] = `
 <DocumentFragment>
   <div
     class="chakra-stack css-1ey6aov"
@@ -113,6 +113,162 @@ exports[`RecordPage snapshot with prefetch data 1`] = `
           aria-labelledby="tabs-:r0:--tab-0"
           class="chakra-tabs__tab-panel css-a5mhaz"
           id="tabs-:r0:--tabpanel-0"
+          role="tabpanel"
+          tabindex="0"
+        >
+          <div
+            class="css-gmuwbf"
+          >
+            <div
+              class="chakra-spinner css-jmuyva"
+            >
+              <span
+                class="css-8b45rq"
+              >
+                Loading...
+              </span>
+            </div>
+          </div>
+        </div>
+        <div
+          aria-labelledby="tabs-:r0:--tab-1"
+          class="chakra-tabs__tab-panel css-a5mhaz"
+          hidden=""
+          id="tabs-:r0:--tabpanel-1"
+          role="tabpanel"
+          tabindex="0"
+        />
+        <div
+          aria-labelledby="tabs-:r0:--tab-2"
+          class="chakra-tabs__tab-panel css-a5mhaz"
+          hidden=""
+          id="tabs-:r0:--tabpanel-2"
+          role="tabpanel"
+          tabindex="0"
+        />
+      </div>
+    </div>
+  </div>
+  <span
+    hidden=""
+    id="__chakra_env"
+  />
+</DocumentFragment>
+`;
+
+exports[`RecordPage snapshot with prefetch data 1`] = `
+<DocumentFragment>
+  <div
+    class="chakra-stack css-1ey6aov"
+  >
+    <div
+      class="chakra-select__wrapper css-dsdwpa"
+    >
+      <select
+        class="chakra-select css-1icl0uu"
+        id="event"
+      >
+        <option
+          value="3x3x3"
+        >
+          3x3x3
+        </option>
+        <option
+          value="2x2x2"
+        >
+          2x2x2
+        </option>
+        <option
+          value="4x4x4"
+        >
+          4x4x4
+        </option>
+        <option
+          value="5x5x5"
+        >
+          5x5x5
+        </option>
+        <option
+          value="6x6x6"
+        >
+          6x6x6
+        </option>
+        <option
+          value="7x7x7"
+        >
+          7x7x7
+        </option>
+      </select>
+      <div
+        class="chakra-select__icon-wrapper css-iohxn1"
+      >
+        <svg
+          aria-hidden="true"
+          class="chakra-select__icon"
+          focusable="false"
+          role="presentation"
+          style="width: 1em; height: 1em; color: currentColor;"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"
+            fill="currentColor"
+          />
+        </svg>
+      </div>
+    </div>
+    <div
+      class="chakra-tabs css-m2m7l3"
+    >
+      <div
+        aria-orientation="horizontal"
+        class="chakra-tabs__tablist css-1xhq01z"
+        role="tablist"
+      >
+        <button
+          aria-controls="tabs-:r1:--tabpanel-0"
+          aria-selected="true"
+          class="chakra-tabs__tab css-52dxnr"
+          data-index="0"
+          id="tabs-:r1:--tab-0"
+          role="tab"
+          tabindex="0"
+          type="button"
+        >
+          table
+        </button>
+        <button
+          aria-controls="tabs-:r1:--tabpanel-1"
+          aria-selected="false"
+          class="chakra-tabs__tab css-52dxnr"
+          data-index="1"
+          id="tabs-:r1:--tab-1"
+          role="tab"
+          tabindex="-1"
+          type="button"
+        >
+          graph
+        </button>
+        <button
+          aria-controls="tabs-:r1:--tabpanel-2"
+          aria-selected="false"
+          class="chakra-tabs__tab css-52dxnr"
+          data-index="2"
+          id="tabs-:r1:--tab-2"
+          role="tab"
+          tabindex="-1"
+          type="button"
+        >
+          daily average
+        </button>
+      </div>
+      <div
+        class="chakra-tabs__tab-panels css-8atqhb"
+      >
+        <div
+          aria-labelledby="tabs-:r1:--tab-0"
+          class="chakra-tabs__tab-panel css-a5mhaz"
+          id="tabs-:r1:--tabpanel-0"
           role="tabpanel"
           tabindex="0"
         >
@@ -235,18 +391,18 @@ exports[`RecordPage snapshot with prefetch data 1`] = `
           </div>
         </div>
         <div
-          aria-labelledby="tabs-:r0:--tab-1"
+          aria-labelledby="tabs-:r1:--tab-1"
           class="chakra-tabs__tab-panel css-a5mhaz"
           hidden=""
-          id="tabs-:r0:--tabpanel-1"
+          id="tabs-:r1:--tabpanel-1"
           role="tabpanel"
           tabindex="0"
         />
         <div
-          aria-labelledby="tabs-:r0:--tab-2"
+          aria-labelledby="tabs-:r1:--tab-2"
           class="chakra-tabs__tab-panel css-a5mhaz"
           hidden=""
-          id="tabs-:r0:--tabpanel-2"
+          id="tabs-:r1:--tabpanel-2"
           role="tabpanel"
           tabindex="0"
         />
