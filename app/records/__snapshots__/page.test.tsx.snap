@@ -1,0 +1,261 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RecordPage snapshot with prefetch data 1`] = `
+<DocumentFragment>
+  <div
+    class="chakra-stack css-1ey6aov"
+  >
+    <div
+      class="chakra-select__wrapper css-dsdwpa"
+    >
+      <select
+        class="chakra-select css-1icl0uu"
+        id="event"
+      >
+        <option
+          value="3x3x3"
+        >
+          3x3x3
+        </option>
+        <option
+          value="2x2x2"
+        >
+          2x2x2
+        </option>
+        <option
+          value="4x4x4"
+        >
+          4x4x4
+        </option>
+        <option
+          value="5x5x5"
+        >
+          5x5x5
+        </option>
+        <option
+          value="6x6x6"
+        >
+          6x6x6
+        </option>
+        <option
+          value="7x7x7"
+        >
+          7x7x7
+        </option>
+      </select>
+      <div
+        class="chakra-select__icon-wrapper css-iohxn1"
+      >
+        <svg
+          aria-hidden="true"
+          class="chakra-select__icon"
+          focusable="false"
+          role="presentation"
+          style="width: 1em; height: 1em; color: currentColor;"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"
+            fill="currentColor"
+          />
+        </svg>
+      </div>
+    </div>
+    <div
+      class="chakra-tabs css-m2m7l3"
+    >
+      <div
+        aria-orientation="horizontal"
+        class="chakra-tabs__tablist css-1xhq01z"
+        role="tablist"
+      >
+        <button
+          aria-controls="tabs-:r0:--tabpanel-0"
+          aria-selected="true"
+          class="chakra-tabs__tab css-52dxnr"
+          data-index="0"
+          id="tabs-:r0:--tab-0"
+          role="tab"
+          tabindex="0"
+          type="button"
+        >
+          table
+        </button>
+        <button
+          aria-controls="tabs-:r0:--tabpanel-1"
+          aria-selected="false"
+          class="chakra-tabs__tab css-52dxnr"
+          data-index="1"
+          id="tabs-:r0:--tab-1"
+          role="tab"
+          tabindex="-1"
+          type="button"
+        >
+          graph
+        </button>
+        <button
+          aria-controls="tabs-:r0:--tabpanel-2"
+          aria-selected="false"
+          class="chakra-tabs__tab css-52dxnr"
+          data-index="2"
+          id="tabs-:r0:--tab-2"
+          role="tab"
+          tabindex="-1"
+          type="button"
+        >
+          daily average
+        </button>
+      </div>
+      <div
+        class="chakra-tabs__tab-panels css-8atqhb"
+      >
+        <div
+          aria-labelledby="tabs-:r0:--tab-0"
+          class="chakra-tabs__tab-panel css-a5mhaz"
+          id="tabs-:r0:--tabpanel-0"
+          role="tabpanel"
+          tabindex="0"
+        >
+          <div
+            class="chakra-stack css-p58c91"
+          >
+            <p
+              class="chakra-text css-0"
+            >
+              among last 100 records:
+            </p>
+            <ul
+              class="css-155za0w"
+              role="list"
+            >
+              <li
+                class="css-0"
+              >
+                best: 11.508
+              </li>
+            </ul>
+            <div
+              class="chakra-table__container css-zipzvv"
+            >
+              <table
+                class="chakra-table css-5605sr"
+              >
+                <thead
+                  class="css-0"
+                >
+                  <tr
+                    class="css-0"
+                  >
+                    <th
+                      class="css-1zts0j"
+                    >
+                      time
+                    </th>
+                    <th
+                      class="css-1zts0j"
+                    >
+                      recorded at
+                    </th>
+                    <th
+                      class="css-1zts0j"
+                    >
+                      scramble
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  class="css-0"
+                >
+                  <tr
+                    class="css-0"
+                  >
+                    <td
+                      class="css-xumdn4"
+                    >
+                      13.715
+                    </td>
+                    <td
+                      class="css-xumdn4"
+                    >
+                      2023/6/7 23:35:54
+                    </td>
+                    <td
+                      class="css-xumdn4"
+                    >
+                      L  B2 R' D2 U2 B2 R' U2 B2 U2 B  U  R2 D' F' L' U' R2 B  
+                    </td>
+                  </tr>
+                  <tr
+                    class="css-0"
+                  >
+                    <td
+                      class="css-xumdn4"
+                    >
+                      15.605
+                    </td>
+                    <td
+                      class="css-xumdn4"
+                    >
+                      2023/6/7 23:35:23
+                    </td>
+                    <td
+                      class="css-xumdn4"
+                    >
+                      L  D2 B2 L2 B2 U2 L  F2 R2 U2 F2 R  U' R  F' D' B2 D2 L  B2 
+                    </td>
+                  </tr>
+                  <tr
+                    class="css-0"
+                  >
+                    <td
+                      class="css-xumdn4"
+                    >
+                      11.508
+                    </td>
+                    <td
+                      class="css-xumdn4"
+                    >
+                      2023/6/7 23:34:43
+                    </td>
+                    <td
+                      class="css-xumdn4"
+                    >
+                      B' U2 B' U2 B' L2 U2 L2 F' L2 U2 F2 R' D  B' L' R2 D' L  D2 F  
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <button
+              class="chakra-button css-i857na"
+              type="button"
+            >
+              load more
+            </button>
+          </div>
+        </div>
+        <div
+          aria-labelledby="tabs-:r0:--tab-1"
+          class="chakra-tabs__tab-panel css-a5mhaz"
+          hidden=""
+          id="tabs-:r0:--tabpanel-1"
+          role="tabpanel"
+          tabindex="0"
+        />
+        <div
+          aria-labelledby="tabs-:r0:--tab-2"
+          class="chakra-tabs__tab-panel css-a5mhaz"
+          hidden=""
+          id="tabs-:r0:--tabpanel-2"
+          role="tabpanel"
+          tabindex="0"
+        />
+      </div>
+    </div>
+  </div>
+  <span
+    hidden=""
+    id="__chakra_env"
+  />
+</DocumentFragment>
+`;

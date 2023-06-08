@@ -16,6 +16,11 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "2.6.0",
+    "@babel/core": "7.22.1",
+    "@babel/plugin-transform-modules-commonjs": "7.21.5",
+    "@babel/preset-env": "7.22.4",
+    "@babel/preset-react": "7.22.3",
+    "@babel/preset-typescript": "7.21.5",
     "@chakra-ui/icons": "2.0.15",
     "@chakra-ui/react": "2.6.1",
     "@emotion/react": "11.10.5",
@@ -23,10 +28,15 @@
     "@nivo/core": "0.80.0",
     "@nivo/line": "0.80.0",
     "@prisma/client": "4.8.0",
+    "@testing-library/react": "14.0.0",
+    "@types/jest": "29.5.2",
     "@types/react": "18.0.26",
     "@types/react-dom": "18.0.10",
     "@typescript-eslint/eslint-plugin": "5.59.7",
+    "babel-jest": "29.5.0",
     "framer-motion": "6.5.1",
+    "jest": "29.5.0",
+    "jest-environment-jsdom": "29.5.0",
     "lizod": "0.2.3",
     "next": "13.4.3",
     "patch-package": "6.5.0",
@@ -38,7 +48,8 @@
     "react-icons": "4.7.1",
     "scrambow": "1.7.0",
     "swr": "2.1.5",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "whatwg-fetch": "3.6.2"
   },
   "devDependencies": {
     "eslint": "8.30.0",
