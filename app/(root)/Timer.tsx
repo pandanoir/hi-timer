@@ -277,10 +277,10 @@ export const Timer: FC<
       </Button>
     </ScreenButton>
   ) : timer.state === 'recording' ? (
-    <Modal isOpen onClose={timer.stop} isCentered>
+    <Modal isOpen onClose={() => void 0} isCentered size="full">
       <ModalOverlay bg={bg} />
       <ModalContent bg="transparent" boxShadow="none" m="0">
-        <ScreenButton key={timer.state} onPointerDown={timer.stop}>
+        <ScreenButton key={timer.state} onPointerDown={timer.stop} h="100dvh">
           <Text
             fontSize={['5xl', '8xl']}
             fontWeight="bold"
