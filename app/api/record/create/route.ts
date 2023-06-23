@@ -23,6 +23,7 @@ export const POST = async (req: Request) => {
   if (!validate(body)) {
     throw new Error('request body is invalid');
   }
+
   const post = await prisma.timerRecord.create({
     data: {
       time: body.time,

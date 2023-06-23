@@ -13,6 +13,8 @@ import { RequestBody as DeleteRequestBody } from '../api/record/delete/route';
 import { RequestBody as UpdateRequestBody } from '../api/record/update/route';
 import { RecordPage, fetchRecordPage } from '../_utils/fetchRecordPage';
 
+const tempId = 'temp';
+
 const useTimerRecords = (event: string) => {
   const { mutate } = useSWRConfig();
   const { data, error } = useSWR(
@@ -25,17 +27,27 @@ const useTimerRecords = (event: string) => {
   }
   const records = data.data;
 
-  const update = (
-    id: string,
-    change: Partial<Omit<UpdateRequestBody, 'id'>>
-  ) => {
-    const index = records.findIndex((x) => x.id === id);
+  const update = ({
+    change,
+    ...args
+  }: ({ id: string } | { compositeKey: { time: number; scramble: string } }) & {
+    change: Partial<Omit<UpdateRequestBody, 'id'>>;
+  }) => {
+    const index = records.findIndex((x) => {
+      if ('id' in args) {
+        return x.id === args.id;
+      }
+      return (
+        x.time === args.compositeKey.time &&
+        x.scramble === args.compositeKey.scramble
+      );
+    });
     mutate(
       { url: '/api/record/read', query: { event, limit: '100' } },
       fetch('/api/record/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...change, id }),
+        body: JSON.stringify({ ...change, ...args }),
       }).then(
         async (res) =>
           ({
@@ -80,7 +92,7 @@ const useTimerRecords = (event: string) => {
             data: [
               {
                 ...record,
-                id: 'temp',
+                id: tempId,
                 createdAt: new Date(record.createdAt).toISOString(),
               },
               ...records,
@@ -90,26 +102,49 @@ const useTimerRecords = (event: string) => {
         }
       );
     },
-    imposePenalty: (id: string) => {
-      update(id, { penalty: true });
+    imposePenalty: ({ id, time, scramble }: TimerRecord) => {
+      update({
+        ...(id !== tempId ? { id } : { compositeKey: { time, scramble } }),
+        change: { penalty: true },
+      });
     },
-    toDNF: (id: string) => {
-      update(id, { dnf: true });
+    toDNF: ({ id, time, scramble }: TimerRecord) => {
+      update({
+        ...(id !== tempId ? { id } : { compositeKey: { time, scramble } }),
+        change: { dnf: true },
+      });
     },
-    undoPenalty: (id: string) => {
-      update(id, { penalty: false });
+    undoPenalty: ({ id, time, scramble }: TimerRecord) => {
+      update({
+        ...(id !== tempId ? { id } : { compositeKey: { time, scramble } }),
+        change: { penalty: false },
+      });
     },
-    undoDNF: (id: string) => {
-      update(id, { dnf: false });
+    undoDNF: ({ id, time, scramble }: TimerRecord) => {
+      update({
+        ...(id !== tempId ? { id } : { compositeKey: { time, scramble } }),
+        change: { dnf: false },
+      });
     },
-    deleteRecord: (id: string) => {
-      const index = records.findIndex((x) => x.id === id);
+    deleteRecord: ({ id, time, scramble }: TimerRecord) => {
+      const index = records.findIndex((x) => {
+        if (id !== tempId) {
+          return x.id === id;
+        }
+        return x.time === time && x.scramble === scramble;
+      });
       mutate(
         { url: '/api/record/read', query: { event, limit: '100' } },
         fetch('/api/record/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id } satisfies DeleteRequestBody),
+          body: JSON.stringify(
+            (id !== tempId
+              ? { id }
+              : {
+                  compositeKey: { time, scramble },
+                }) satisfies DeleteRequestBody
+          ),
         }).then(
           () =>
             ({
@@ -124,6 +159,7 @@ const useTimerRecords = (event: string) => {
         }
       );
     },
+
     restoreDeletedRecord: (record: Omit<TimerRecord, 'id'>) => {
       mutate(
         { url: '/api/record/read', query: { event, limit: '100' } },
@@ -140,7 +176,7 @@ const useTimerRecords = (event: string) => {
         ),
         {
           optimisticData: {
-            data: [{ ...record, id: 'temp' }, ...records],
+            data: [{ ...record, id: tempId }, ...records],
           } satisfies Omit<RecordPage, 'hasNextPage'>,
           rollbackOnError: true,
         }
@@ -170,8 +206,7 @@ const TimerPage: FC = () => {
   const scrambleHistory = useScrambleHistory(currentEvent);
 
   if (!isLoading && !user) {
-    redirect('/anonymous');
-    return null;
+    return redirect('/anonymous');
   }
   return (
     <TimerPageWithSWR

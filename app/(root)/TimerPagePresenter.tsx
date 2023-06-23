@@ -38,11 +38,11 @@ export const TimerPagePresenter: FC<
         createNewRecord: (
           record: Omit<TimerRecord, 'id' | 'createdAt'> & { createdAt: number }
         ) => void;
-        imposePenalty: (id: string) => void;
-        toDNF: (id: string) => void;
-        undoPenalty: (id: string) => void;
-        undoDNF: (id: string) => void;
-        deleteRecord: (id: string) => void;
+        imposePenalty: (record: TimerRecord) => void;
+        toDNF: (record: TimerRecord) => void;
+        undoPenalty: (record: TimerRecord) => void;
+        undoDNF: (record: TimerRecord) => void;
+        deleteRecord: (record: TimerRecord) => void;
         restoreDeletedRecord: (record: Omit<TimerRecord, 'id'>) => void;
       }
     | {
@@ -209,9 +209,9 @@ export const TimerPagePresenter: FC<
                 key="+2"
                 onClick={() => {
                   if (records[0].penalty) {
-                    undoPenalty(records[0].id);
+                    undoPenalty(records[0]);
                   } else {
-                    imposePenalty(records[0].id);
+                    imposePenalty(records[0]);
                   }
                 }}
                 variant="outline"
@@ -222,11 +222,12 @@ export const TimerPagePresenter: FC<
             )}
             <Button
               key="DNF"
+              isDisabled={records[0].id === 'temp'}
               onClick={() => {
                 if (records[0].dnf) {
-                  undoDNF(records[0].id);
+                  undoDNF(records[0]);
                 } else {
-                  toDNF(records[0].id);
+                  toDNF(records[0]);
                 }
               }}
               variant="outline"
@@ -238,7 +239,7 @@ export const TimerPagePresenter: FC<
               key="delete"
               onClick={() => {
                 const deletedRecord = records[0];
-                deleteRecord(records[0].id);
+                deleteRecord(records[0]);
                 toast({
                   isClosable: true,
                   render: ({ status, variant, onClose, isClosable }) => (

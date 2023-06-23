@@ -12,15 +12,24 @@ import {
   Infer,
 } from 'lizod';
 
-const validate = $object({
+const record = {
   time: $union([$number, $undefined]),
   penalty: $union([$boolean, $undefined]),
   dnf: $union([$boolean, $undefined]),
   createdAt: $union([$string, $undefined]),
   scramble: $union([$string, $undefined]),
   event: $union([$string, $undefined]),
-  id: $string,
-});
+};
+const validate = $union([
+  $object({
+    ...record,
+    id: $string,
+  }),
+  $object({
+    ...record,
+    compositeKey: $object({ time: $number, scramble: $string }),
+  }),
+]);
 export type RequestBody = Infer<typeof validate>;
 
 export const POST = async (req: Request) => {
@@ -32,17 +41,21 @@ export const POST = async (req: Request) => {
   if (!validate(body)) {
     throw new Error('request body is invalid');
   }
-  if (
-    (
-      await prisma.timerRecord.findFirst({
-        where: { id: body.id },
-      })
-    )?.userId !== session.user.sub
-  ) {
+  const targetRecord = await prisma.timerRecord.findFirst({
+    where:
+      'id' in body
+        ? { id: body.id }
+        : { time: body.time, scramble: body.scramble },
+  });
+  if (!targetRecord) {
+    throw new Error(`record doesn't exist`);
+  }
+  if (targetRecord.userId !== session.user.sub) {
     throw new Error('permission denied');
   }
   const post = await prisma.timerRecord.update({
-    where: { id: body.id },
+    where:
+      'id' in body ? { id: body.id } : { record_identifier: body.compositeKey },
     data: {
       time: body.time,
       penalty: body.penalty,
