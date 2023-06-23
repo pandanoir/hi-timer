@@ -53,19 +53,19 @@ const useTimerRecords = (event: string) => {
         };
       });
     },
-    imposePenalty: (id: string) => {
+    imposePenalty: ({ id }: TimerRecord) => {
       update(id, { penalty: true });
     },
-    toDNF: (id: string) => {
+    toDNF: ({ id }: TimerRecord) => {
       update(id, { dnf: true });
     },
-    undoPenalty: (id: string) => {
+    undoPenalty: ({ id }: TimerRecord) => {
       update(id, { penalty: false });
     },
-    undoDNF: (id: string) => {
+    undoDNF: ({ id }: TimerRecord) => {
       update(id, { dnf: false });
     },
-    deleteRecord: (id: string) => {
+    deleteRecord: ({ id }: TimerRecord) => {
       const index = records.findIndex((x) => x.id === id);
       setAllRecords((allRecords) => {
         const records = allRecords[event];
