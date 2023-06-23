@@ -222,7 +222,6 @@ export const TimerPagePresenter: FC<
             )}
             <Button
               key="DNF"
-              isDisabled={records[0].id === 'temp'}
               onClick={() => {
                 if (records[0].dnf) {
                   undoDNF(records[0]);
