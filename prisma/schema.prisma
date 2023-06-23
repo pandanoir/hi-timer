@@ -21,4 +21,6 @@ model TimerRecord {
   scramble  String
   userId    String
   event     String
+
+  @@unique([time, scramble], name: "record_identifier")
 }
