@@ -20,7 +20,7 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { AiFillDatabase } from 'react-icons/ai';
 import { TimerRecord } from '../_types/TimerRecord';
 import { calcAo } from '../_utils/calcAo';
@@ -82,7 +82,6 @@ export const TimerPagePresenter: FC<
     true,
     'usesInspection'
   );
-  const [isTimerRecording, setIsTimerRecording] = useState(false);
   const {
     isOpen: isRecordModalOpen,
     onOpen: onRecordModalOpen,
@@ -114,7 +113,6 @@ export const TimerPagePresenter: FC<
           id="use inspection"
           isChecked={usesInspection}
           onChange={({ target: { checked } }) => setUsesInspection(checked)}
-          disabled={isTimerRecording}
         />
         {isAnonymousMode && (
           <Alert status="error" w="max-content">
@@ -141,9 +139,6 @@ export const TimerPagePresenter: FC<
       <Box flex="1">
         <Timer
           usesInspection={usesInspection}
-          onStart={() => {
-            setIsTimerRecording(true);
-          }}
           onStop={(record, inspectionTime) => {
             createNewRecord?.({
               time: record,
@@ -154,10 +149,6 @@ export const TimerPagePresenter: FC<
               createdAt: Date.now(),
             });
             nextScramble();
-            setIsTimerRecording(false);
-          }}
-          onCancel={() => {
-            setIsTimerRecording(false);
           }}
         >
           {records && (
@@ -223,7 +214,6 @@ export const TimerPagePresenter: FC<
                     imposePenalty(records[0].id);
                   }
                 }}
-                disabled={isTimerRecording}
                 variant="outline"
                 colorScheme="blue"
               >
@@ -239,7 +229,6 @@ export const TimerPagePresenter: FC<
                   toDNF(records[0].id);
                 }
               }}
-              disabled={isTimerRecording}
               variant="outline"
               colorScheme="blue"
             >
@@ -295,7 +284,6 @@ export const TimerPagePresenter: FC<
                   ),
                 });
               }}
-              disabled={isTimerRecording}
               variant="outline"
               colorScheme="red"
             >
@@ -304,7 +292,6 @@ export const TimerPagePresenter: FC<
           </HStack>
           <IconButton
             onClick={onRecordModalOpen}
-            disabled={isTimerRecording}
             icon={<Icon as={AiFillDatabase} />}
             aria-label="open record list"
           />

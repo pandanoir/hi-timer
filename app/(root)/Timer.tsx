@@ -57,9 +57,9 @@ const ScreenButton = (props: ComponentProps<typeof VStack>) => (
 export const Timer: FC<
   PropsWithChildren<{
     usesInspection: boolean;
-    onStart: () => void;
+    onStart?: () => void;
     onStop: (record: number, inspectionTime: number | null) => void;
-    onCancel: () => void;
+    onCancel?: () => void;
   }>
 > = memo(function Timer({
   children,
@@ -178,7 +178,7 @@ export const Timer: FC<
         return;
       }
       if (timer.state === 'inspecting' || timer.state === 'recording') {
-        onStart();
+        onStart?.();
       }
       prevTimerState.current = timer.state;
     }, [onStart, timer.state]);
@@ -235,7 +235,7 @@ export const Timer: FC<
                 event.stopPropagation();
               }}
               onClick={() => {
-                onCancel();
+                onCancel?.();
                 off();
                 timer.cancel();
               }}
