@@ -3,7 +3,13 @@ import { FC, useMemo } from 'react';
 import { recordToMilliSeconds } from '../../_utils/recordToMilliSeconds';
 
 import useSWRInfinite from 'swr/infinite';
-import { Button, Card, CardBody, VStack } from '@chakra-ui/react';
+import {
+  Button,
+  Card,
+  CardBody,
+  VStack,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import { RecordPage, fetchRecordPage } from '../../_utils/fetchRecordPage';
 const pageSize = 1000;
 
@@ -78,14 +84,16 @@ const DailyAverageGraph: FC<{ event: string }> = ({ event }) => {
         : [],
     [averages]
   );
+  const cardBg = useColorModeValue('gray.50', 'gray.700');
+  const textColor = useColorModeValue('black', 'white');
 
   if (!averages) {
     return null;
   }
   if (data.length === 0) {
     return (
-      <Card w="full" h={96} bg="gray.50">
-        <CardBody color="black" textAlign="left" w="full">
+      <Card w="full" h={96} bg={cardBg}>
+        <CardBody color={textColor} textAlign="left" w="full">
           No data exists
         </CardBody>
       </Card>
@@ -93,9 +101,13 @@ const DailyAverageGraph: FC<{ event: string }> = ({ event }) => {
   }
   return (
     <VStack w="full">
-      <Card w="full" h={96} bg="gray.50" align="center" justify="center">
+      <Card w="full" h={96} bg={cardBg} align="center" justify="center">
         <ResponsiveLine
-          theme={{ tooltip: { basic: { color: 'black' } } }}
+          theme={{
+            background: 'transparent',
+            textColor,
+            tooltip: { basic: { color: 'black' } },
+          }}
           data={[{ id: 'record', data }]}
           margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
           xScale={{ type: 'point' }}

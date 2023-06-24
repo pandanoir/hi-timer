@@ -3,6 +3,7 @@ import { FC, useMemo } from 'react';
 import { TimerRecord } from '../../_types/TimerRecord';
 import { recordToMilliSeconds } from '../../_utils/recordToMilliSeconds';
 import { calcRa } from '../../_utils/calcRollingAverage';
+import { useColorModeValue } from '@chakra-ui/react';
 
 const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
   const reversed = useMemo(() => [...records].reverse(), [records]);
@@ -33,7 +34,11 @@ const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
 
   return (
     <ResponsiveLine
-      theme={{ tooltip: { basic: { color: 'black' } } }}
+      theme={{
+        background: 'transparent',
+        textColor: useColorModeValue('black', 'white'),
+        tooltip: { basic: { color: 'black' } },
+      }}
       data={[
         { id: 'record', data },
         { id: 'ao5', data: ao5 },

@@ -12,6 +12,7 @@ import {
   TabPanels,
   Tabs,
   VStack,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { FC, lazy, Suspense, useMemo, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
@@ -63,6 +64,7 @@ const TimerPage: FC<{ params: { type?: string[] } }> = ({
   const { records, error, hasNextPage, setSize } =
     useTimerRecordsInfinite(currentEvent);
   const router = useRouter();
+  const cardBg = useColorModeValue('gray.50', 'gray.700');
 
   if (error) {
     return <div>error caused</div>;
@@ -111,7 +113,7 @@ const TimerPage: FC<{ params: { type?: string[] } }> = ({
             )}
           </TabPanel>
           <TabPanel>
-            <Card h={96} bg="gray.50" align="center" justify="center">
+            <Card h={96} bg={cardBg} align="center" justify="center">
               <Suspense fallback={<Spinner color="black" size="xl" />}>
                 {!records ? (
                   <Spinner size="xl" />

@@ -2,6 +2,9 @@ import { TimerRecord } from '../_types/TimerRecord';
 import { calcAo } from './calcAo';
 
 export const calcRa = (records: TimerRecord[], size: number) => {
+  if (size > records.length) {
+    return Array(records.length).fill(null);
+  }
   const res: (number | null)[] = Array(records.length);
   for (let i = 0; i < size - 1; i++) {
     res[i] = null;
