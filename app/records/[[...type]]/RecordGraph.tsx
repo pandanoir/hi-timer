@@ -67,7 +67,7 @@ const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
         legendOffset: -40,
         legendPosition: 'middle',
       }}
-      pointSize={10}
+      pointSize={3}
       pointColor={{ theme: 'background' }}
       pointBorderWidth={2}
       pointBorderColor={{ from: 'serieColor' }}
