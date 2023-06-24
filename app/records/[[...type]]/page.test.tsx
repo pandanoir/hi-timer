@@ -6,6 +6,16 @@ import RecordPage from './page';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { SWRConfig, unstable_serialize } from 'swr';
 import { render } from '../../../__tests__/render';
+jest.mock('next/navigation', () => ({
+  useRouter() {
+    return {
+      route: '/',
+      pathname: '',
+      query: '',
+      asPath: '',
+    };
+  },
+}));
 
 describe('RecordPage', () => {
   test('snapshot', async () => {
@@ -22,7 +32,7 @@ describe('RecordPage', () => {
           sid: '000000000000000000000000-0000000',
         }}
       >
-        <RecordPage />
+        <RecordPage params={{ type: undefined }} />
       </UserProvider>
     );
     await findByRole('combobox');
@@ -91,7 +101,7 @@ describe('RecordPage', () => {
             sid: '000000000000000000000000-0000000',
           }}
         >
-          <RecordPage />
+          <RecordPage params={{ type: undefined }} />
         </UserProvider>
       </SWRConfig>
     );
