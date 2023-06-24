@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { setTimeout } from 'timers/promises';
-import { SWRConfigClient } from '../SWRConfigClient';
-import { fetchRecordInServerSide } from '../api/record/read/route';
+import { SWRConfigClient } from '../../SWRConfigClient';
+import { fetchRecordInServerSide } from '../../api/record/read/route';
 
 export default async function Layout({ children }: PropsWithChildren) {
   const timeout = setTimeout(300, 'timeout' as const);

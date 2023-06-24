@@ -5,7 +5,7 @@ import 'whatwg-fetch';
 import RecordPage from './page';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { SWRConfig, unstable_serialize } from 'swr';
-import { render } from '../../__tests__/render';
+import { render } from '../../../__tests__/render';
 
 describe('RecordPage', () => {
   test('snapshot', async () => {

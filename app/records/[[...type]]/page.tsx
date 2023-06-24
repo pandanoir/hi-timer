@@ -1,5 +1,5 @@
 'use client';
-import { UserProfile, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import {
   Card,
   CardBody,
@@ -16,7 +16,8 @@ import {
 import { FC, lazy, Suspense, useMemo, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { RecordTable } from './RecordTable';
-import { RecordPage, fetchRecordPage } from '../_utils/fetchRecordPage';
+import { RecordPage, fetchRecordPage } from '../../_utils/fetchRecordPage';
+import { useRouter } from 'next/navigation';
 
 const RecordGraph = lazy(() => import('./RecordGraph'));
 const DailyAverageGraph = lazy(() => import('./DailyAverageGraph'));
@@ -54,10 +55,15 @@ const useTimerRecordsInfinite = (event: string) => {
   } as const;
 };
 
-const TimerPage: FC<{ user: UserProfile }> = () => {
+const tabUrls = ['/records', '/records/graph', '/records/daily'];
+const TimerPage: FC<{ params: { type?: string[] } }> = ({
+  params: { type },
+}) => {
   const [currentEvent, setCurrentEvent] = useState('3x3x3');
   const { records, error, hasNextPage, setSize } =
     useTimerRecordsInfinite(currentEvent);
+  const router = useRouter();
+
   if (error) {
     return <div>error caused</div>;
   }
@@ -77,7 +83,14 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
         <option value="6x6x6">6x6x6</option>
         <option value="7x7x7">7x7x7</option>
       </Select>
-      <Tabs isLazy w="full">
+      <Tabs
+        isLazy
+        w="full"
+        defaultIndex={tabUrls.indexOf(`/records${type ? `/${type[0]}` : ''}`)}
+        onChange={(index) => {
+          router.push(tabUrls[index]);
+        }}
+      >
         <TabList>
           <Tab>table</Tab>
           <Tab>graph</Tab>
@@ -122,6 +135,6 @@ const TimerPage: FC<{ user: UserProfile }> = () => {
 };
 
 // HACK: 単に withPageAuthRequired(TimerPage) を export すると TypeError になるのでラップしている
-export default function Page() {
-  return withPageAuthRequired(TimerPage)({});
+export default function Page({ params }: { params: { type?: string[] } }) {
+  return withPageAuthRequired(TimerPage)({ params });
 }

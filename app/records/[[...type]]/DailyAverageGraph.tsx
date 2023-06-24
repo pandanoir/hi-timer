@@ -1,10 +1,10 @@
 import { ResponsiveLine } from '@nivo/line';
 import { FC, useMemo } from 'react';
-import { recordToMilliSeconds } from '../_utils/recordToMilliSeconds';
+import { recordToMilliSeconds } from '../../_utils/recordToMilliSeconds';
 
 import useSWRInfinite from 'swr/infinite';
 import { Button, Card, CardBody, VStack } from '@chakra-ui/react';
-import { RecordPage, fetchRecordPage } from '../_utils/fetchRecordPage';
+import { RecordPage, fetchRecordPage } from '../../_utils/fetchRecordPage';
 const pageSize = 1000;
 
 const useDailyAverageInfinite = (event: string) => {

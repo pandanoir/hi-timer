@@ -1,8 +1,8 @@
 import { ResponsiveLine } from '@nivo/line';
 import { FC, useMemo } from 'react';
-import { TimerRecord } from '../_types/TimerRecord';
-import { recordToMilliSeconds } from '../_utils/recordToMilliSeconds';
-import { calcRa } from '../_utils/calcRollingAverage';
+import { TimerRecord } from '../../_types/TimerRecord';
+import { recordToMilliSeconds } from '../../_utils/recordToMilliSeconds';
+import { calcRa } from '../../_utils/calcRollingAverage';
 
 const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
   const reversed = useMemo(() => [...records].reverse(), [records]);
