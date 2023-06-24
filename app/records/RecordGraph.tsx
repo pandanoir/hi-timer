@@ -2,24 +2,42 @@ import { ResponsiveLine } from '@nivo/line';
 import { FC, useMemo } from 'react';
 import { TimerRecord } from '../_types/TimerRecord';
 import { recordToMilliSeconds } from '../_utils/recordToMilliSeconds';
+import { calcRa } from '../_utils/calcRollingAverage';
 
 const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
+  const reversed = useMemo(() => [...records].reverse(), [records]);
   const data = useMemo(
     () =>
-      [...records].reverse().map((time) => ({
+      reversed.map((time) => ({
         x: time.createdAt.replace(/^\d+\//, ''),
         y: time.dnf ? null : recordToMilliSeconds(time) / 1000,
       })),
-    [records]
+    [reversed]
   );
+  const ao5 = useMemo(
+    () =>
+      calcRa(reversed, 5).map((time, i) => ({
+        x: reversed[i].createdAt.replace(/^\d+\//, ''),
+        y: time && Number.isFinite(time) ? time / 1000 : null,
+      })),
+    [reversed]
+  );
+  const ao12 = useMemo(
+    () =>
+      calcRa(reversed, 12).map((time, i) => ({
+        x: reversed[i].createdAt.replace(/^\d+\//, ''),
+        y: time && Number.isFinite(time) ? time / 1000 : null,
+      })),
+    [reversed]
+  );
+
   return (
     <ResponsiveLine
       theme={{ tooltip: { basic: { color: 'black' } } }}
       data={[
-        {
-          id: 'record',
-          data,
-        },
+        { id: 'record', data },
+        { id: 'ao5', data: ao5 },
+        { id: 'ao12', data: ao12 },
       ]}
       margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
       xScale={{ type: 'point' }}
@@ -27,7 +45,7 @@ const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
         type: 'linear',
         min: 'auto',
         max: 'auto',
-        stacked: true,
+        stacked: false,
         reverse: false,
       }}
       yFormat=" >-.2f"
