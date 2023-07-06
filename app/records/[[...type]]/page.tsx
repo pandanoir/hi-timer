@@ -14,7 +14,7 @@ import {
   VStack,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { FC, lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { RecordTable } from './RecordTable';
 import { RecordPage, fetchRecordPage } from '../../_utils/fetchRecordPage';
@@ -56,15 +56,18 @@ const useTimerRecordsInfinite = (event: string) => {
   } as const;
 };
 
-const tabUrls = ['/records', '/records/graph', '/records/daily'];
-const TimerPage: FC<{ params: { type?: string[] } }> = ({
-  params: { type },
-}) => {
+const TimerPage = ({ params: { type } }: { params: { type?: string[] } }) => {
   const [currentEvent, setCurrentEvent] = useState('3x3x3');
   const { records, error, hasNextPage, setSize } =
     useTimerRecordsInfinite(currentEvent);
   const router = useRouter();
   const cardBg = useColorModeValue('gray.50', 'gray.700');
+
+  const tabs = [
+    { title: 'graph', url: '/records' },
+    { title: 'daily average', url: '/records/daily' },
+    { title: 'table', url: '/records/table' },
+  ];
 
   if (error) {
     return <div>error caused</div>;
@@ -88,30 +91,19 @@ const TimerPage: FC<{ params: { type?: string[] } }> = ({
       <Tabs
         isLazy
         w="full"
-        defaultIndex={tabUrls.indexOf(`/records${type ? `/${type[0]}` : ''}`)}
+        index={tabs.findIndex(({ url }) =>
+          type ? url === `/records/${type[0]}` : url === '/records'
+        )}
         onChange={(index) => {
-          router.push(tabUrls[index]);
+          router.push(tabs[index].url, { forceOptimisticNavigation: true });
         }}
       >
         <TabList>
-          <Tab>table</Tab>
-          <Tab>graph</Tab>
-          <Tab>daily average</Tab>
+          {tabs.map(({ title }) => (
+            <Tab key={title}>{title}</Tab>
+          ))}
         </TabList>
         <TabPanels>
-          <TabPanel>
-            {records ? (
-              <RecordTable
-                records={records}
-                hasNextPage={hasNextPage}
-                onLoadMoreClick={() => setSize((size) => size + 1)}
-              />
-            ) : (
-              <Center>
-                <Spinner size="xl" />
-              </Center>
-            )}
-          </TabPanel>
           <TabPanel>
             <Card h={96} bg={cardBg} align="center" justify="center">
               <Suspense fallback={<Spinner color="black" size="xl" />}>
@@ -130,13 +122,23 @@ const TimerPage: FC<{ params: { type?: string[] } }> = ({
           <TabPanel>
             <DailyAverageGraph event={currentEvent} />
           </TabPanel>
+          <TabPanel>
+            {records ? (
+              <RecordTable
+                records={records}
+                hasNextPage={hasNextPage}
+                onLoadMoreClick={() => setSize((size) => size + 1)}
+              />
+            ) : (
+              <Center>
+                <Spinner size="xl" />
+              </Center>
+            )}
+          </TabPanel>
         </TabPanels>
       </Tabs>
     </VStack>
   );
 };
 
-// HACK: 単に withPageAuthRequired(TimerPage) を export すると TypeError になるのでラップしている
-export default function Page({ params }: { params: { type?: string[] } }) {
-  return withPageAuthRequired(TimerPage)({ params });
-}
+export default withPageAuthRequired(TimerPage);
