@@ -4,6 +4,7 @@ import {
   Card,
   CardBody,
   Center,
+  FormLabel,
   Select,
   Spinner,
   Tab,
@@ -58,6 +59,7 @@ const useTimerRecordsInfinite = (event: string) => {
 
 const TimerPage = ({ params: { type } }: { params: { type?: string[] } }) => {
   const [currentEvent, setCurrentEvent] = useState('3x3x3');
+  const [pageSize, setPageSize] = useState(100);
   const { records, error, hasNextPage, setSize } =
     useTimerRecordsInfinite(currentEvent);
   const router = useRouter();
@@ -105,6 +107,25 @@ const TimerPage = ({ params: { type } }: { params: { type?: string[] } }) => {
         </TabList>
         <TabPanels>
           <TabPanel>
+            <FormLabel display="flex" alignItems="center" gap="2">
+              number of records:
+              <Select
+                w="max-content"
+                variant="filled"
+                value={pageSize}
+                onChange={(e) => {
+                  const pageSize = Number(e.target.value);
+                  setPageSize(pageSize);
+                  setSize?.(pageSize / 100);
+                }}
+              >
+                <option value="100">100</option>
+                <option value="200">200</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+                <option value="2500">2500</option>
+              </Select>
+            </FormLabel>
             <Card h={96} bg={cardBg} align="center" justify="center">
               <Suspense fallback={<Spinner color="black" size="xl" />}>
                 {!records ? (
@@ -114,7 +135,7 @@ const TimerPage = ({ params: { type } }: { params: { type?: string[] } }) => {
                     No data exists
                   </CardBody>
                 ) : (
-                  <RecordGraph records={records.flat().slice(0, 50)} />
+                  <RecordGraph records={records.flat().slice(0, pageSize)} />
                 )}
               </Suspense>
             </Card>

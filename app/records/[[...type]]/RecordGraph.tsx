@@ -54,16 +54,7 @@ const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
         reverse: false,
       }}
       yFormat=" >-.2f"
-      axisTop={null}
-      axisRight={null}
-      axisBottom={{
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 15,
-        legend: 'date',
-        legendOffset: 36,
-        legendPosition: 'middle',
-      }}
+      axisBottom={null}
       axisLeft={{
         tickSize: 5,
         tickPadding: 5,
@@ -76,8 +67,9 @@ const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
       pointColor={{ theme: 'background' }}
       pointBorderWidth={2}
       pointBorderColor={{ from: 'serieColor' }}
-      pointLabelYOffset={-12}
       useMesh
+      enableGridX={false}
+      enableGridY={false}
       legends={[
         {
           anchor: 'bottom-right',
