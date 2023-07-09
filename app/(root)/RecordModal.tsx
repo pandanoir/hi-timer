@@ -1,5 +1,6 @@
 import {
   Button,
+  HStack,
   List,
   ListItem,
   Modal,
@@ -9,6 +10,12 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
   VStack,
 } from '@chakra-ui/react';
 import { FC, useMemo } from 'react';
@@ -16,6 +23,7 @@ import { TimerRecord } from '../_types/TimerRecord';
 import { calcAo } from '../_utils/calcAo';
 import { calcBestAo } from '../_utils/calcBestAo';
 import { recordToMilliSeconds } from '../_utils/recordToMilliSeconds';
+import RecordGraph from '../records/[[...type]]/RecordGraph';
 
 const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
   const bestRecords = useMemo<Record<string, number>>(() => {
@@ -58,31 +66,48 @@ export const RecordModal: FC<{
   onClose: () => void;
   records: TimerRecord[] | undefined;
 }> = ({ records, isOpen, onClose }) => (
-  <Modal isOpen={isOpen} onClose={onClose} size="3xl">
+  <Modal isOpen={isOpen} onClose={onClose} size="3xl" isCentered>
     <ModalOverlay />
     <ModalContent>
-      <ModalHeader>100 most recent time records</ModalHeader>
+      <ModalHeader>
+        <HStack gap="2">
+          <Text>100 most recent time records</Text>
+          <Button as="a" href="/records" w="max-content">
+            See more records
+          </Button>
+        </HStack>
+      </ModalHeader>
       <ModalCloseButton />
       <ModalBody>
         {records && records.length > 0 ? (
-          <VStack spacing={2} align="left">
-            <Button as="a" href="/records" w="max-content">
-              See more records
-            </Button>
-            <BestAverages records={records} />
-            <List>
-              {records.map(({ time, penalty, dnf, createdAt }) => {
-                const timeStr = `${Math.trunc(time) / 1000}sec${
-                  penalty ? ' + 2' : ''
-                }`;
-                return (
-                  <ListItem key={createdAt}>
-                    {dnf ? `DNF(${timeStr})` : timeStr}
-                  </ListItem>
-                );
-              })}
-            </List>
-          </VStack>
+          <Tabs isLazy w="full">
+            <TabList>
+              <Tab>graph</Tab>
+              <Tab>table</Tab>
+            </TabList>
+            <TabPanels h="full">
+              <TabPanel h={96}>
+                <RecordGraph usesPoint={false} records={records} />
+              </TabPanel>
+              <TabPanel h={96} overflowY="scroll">
+                <VStack spacing={2} align="left">
+                  <BestAverages records={records} />
+                  <List>
+                    {records.map(({ time, penalty, dnf, createdAt }) => {
+                      const timeStr = `${Math.trunc(time) / 1000}sec${
+                        penalty ? ' + 2' : ''
+                      }`;
+                      return (
+                        <ListItem key={createdAt}>
+                          {dnf ? `DNF(${timeStr})` : timeStr}
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </VStack>
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
         ) : (
           'No record exists.'
         )}

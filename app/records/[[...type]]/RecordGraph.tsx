@@ -5,7 +5,10 @@ import { recordToMilliSeconds } from '../../_utils/recordToMilliSeconds';
 import { calcRa } from '../../_utils/calcRollingAverage';
 import { useColorModeValue } from '@chakra-ui/react';
 
-const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
+const RecordGraph: FC<{ records: TimerRecord[]; usesPoint?: boolean }> = ({
+  records,
+  usesPoint = true,
+}) => {
   const reversed = useMemo(() => [...records].reverse(), [records]);
   const data = useMemo(
     () =>
@@ -63,7 +66,7 @@ const RecordGraph: FC<{ records: TimerRecord[] }> = ({ records }) => {
         legendOffset: -40,
         legendPosition: 'middle',
       }}
-      pointSize={3}
+      pointSize={usesPoint ? 3 : 0}
       pointColor={{ theme: 'background' }}
       pointBorderWidth={2}
       pointBorderColor={{ from: 'serieColor' }}
