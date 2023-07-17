@@ -72,7 +72,7 @@ const RecordGraph: FC<{ records: TimerRecord[]; usesPoint?: boolean }> = ({
       pointBorderColor={{ from: 'serieColor' }}
       useMesh
       enableGridX={false}
-      enableGridY={false}
+      enableGridY
       legends={[
         {
           anchor: 'bottom-right',

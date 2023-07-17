@@ -3,16 +3,18 @@ import { appendSearchParamsByEntries } from './appendSearchParamsByEntries';
 
 const validate = $object({
   data: $array(
-    $object({
-      time: $number,
-      penalty: $boolean,
-      dnf: $boolean,
-      createdAt: $string,
-      scramble: $string,
-      id: $string,
-      userId: $string,
-      event: $string,
-    })
+    $object(
+      {
+        time: $number,
+        penalty: $boolean,
+        dnf: $boolean,
+        createdAt: $string,
+        scramble: $string,
+        id: $string,
+        event: $string,
+      },
+      false
+    )
   ),
   hasNextPage: $boolean,
 });
@@ -29,7 +31,6 @@ export const fetchRecordPage = async (key: {
   if (!validate(res)) {
     throw new Error('invalid response');
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return { ...res, data: res.data.map(({ userId: _, ...x }) => x) };
+  return { ...res, data: res.data };
 };
 export type RecordPage = Awaited<ReturnType<typeof fetchRecordPage>>;

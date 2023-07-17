@@ -19,17 +19,18 @@ export const POST = async (req: Request) => {
   if (!validate(body)) {
     throw new Error('request body is invalid');
   }
+
   const targetRecord = await prisma.timerRecord.findUnique({
     where:
       'id' in body ? { id: body.id } : { record_identifier: body.compositeKey },
   });
-
   if (!targetRecord) {
     throw new Error(`record doesn't exist`);
   }
   if (targetRecord.userId !== session.user.sub) {
     throw new Error('permission denied');
   }
+
   const post = await prisma.timerRecord.delete({
     where:
       'id' in body ? { id: body.id } : { record_identifier: body.compositeKey },
