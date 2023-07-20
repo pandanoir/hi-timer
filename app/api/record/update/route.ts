@@ -26,8 +26,11 @@ const validate = $intersection([
     false
   ),
   $union([
-    $object({ id: $string }),
-    $object({ compositeKey: $object({ time: $number, scramble: $string }) }),
+    $object({ id: $string }, false),
+    $object(
+      { compositeKey: $object({ time: $number, scramble: $string }) },
+      false
+    ),
   ]),
 ]);
 export type RequestBody = Infer<typeof validate>;
