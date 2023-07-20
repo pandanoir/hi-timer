@@ -30,6 +30,7 @@ import { ScrambleCarousel } from './ScrambleCarousel';
 import { useLocalStorageState } from './useLocalStorageState';
 import { useScrambleHistory } from './useScrambleHistory';
 import { RecordModal } from './RecordModal';
+import { useLatestRecord } from './LatestRecordContext';
 
 export const TimerPagePresenter: FC<
   (
@@ -88,6 +89,7 @@ export const TimerPagePresenter: FC<
     onClose: onRecordModalClose,
   } = useDisclosure();
   const toast = useToast();
+  const latestRecord = useLatestRecord();
 
   return (
     <VStack flex="1" align="left" as="main">
@@ -151,7 +153,7 @@ export const TimerPagePresenter: FC<
             nextScramble();
           }}
         >
-          {records && (
+          {records ? (
             <VStack align="center">
               {records[0] && (
                 <Text
@@ -196,6 +198,24 @@ export const TimerPagePresenter: FC<
                   </>
                 )}
               </Grid>
+            </VStack>
+          ) : (
+            <VStack align="center">
+              {latestRecord && (
+                <Text
+                  fontSize={['5xl', '8xl']}
+                  fontWeight="bold"
+                  fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
+                >
+                  {latestRecord.dnf
+                    ? 'DNF'
+                    : `${Math.trunc(latestRecord.time / 1000)}.${`${
+                        latestRecord.time % 1000
+                      }`.padStart(3, '0')}sec${
+                        latestRecord.penalty ? ' + 2' : ''
+                      }`}
+                </Text>
+              )}
             </VStack>
           )}
         </Timer>

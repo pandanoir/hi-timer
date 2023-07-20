@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { getSession } from '../../getSession';
 import { TimerRecord } from '@prisma/client';
+import { kv } from '@vercel/kv';
 
 type Response = {
   data: TimerRecord[];
@@ -30,7 +31,9 @@ export const GET = async (req: Request) => {
     // hasNextPage の判定用に1つ多く取ってきているぶんを消す
     posts.pop();
   }
-
+  if (typeof cursor === 'undefined') {
+    kv.set(`${session.user}--latest-record`, posts[0]);
+  }
   return NextResponse.json({ data: posts, hasNextPage } satisfies Response);
 };
 export const fetchRecordInServerSide = () =>

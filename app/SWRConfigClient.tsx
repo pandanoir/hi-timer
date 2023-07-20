@@ -7,21 +7,19 @@ export const SWRConfigClient = ({
   keyValues,
   value,
   ...props
-}: ComponentProps<typeof SWRConfig> & { keyValues?: [Key, unknown][] }) => {
-  return (
-    <SWRConfig
-      {...props}
-      value={{
-        fallback: {
-          ...(value && 'fallback' in value ? value.fallback : null),
-          ...Object.fromEntries(
-            keyValues?.flatMap(([k, v]) => [
-              [unstable_serialize(k), v],
-              [`$inf$${unstable_serialize(k)}`, [v]],
-            ]) ?? []
-          ),
-        },
-      }}
-    />
-  );
-};
+}: ComponentProps<typeof SWRConfig> & { keyValues?: [Key, unknown][] }) => (
+  <SWRConfig
+    {...props}
+    value={{
+      fallback: {
+        ...(value && 'fallback' in value ? value.fallback : null),
+        ...Object.fromEntries(
+          keyValues?.flatMap(([k, v]) => [
+            [unstable_serialize(k), v],
+            [`$inf$${unstable_serialize(k)}`, [v]],
+          ]) ?? []
+        ),
+      },
+    }}
+  />
+);
