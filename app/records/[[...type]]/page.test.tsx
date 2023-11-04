@@ -6,6 +6,7 @@ import RecordPage from './page';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { SWRConfig, unstable_serialize } from 'swr';
 import { render } from '../../../__tests__/render';
+import { screen } from '@testing-library/react';
 jest.mock('next/navigation', () => ({
   useRouter() {
     return {
@@ -19,7 +20,7 @@ jest.mock('next/navigation', () => ({
 
 describe('RecordPage', () => {
   test('snapshot', async () => {
-    const { findByRole, asFragment } = render(
+    const { asFragment } = render(
       <UserProvider
         user={{
           nickname: 'user',
@@ -35,11 +36,11 @@ describe('RecordPage', () => {
         <RecordPage params={{ type: undefined }} />
       </UserProvider>,
     );
-    await findByRole('combobox');
+    await screen.findByRole('option', { selected: true, name: '3x3x3' });
     expect(asFragment()).toMatchSnapshot();
   });
-  test('snapshot with prefetch data', async () => {
-    const { findByRole, asFragment } = render(
+  test.only('snapshot with prefetch data', async () => {
+    const { asFragment } = render(
       <SWRConfig
         value={{
           fallback: {
@@ -105,7 +106,7 @@ describe('RecordPage', () => {
         </UserProvider>
       </SWRConfig>,
     );
-    await findByRole('combobox');
+    await screen.findByRole('option', { selected: true, name: '3x3x3' });
     expect(asFragment()).toMatchSnapshot();
   });
 });
