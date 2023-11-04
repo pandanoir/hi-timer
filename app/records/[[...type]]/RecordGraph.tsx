@@ -16,7 +16,7 @@ const RecordGraph: FC<{ records: TimerRecord[]; usesPoint?: boolean }> = ({
         x: time.createdAt.replace(/^\d+\//, ''),
         y: time.dnf ? null : recordToMilliSeconds(time) / 1000,
       })),
-    [reversed]
+    [reversed],
   );
   const ao5 = useMemo(
     () =>
@@ -24,7 +24,7 @@ const RecordGraph: FC<{ records: TimerRecord[]; usesPoint?: boolean }> = ({
         x: reversed[i].createdAt.replace(/^\d+\//, ''),
         y: time && Number.isFinite(time) ? time / 1000 : null,
       })),
-    [reversed]
+    [reversed],
   );
   const ao12 = useMemo(
     () =>
@@ -32,7 +32,7 @@ const RecordGraph: FC<{ records: TimerRecord[]; usesPoint?: boolean }> = ({
         x: reversed[i].createdAt.replace(/^\d+\//, ''),
         y: time && Number.isFinite(time) ? time / 1000 : null,
       })),
-    [reversed]
+    [reversed],
   );
 
   return (

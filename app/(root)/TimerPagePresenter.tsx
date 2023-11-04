@@ -37,7 +37,7 @@ export const TimerPagePresenter: FC<
     | {
         records: TimerRecord[];
         createNewRecord: (
-          record: Omit<TimerRecord, 'id' | 'createdAt'> & { createdAt: number }
+          record: Omit<TimerRecord, 'id' | 'createdAt'> & { createdAt: number },
         ) => void;
         imposePenalty: (record: TimerRecord) => void;
         toDNF: (record: TimerRecord) => void;
@@ -81,7 +81,7 @@ export const TimerPagePresenter: FC<
 }) => {
   const [usesInspection, setUsesInspection] = useLocalStorageState(
     true,
-    'usesInspection'
+    'usesInspection',
   );
   const {
     isOpen: isRecordModalOpen,

@@ -25,7 +25,7 @@ describe('TimerPage', () => {
         }}
       >
         <Page />
-      </UserProvider>
+      </UserProvider>,
     );
     await findByRole('button', { name: 'inspection start' });
     expect(asFragment()).toMatchSnapshot();

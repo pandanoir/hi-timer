@@ -17,7 +17,7 @@ export const SWRConfigClient = ({
           keyValues?.flatMap(([k, v]) => [
             [unstable_serialize(k), v],
             [`$inf$${unstable_serialize(k)}`, [v]],
-          ]) ?? []
+          ]) ?? [],
         ),
       },
     }}

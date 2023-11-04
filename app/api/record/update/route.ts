@@ -23,13 +23,13 @@ const validate = $intersection([
       scramble: $union([$string, $undefined]),
       event: $union([$string, $undefined]),
     },
-    false
+    false,
   ),
   $union([
     $object({ id: $string }, false),
     $object(
       { compositeKey: $object({ time: $number, scramble: $string }) },
-      false
+      false,
     ),
   ]),
 ]);

@@ -33,7 +33,7 @@ const useTimerRecords = (event: string) => {
     records,
     error: undefined,
     createNewRecord: (
-      record: Omit<TimerRecord, 'id' | 'createdAt'> & { createdAt: number }
+      record: Omit<TimerRecord, 'id' | 'createdAt'> & { createdAt: number },
     ) => {
       setAllRecords((allRecords) => {
         const records = allRecords[event];
@@ -98,7 +98,7 @@ const useTimerRecords = (event: string) => {
 const TimerPage: FC = () => {
   const [currentEvent, setCurrentEvent] = useLocalStorageState(
     '3x3x3',
-    'currentEvent'
+    'currentEvent',
   );
 
   return (

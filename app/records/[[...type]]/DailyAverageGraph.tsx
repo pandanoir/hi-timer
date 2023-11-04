@@ -28,7 +28,7 @@ const useDailyAverageInfinite = (event: string) => {
         },
       } satisfies Parameters<typeof fetchRecordPage>[0];
     },
-    fetchRecordPage
+    fetchRecordPage,
   );
   const records = data?.map(({ data }) => data);
 
@@ -82,7 +82,7 @@ const DailyAverageGraph: FC<{ event: string }> = ({ event }) => {
               y: averageMillisec / 1000,
             }))
         : [],
-    [averages]
+    [averages],
   );
   const cardBg = useColorModeValue('gray.50', 'gray.700');
   const textColor = useColorModeValue('black', 'white');

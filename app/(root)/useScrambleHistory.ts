@@ -51,7 +51,7 @@ export const useScrambleHistory = (currentEvent: string) => {
         }, 100);
       });
     },
-    [scrambleHistory.length, scrambler]
+    [scrambleHistory.length, scrambler],
   );
   return {
     scrambleHistory,

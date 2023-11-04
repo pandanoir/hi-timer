@@ -33,7 +33,7 @@ describe('RecordPage', () => {
         }}
       >
         <RecordPage params={{ type: undefined }} />
-      </UserProvider>
+      </UserProvider>,
     );
     await findByRole('combobox');
     expect(asFragment()).toMatchSnapshot();
@@ -103,7 +103,7 @@ describe('RecordPage', () => {
         >
           <RecordPage params={{ type: undefined }} />
         </UserProvider>
-      </SWRConfig>
+      </SWRConfig>,
     );
     await findByRole('combobox');
     expect(asFragment()).toMatchSnapshot();

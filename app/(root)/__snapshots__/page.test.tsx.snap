@@ -3,16 +3,16 @@
 exports[`TimerPage snapshot 1`] = `
 <DocumentFragment>
   <main
-    class="chakra-stack css-1wnpsqa"
+    class="chakra-stack css-118vyam"
   >
     <div
-      class="chakra-stack css-84zodg"
+      class="chakra-stack css-1igwmid"
     >
       <div
         class="chakra-select__wrapper css-dsdwpa"
       >
         <select
-          class="chakra-select css-1icl0uu"
+          class="chakra-select css-9zgf1d"
           id="event"
         >
           <option
@@ -98,7 +98,7 @@ exports[`TimerPage snapshot 1`] = `
       class="carousel"
     >
       <div
-        class="chakra-stack css-1d0c3h9"
+        class="chakra-stack css-10t90fk"
       >
         <button
           aria-label="previous"
@@ -359,10 +359,13 @@ exports[`TimerPage snapshot 1`] = `
       class="css-1rr4qq7"
     >
       <div
-        class="chakra-stack css-191yzw1"
+        class="chakra-stack css-oe35x4"
       >
+        <div
+          class="chakra-stack css-tl3ftk"
+        />
         <button
-          class="chakra-button css-i857na"
+          class="chakra-button css-ez23ye"
           type="button"
         >
           inspection start

@@ -39,7 +39,7 @@ const useTimerRecordsInfinite = (event: string) => {
         },
       } satisfies Parameters<typeof fetchRecordPage>[0];
     },
-    fetchRecordPage
+    fetchRecordPage,
   );
   const records = useMemo(() => data?.map(({ data }) => data), [data]);
 
@@ -94,7 +94,7 @@ const TimerPage = ({ params: { type } }: { params: { type?: string[] } }) => {
         isLazy
         w="full"
         index={tabs.findIndex(({ url }) =>
-          type ? url === `/records/${type[0]}` : url === '/records'
+          type ? url === `/records/${type[0]}` : url === '/records',
         )}
         onChange={(index) => {
           router.push(tabs[index].url, { forceOptimisticNavigation: true });

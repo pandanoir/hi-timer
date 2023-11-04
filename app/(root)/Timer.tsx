@@ -21,7 +21,7 @@ import { useCubeTimer } from './useCubeTimer';
 
 export const usePreventDefault = <T extends HTMLElement>(
   eventName: string,
-  enable = true
+  enable = true,
 ) => {
   const ref = useRef<T>(null);
   useEffect(() => {

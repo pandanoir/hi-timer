@@ -52,7 +52,7 @@ export const useCubeTimer = ({
         onStop(elapsedTime, inspectionTime);
         setInspectionTime(null);
       },
-      [onStop, inspectionTime]
+      [onStop, inspectionTime],
     ),
   });
   const { start: startStopwatch } = stopwatch;
@@ -62,7 +62,7 @@ export const useCubeTimer = ({
         setInspectionTime(elapsedTime);
         startStopwatch?.();
       },
-      [startStopwatch]
+      [startStopwatch],
     ),
   });
 

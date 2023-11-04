@@ -13,15 +13,15 @@ const validate = $object({
         id: $string,
         event: $string,
       },
-      false
-    )
+      false,
+    ),
   ),
   hasNextPage: $boolean,
 });
 
 export const fetchRecordPage = async (key: {
   url: string;
-  query: { event: string; limit: string; cursor: string | undefined };
+  query: { event: string; limit: string; cursor?: string | undefined };
 }) => {
   const url = new URL(key.url, location.origin);
   appendSearchParamsByEntries(url, Object.entries(key.query));

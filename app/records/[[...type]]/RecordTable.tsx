@@ -54,7 +54,7 @@ export const RecordTable: FC<{
                 {ao === 'best' ? 'best: ' : `best ${ao}: `}
                 {Number.isFinite(val)
                   ? `${Math.trunc(val / 1000)}.${`${Math.trunc(
-                      val % 1000
+                      val % 1000,
                     )}`.padStart(3, '0')}`
                   : 'DNF'}
               </ListItem>

@@ -12,8 +12,8 @@ describe('calcAo', () => {
           scramble: '',
           id: '',
           event: '',
-        }))
-      )
+        })),
+      ),
     ).toEqual(370);
   });
 
@@ -47,7 +47,7 @@ describe('calcAo', () => {
           id: '',
           event: '',
         },
-      ])
+      ]),
     ).toBe(100);
   });
 
@@ -81,7 +81,7 @@ describe('calcAo', () => {
           id: '',
           event: '',
         },
-      ])
+      ]),
     ).toBe(Infinity);
   });
 });

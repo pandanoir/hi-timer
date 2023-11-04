@@ -13,8 +13,8 @@ describe('calcRa', () => {
           id: '',
           event: '',
         })),
-        5
-      )
+        5,
+      ),
     ).toEqual([null, null, null, null, 370]);
 
     expect(
@@ -31,8 +31,8 @@ describe('calcRa', () => {
           id: '',
           event: '',
         })),
-        25
-      )
+        25,
+      ),
     ).toEqual([
       null,
       null,
@@ -74,8 +74,8 @@ describe('calcRa', () => {
           id: '',
           event: '',
         })),
-        6
-      )
+        6,
+      ),
     ).toEqual([null, null, null, null, null]);
   });
 });

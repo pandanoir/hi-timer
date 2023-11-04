@@ -19,7 +19,7 @@ const useTimerRecords = (event: string) => {
   const { mutate } = useSWRConfig();
   const { data, error } = useSWR(
     { url: '/api/record/read', query: { event, limit: '100' } },
-    fetchRecordPage
+    fetchRecordPage,
   );
 
   if (!data) {
@@ -56,7 +56,7 @@ const useTimerRecords = (event: string) => {
               await res.json(),
               ...records.slice(index + 1),
             ],
-          } satisfies Omit<RecordPage, 'hasNextPage'>)
+          }) satisfies Omit<RecordPage, 'hasNextPage'>,
       ),
       {
         optimisticData: {
@@ -67,7 +67,7 @@ const useTimerRecords = (event: string) => {
           ],
         } satisfies Omit<RecordPage, 'hasNextPage'>,
         rollbackOnError: true,
-      }
+      },
     );
   };
   return {
@@ -82,10 +82,10 @@ const useTimerRecords = (event: string) => {
           body: JSON.stringify(record satisfies CreateRequestBody),
         }).then(
           async (res) =>
-            ({ data: [await res.json(), ...records] } satisfies Omit<
+            ({ data: [await res.json(), ...records] }) satisfies Omit<
               RecordPage,
               'hasNextPage'
-            >)
+            >,
         ),
         {
           optimisticData: {
@@ -99,7 +99,7 @@ const useTimerRecords = (event: string) => {
             ],
           } satisfies Omit<RecordPage, 'hasNextPage'>,
           rollbackOnError: true,
-        }
+        },
       );
     },
     imposePenalty: ({ id, time, scramble }: TimerRecord) => {
@@ -143,20 +143,20 @@ const useTimerRecords = (event: string) => {
               ? { id }
               : {
                   compositeKey: { time, scramble },
-                }) satisfies DeleteRequestBody
+                }) satisfies DeleteRequestBody,
           ),
         }).then(
           () =>
             ({
               data: [...records.slice(0, index), ...records.slice(index + 1)],
-            } satisfies Omit<RecordPage, 'hasNextPage'>)
+            }) satisfies Omit<RecordPage, 'hasNextPage'>,
         ),
         {
           optimisticData: {
             data: [...records.slice(0, index), ...records.slice(index + 1)],
           } satisfies Omit<RecordPage, 'hasNextPage'>,
           rollbackOnError: true,
-        }
+        },
       );
     },
 
@@ -169,17 +169,17 @@ const useTimerRecords = (event: string) => {
           body: JSON.stringify(record),
         }).then(
           async (res) =>
-            ({ data: [await res.json(), ...records] } satisfies Omit<
+            ({ data: [await res.json(), ...records] }) satisfies Omit<
               RecordPage,
               'hasNextPage'
-            >)
+            >,
         ),
         {
           optimisticData: {
             data: [{ ...record, id: tempId }, ...records],
           } satisfies Omit<RecordPage, 'hasNextPage'>,
           rollbackOnError: true,
-        }
+        },
       );
     },
   } as const;
@@ -201,7 +201,7 @@ const TimerPage: FC = () => {
   const { isLoading, user } = useUser();
   const [currentEvent, setCurrentEvent] = useLocalStorageState(
     '3x3x3',
-    'currentEvent'
+    'currentEvent',
   );
   const scrambleHistory = useScrambleHistory(currentEvent);
 

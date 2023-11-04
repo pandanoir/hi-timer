@@ -53,7 +53,7 @@ const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
           {Number.isFinite(val)
             ? `${Math.trunc(val / 1000)}.${`${Math.trunc(val % 1000)}`.padStart(
                 3,
-                '0'
+                '0',
               )}`
             : 'DNF'}
         </ListItem>
