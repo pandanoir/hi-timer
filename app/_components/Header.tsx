@@ -57,12 +57,7 @@ export const Header = () => {
             variant="outline"
           />
           {user ?
-            <SecondaryLinkButton
-              href="/records"
-              display={{ base: 'none', md: 'inline-flex' }}
-            >
-              Records
-            </SecondaryLinkButton>
+            <SecondaryLinkButton href="/records">Records</SecondaryLinkButton>
           : <PrimaryLinkButton colorScheme="blue" href="/api/auth/login">
               Login
             </PrimaryLinkButton>
