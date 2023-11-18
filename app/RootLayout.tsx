@@ -5,17 +5,17 @@ import './global.css';
 import { Header } from './Header';
 import { cookies } from 'next/headers';
 import { ChakraProviderClient } from './ChakraProviderClient';
+import { $enum } from 'lizod';
 
 export const RootLayout = ({
   children,
   user,
 }: PropsWithChildren<{ user?: UserProfile }>) => {
+  const initColorMode = cookies().get('chakra-ui-color-mode')?.value;
   return (
     <ChakraProviderClient
       colorMode={
-        cookies().get('chakra-ui-color-mode')?.value === 'light' ?
-          'light'
-        : 'dark'
+        $enum(['light', 'dark'])(initColorMode) ? initColorMode : 'system'
       }
     >
       <UserProvider user={user}>

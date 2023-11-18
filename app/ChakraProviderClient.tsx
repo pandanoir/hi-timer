@@ -10,15 +10,10 @@ import { PropsWithChildren } from 'react';
 export const ChakraProviderClient = ({
   children,
   colorMode,
-}: PropsWithChildren<{ colorMode: 'light' | 'dark' }>) => (
+}: PropsWithChildren<{ colorMode: 'light' | 'dark' | 'system' }>) => (
   <ChakraProvider
     colorModeManager={localStorageManager}
-    theme={extendTheme({
-      config: {
-        initialColorMode: colorMode,
-        useSystemColorMode: true,
-      },
-    })}
+    theme={extendTheme({ config: { initialColorMode: colorMode } })}
   >
     {children}
   </ChakraProvider>
