@@ -13,7 +13,6 @@ import {
   TabPanels,
   Tabs,
   VStack,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
@@ -63,7 +62,6 @@ const TimerPage = ({ params: { type } }: { params: { type?: string[] } }) => {
   const { records, error, hasNextPage, setSize } =
     useTimerRecordsInfinite(currentEvent);
   const router = useRouter();
-  const cardBg = useColorModeValue('gray.50', 'gray.700');
 
   const tabs = [
     { title: 'graph', url: '/records' },
@@ -90,12 +88,15 @@ const TimerPage = ({ params: { type } }: { params: { type?: string[] } }) => {
         <option value="6x6x6">6x6x6</option>
         <option value="7x7x7">7x7x7</option>
       </Select>
+
       <Tabs
         isLazy
         w="full"
-        index={tabs.findIndex(({ url }) =>
-          type ? url === `/records/${type[0]}` : url === '/records',
-        )}
+        index={
+          type ?
+            tabs.findIndex(({ url }) => url === `/records/${type[0]}`)
+          : tabs.findIndex(({ url }) => url === '/records')
+        }
         onChange={(index) => {
           router.push(tabs[index].url, { forceOptimisticNavigation: true });
         }}
@@ -126,7 +127,7 @@ const TimerPage = ({ params: { type } }: { params: { type?: string[] } }) => {
                 <option value="2500">2500</option>
               </Select>
             </FormLabel>
-            <Card h={96} bg={cardBg} align="center" justify="center">
+            <Card h={96} align="center" justify="center" variant="filled">
               <Suspense fallback={<Spinner color="black" size="xl" />}>
                 {!records ?
                   <Spinner size="xl" />

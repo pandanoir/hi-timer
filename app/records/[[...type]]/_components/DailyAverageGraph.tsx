@@ -88,7 +88,6 @@ const DailyAverageGraph: FC<{ event: string }> = ({ event }) => {
       : [],
     [averages],
   );
-  const cardBg = useColorModeValue('gray.50', 'gray.700');
   const textColor = useColorModeValue('black', 'white');
 
   if (!averages) {
@@ -96,8 +95,8 @@ const DailyAverageGraph: FC<{ event: string }> = ({ event }) => {
   }
   if (data.length === 0) {
     return (
-      <Card w="full" h={96} bg={cardBg}>
-        <CardBody color={textColor} textAlign="left" w="full">
+      <Card w="full" h={96} variant="filled">
+        <CardBody textAlign="left" w="full">
           No data exists
         </CardBody>
       </Card>
@@ -105,7 +104,7 @@ const DailyAverageGraph: FC<{ event: string }> = ({ event }) => {
   }
   return (
     <VStack w="full">
-      <Card w="full" h={96} bg={cardBg} align="center" justify="center">
+      <Card w="full" h={96} variant="filled" align="center" justify="center">
         <ResponsiveLine
           theme={{
             background: 'transparent',
