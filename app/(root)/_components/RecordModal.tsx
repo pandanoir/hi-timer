@@ -50,12 +50,12 @@ const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
       {Object.entries(bestRecords).map(([ao, val]) => (
         <ListItem key={ao}>
           {ao === 'best' ? 'best: ' : `best ${ao}: `}
-          {Number.isFinite(val)
-            ? `${Math.trunc(val / 1000)}.${`${Math.trunc(val % 1000)}`.padStart(
-                3,
-                '0',
-              )}`
-            : 'DNF'}
+          {Number.isFinite(val) ?
+            `${Math.trunc(val / 1000)}.${`${Math.trunc(val % 1000)}`.padStart(
+              3,
+              '0',
+            )}`
+          : 'DNF'}
         </ListItem>
       ))}
     </List>
@@ -79,7 +79,7 @@ const RecordModal: FC<{
       </ModalHeader>
       <ModalCloseButton />
       <ModalBody>
-        {records && records.length > 0 ? (
+        {records && records.length > 0 ?
           <Tabs isLazy w="full">
             <TabList>
               <Tab>graph</Tab>
@@ -108,9 +108,7 @@ const RecordModal: FC<{
               </TabPanel>
             </TabPanels>
           </Tabs>
-        ) : (
-          'No record exists.'
-        )}
+        : 'No record exists.'}
       </ModalBody>
       <ModalFooter>
         <Button colorScheme="blue" mr={3} onClick={onClose}>

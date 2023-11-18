@@ -73,21 +73,20 @@ export const ScrambleCarousel = memo(function Carousel({
           style={{ flex: '1' }}
           onTransitionEnd={onTransitionEnd}
         >
-          {scrambleHistory.length === 0 ? (
+          {scrambleHistory.length === 0 ?
             <Slide key={0} index={0} style={{ margin: '0 8px' }}>
               <VStack align="center">
                 <Spinner />
               </VStack>
             </Slide>
-          ) : (
-            scrambleHistory.map((scramble, index) => (
+          : scrambleHistory.map((scramble, index) => (
               <Slide key={index} index={index} style={{ margin: '0 8px' }}>
                 <Text fontSize={['xl', '3xl']} textAlign="center">
                   {scramble}
                 </Text>
               </Slide>
             ))
-          )}
+          }
         </Slider>
         <ButtonNext disabled={animationDisabled ? true : undefined}>
           <ArrowRightIcon

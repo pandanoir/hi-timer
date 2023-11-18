@@ -74,14 +74,18 @@ const DailyAverageGraph: FC<{ event: string }> = ({ event }) => {
   const { averages, setSize, hasNextPage } = useDailyAverageInfinite(event);
   const data = useMemo(
     () =>
-      averages
-        ? Object.entries(averages)
-            .sort(([a], [b]) => (a > b ? 1 : a === b ? 0 : -1)) // 左のほうが日付が古くなるようにソート
-            .map(([date, averageMillisec]) => ({
-              x: date,
-              y: averageMillisec / 1000,
-            }))
-        : [],
+      averages ?
+        Object.entries(averages)
+          .sort(([a], [b]) =>
+            a > b ? 1
+            : a === b ? 0
+            : -1,
+          ) // 左のほうが日付が古くなるようにソート
+          .map(([date, averageMillisec]) => ({
+            x: date,
+            y: averageMillisec / 1000,
+          }))
+      : [],
     [averages],
   );
   const cardBg = useColorModeValue('gray.50', 'gray.700');

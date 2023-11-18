@@ -14,17 +14,17 @@ export default async function Layout({ children }: PropsWithChildren) {
   return (
     <SWRConfigClient
       keyValues={
-        initialRecordData
-          ? [
-              [
-                {
-                  url: '/api/record/read',
-                  query: { event: '3x3x3', limit: '100' },
-                },
-                initialRecordData,
-              ],
-            ]
-          : []
+        initialRecordData ?
+          [
+            [
+              {
+                url: '/api/record/read',
+                query: { event: '3x3x3', limit: '100' },
+              },
+              initialRecordData,
+            ],
+          ]
+        : []
       }
     >
       {children}

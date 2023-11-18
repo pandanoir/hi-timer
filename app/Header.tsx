@@ -37,15 +37,14 @@ export const Header = () => {
               Records
             </Button>
           )}
-          {user ? (
+          {user ?
             <Button as="a" href="/api/auth/logout">
               Logout
             </Button>
-          ) : (
-            <Button as="a" href="/api/auth/login">
+          : <Button as="a" href="/api/auth/login">
               Login
             </Button>
-          )}
+          }
         </HStack>
       </Fade>
     </HStack>

@@ -43,9 +43,9 @@ const useTimerRecords = (event: string) => {
             {
               ...record,
               id:
-                records.length === 0
-                  ? '0'
-                  : `${Number(records[records.length - 1].id) + 1}`,
+                records.length === 0 ?
+                  '0'
+                : `${Number(records[records.length - 1].id) + 1}`,
               createdAt: new Date(record.createdAt).toISOString(),
             },
             ...records,
@@ -84,9 +84,9 @@ const useTimerRecords = (event: string) => {
             {
               ...record,
               id:
-                records.length === 0
-                  ? '0'
-                  : `${Number(records[records.length - 1].id) + 1}`,
+                records.length === 0 ?
+                  '0'
+                : `${Number(records[records.length - 1].id) + 1}`,
             },
             ...records,
           ],

@@ -139,11 +139,11 @@ const useTimerRecords = (event: string) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(
-            (id !== tempId
-              ? { id }
-              : {
-                  compositeKey: { time, scramble },
-                }) satisfies DeleteRequestBody,
+            (id !== tempId ?
+              { id }
+            : {
+                compositeKey: { time, scramble },
+              }) satisfies DeleteRequestBody,
           ),
         }).then(
           () =>

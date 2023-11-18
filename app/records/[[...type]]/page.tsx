@@ -128,15 +128,13 @@ const TimerPage = ({ params: { type } }: { params: { type?: string[] } }) => {
             </FormLabel>
             <Card h={96} bg={cardBg} align="center" justify="center">
               <Suspense fallback={<Spinner color="black" size="xl" />}>
-                {!records ? (
+                {!records ?
                   <Spinner size="xl" />
-                ) : records.flat().length === 0 ? (
+                : records.flat().length === 0 ?
                   <CardBody color="black" textAlign="left" w="full">
                     No data exists
                   </CardBody>
-                ) : (
-                  <RecordGraph records={records.flat().slice(0, pageSize)} />
-                )}
+                : <RecordGraph records={records.flat().slice(0, pageSize)} />}
               </Suspense>
             </Card>
           </TabPanel>
@@ -144,17 +142,16 @@ const TimerPage = ({ params: { type } }: { params: { type?: string[] } }) => {
             <DailyAverageGraph event={currentEvent} />
           </TabPanel>
           <TabPanel>
-            {records ? (
+            {records ?
               <RecordTable
                 records={records}
                 hasNextPage={hasNextPage}
                 onLoadMoreClick={() => setSize((size) => size + 1)}
               />
-            ) : (
-              <Center>
+            : <Center>
                 <Spinner size="xl" />
               </Center>
-            )}
+            }
           </TabPanel>
         </TabPanels>
       </Tabs>

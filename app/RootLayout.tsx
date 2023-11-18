@@ -13,9 +13,9 @@ export const RootLayout = ({
   return (
     <ChakraProviderClient
       colorMode={
-        cookies().get('chakra-ui-color-mode')?.value === 'light'
-          ? 'light'
-          : 'dark'
+        cookies().get('chakra-ui-color-mode')?.value === 'light' ?
+          'light'
+        : 'dark'
       }
     >
       <UserProvider user={user}>

@@ -52,11 +52,11 @@ export const RecordTable: FC<{
             {Object.entries(bestRecords).map(([ao, val]) => (
               <ListItem key={ao}>
                 {ao === 'best' ? 'best: ' : `best ${ao}: `}
-                {Number.isFinite(val)
-                  ? `${Math.trunc(val / 1000)}.${`${Math.trunc(
-                      val % 1000,
-                    )}`.padStart(3, '0')}`
-                  : 'DNF'}
+                {Number.isFinite(val) ?
+                  `${Math.trunc(val / 1000)}.${`${Math.trunc(
+                    val % 1000,
+                  )}`.padStart(3, '0')}`
+                : 'DNF'}
               </ListItem>
             ))}
           </List>

@@ -189,7 +189,10 @@ export const Timer: FC<
   if (timer.state === 'before start') {
     // 押してる秒数に応じて色が変わる
     const colorScheme =
-      isReadyToStart !== null ? (isReadyToStart ? 'pink' : 'teal') : undefined;
+      isReadyToStart !== null ?
+        isReadyToStart ? 'pink'
+        : 'teal'
+      : undefined;
 
     return (
       <ScreenButton
@@ -211,7 +214,10 @@ export const Timer: FC<
   if (timer.state === 'inspecting') {
     // 押してる秒数に応じて色が変わる
     const colorScheme =
-      isReadyToStart !== null ? (isReadyToStart ? 'pink' : 'teal') : undefined;
+      isReadyToStart !== null ?
+        isReadyToStart ? 'pink'
+        : 'teal'
+      : undefined;
 
     return (
       <Modal isOpen onClose={() => void 0} size="full">
@@ -224,11 +230,11 @@ export const Timer: FC<
             h="100dvh"
           >
             <Button colorScheme={colorScheme}>
-              {timer.elapsedInspectionTime < 15000
-                ? `${15 - Math.trunc(timer.elapsedInspectionTime / 1000)}sec`
-                : timer.elapsedInspectionTime < 17000
-                ? '+2'
-                : 'DNF'}
+              {timer.elapsedInspectionTime < 15000 ?
+                `${15 - Math.trunc(timer.elapsedInspectionTime / 1000)}sec`
+              : timer.elapsedInspectionTime < 17000 ?
+                '+2'
+              : 'DNF'}
             </Button>
             <Button
               onPointerDown={(event) => {
@@ -248,54 +254,54 @@ export const Timer: FC<
       </Modal>
     );
   }
-  return timer.state === 'before inspection' ? (
-    <ScreenButton
-      key={timer.state}
-      onPointerDown={onInspectionStartButtonPress}
-      onClick={() => {
-        if (isInspectionStartButtonPressed.current) {
-          timer.startInspection();
-        }
-        onInspectionStartButtonRelease();
-      }}
-    >
-      {children}
-      <Button
-        onPointerDown={(event) => {
-          event.stopPropagation();
-          onInspectionStartButtonPress();
-        }}
-        onClick={(event) => {
-          event.stopPropagation();
+  return (
+    timer.state === 'before inspection' ?
+      <ScreenButton
+        key={timer.state}
+        onPointerDown={onInspectionStartButtonPress}
+        onClick={() => {
           if (isInspectionStartButtonPressed.current) {
             timer.startInspection();
           }
           onInspectionStartButtonRelease();
         }}
       >
-        inspection start
-      </Button>
-    </ScreenButton>
-  ) : timer.state === 'recording' ? (
-    <Modal isOpen onClose={() => void 0} isCentered size="full">
-      <ModalOverlay bg={bg} />
-      <ModalContent bg="transparent" boxShadow="none" m="0">
-        <ScreenButton key={timer.state} onPointerDown={timer.stop} h="100dvh">
-          <Text
-            fontSize={['5xl', '8xl']}
-            fontWeight="bold"
-            fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
-          >
-            {typeof timer.elapsedTime === 'number' &&
-              `${Math.trunc(timer.elapsedTime / 1000)}.${`${
-                timer.elapsedTime % 1000
-              }`.padStart(3, '0')}sec`}
-          </Text>
-          <Button onPointerDown={timer.stop}>stop</Button>
-        </ScreenButton>
-      </ModalContent>
-    </Modal>
-  ) : (
-    (timer satisfies never, null)
+        {children}
+        <Button
+          onPointerDown={(event) => {
+            event.stopPropagation();
+            onInspectionStartButtonPress();
+          }}
+          onClick={(event) => {
+            event.stopPropagation();
+            if (isInspectionStartButtonPressed.current) {
+              timer.startInspection();
+            }
+            onInspectionStartButtonRelease();
+          }}
+        >
+          inspection start
+        </Button>
+      </ScreenButton>
+    : timer.state === 'recording' ?
+      <Modal isOpen onClose={() => void 0} isCentered size="full">
+        <ModalOverlay bg={bg} />
+        <ModalContent bg="transparent" boxShadow="none" m="0">
+          <ScreenButton key={timer.state} onPointerDown={timer.stop} h="100dvh">
+            <Text
+              fontSize={['5xl', '8xl']}
+              fontWeight="bold"
+              fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
+            >
+              {typeof timer.elapsedTime === 'number' &&
+                `${Math.trunc(timer.elapsedTime / 1000)}.${`${
+                  timer.elapsedTime % 1000
+                }`.padStart(3, '0')}sec`}
+            </Text>
+            <Button onPointerDown={timer.stop}>stop</Button>
+          </ScreenButton>
+        </ModalContent>
+      </Modal>
+    : (timer satisfies never, null)
   );
 });

@@ -33,8 +33,8 @@ const useStopwatch = ({
     setElapsedTime(null);
   }, []);
 
-  return elapsedTime === null
-    ? ({ start } as const)
+  return elapsedTime === null ?
+      ({ start } as const)
     : ({ stop, cancel, elapsedTime } as const);
 };
 

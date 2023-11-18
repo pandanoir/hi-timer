@@ -25,9 +25,9 @@ export default async function Layout({ children }: PropsWithChildren) {
       <body>
         <ColorModeScript
           initialColorMode={
-            cookies().get('chakra-ui-color-mode')?.value === 'light'
-              ? 'light'
-              : 'dark'
+            cookies().get('chakra-ui-color-mode')?.value === 'light' ?
+              'light'
+            : 'dark'
           }
         />
         <RootLayout user={await Promise.race([userPromise, timeout])}>
