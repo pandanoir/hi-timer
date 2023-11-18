@@ -10,11 +10,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
   Text,
   VStack,
 } from '@chakra-ui/react';
@@ -78,36 +73,13 @@ const RecordModal: FC<{
         </HStack>
       </ModalHeader>
       <ModalCloseButton />
+
       <ModalBody>
         {records && records.length > 0 ?
-          <Tabs isLazy w="full">
-            <TabList>
-              <Tab>graph</Tab>
-              <Tab>table</Tab>
-            </TabList>
-            <TabPanels h="full">
-              <TabPanel h={96}>
-                <RecordGraph usesPoint={false} records={records} />
-              </TabPanel>
-              <TabPanel h={96} overflowY="scroll">
-                <VStack spacing={2} align="left">
-                  <BestAverages records={records} />
-                  <List>
-                    {records.map(({ time, penalty, dnf, createdAt }) => {
-                      const timeStr = `${Math.trunc(time) / 1000}sec${
-                        penalty ? ' + 2' : ''
-                      }`;
-                      return (
-                        <ListItem key={createdAt}>
-                          {dnf ? `DNF(${timeStr})` : timeStr}
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                </VStack>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
+          <VStack w="full" h="lg" align="left">
+            <BestAverages records={records} />
+            <RecordGraph usesPoint={false} records={records} />
+          </VStack>
         : 'No record exists.'}
       </ModalBody>
       <ModalFooter>
