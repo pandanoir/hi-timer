@@ -3,6 +3,8 @@ import { Metadata, Viewport } from 'next';
 import { setTimeout } from 'timers/promises';
 import { RootLayout } from './RootLayout';
 import { getSession } from './api/getSession';
+import { ColorModeScript } from '@chakra-ui/react';
+import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
   title: 'Hi-Timer',
@@ -21,6 +23,13 @@ export default async function Layout({ children }: PropsWithChildren) {
   return (
     <html>
       <body>
+        <ColorModeScript
+          initialColorMode={
+            cookies().get('chakra-ui-color-mode')?.value === 'light'
+              ? 'light'
+              : 'dark'
+          }
+        />
         <RootLayout user={await Promise.race([userPromise, timeout])}>
           {children}
         </RootLayout>
