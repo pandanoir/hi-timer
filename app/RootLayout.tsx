@@ -1,4 +1,3 @@
-'use client';
 import { PropsWithChildren } from 'react';
 import { UserProfile, UserProvider } from '@auth0/nextjs-auth0/client';
 import { ChakraProvider, VStack, localStorageManager } from '@chakra-ui/react';
