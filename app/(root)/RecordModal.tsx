@@ -61,7 +61,7 @@ const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
     </List>
   );
 };
-export const RecordModal: FC<{
+const RecordModal: FC<{
   isOpen: boolean;
   onClose: () => void;
   records: TimerRecord[] | undefined;
@@ -120,3 +120,5 @@ export const RecordModal: FC<{
     </ModalContent>
   </Modal>
 );
+
+export default RecordModal;
