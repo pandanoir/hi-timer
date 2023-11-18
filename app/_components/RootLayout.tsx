@@ -1,7 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { UserProfile, UserProvider } from '@auth0/nextjs-auth0/client';
 import { VStack } from '@chakra-ui/react';
-import './global.css';
 import { Header } from './Header';
 import { cookies } from 'next/headers';
 import { ChakraProviderClient } from './ChakraProviderClient';
