@@ -19,11 +19,11 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { FC, useMemo } from 'react';
-import { TimerRecord } from '../_types/TimerRecord';
-import { calcAo } from '../_utils/calcAo';
-import { calcBestAo } from '../_utils/calcBestAo';
-import { recordToMilliSeconds } from '../_utils/recordToMilliSeconds';
-import RecordGraph from '../records/[[...type]]/RecordGraph';
+import { TimerRecord } from '../../_types/TimerRecord';
+import { calcAo } from '../../_utils/calcAo';
+import { calcBestAo } from '../../_utils/calcBestAo';
+import { recordToMilliSeconds } from '../../_utils/recordToMilliSeconds';
+import RecordGraph from '../../records/[[...type]]/_components/RecordGraph';
 
 const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
   const bestRecords = useMemo<Record<string, number>>(() => {

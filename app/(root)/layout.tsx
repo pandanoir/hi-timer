@@ -6,7 +6,7 @@ import { SWRConfigClient } from '../SWRConfigClient';
 import { getSession } from '../api/getSession';
 import { fetchRecordInServerSide } from '../api/record/read/fetchRecordInServerSide';
 import { TimerRecord } from '../_types/TimerRecord';
-import { LatestRecordProvider } from './LatestRecordContext';
+import { LatestRecordProvider } from './_components/LatestRecordContext';
 
 export default async function Layout({ children }: PropsWithChildren) {
   const timeout = setTimeout(100, 'timeout' as const);

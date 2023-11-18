@@ -16,8 +16,8 @@ import {
   useEffect,
   useRef,
 } from 'react';
-import { useCountdownTimer } from './useCountdownTimer';
-import { useCubeTimer } from './useCubeTimer';
+import { useCountdownTimer } from '../_hooks/useCountdownTimer';
+import { useCubeTimer } from '../_hooks/useCubeTimer';
 
 export const usePreventDefault = <T extends HTMLElement>(
   eventName: string,

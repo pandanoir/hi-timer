@@ -13,10 +13,10 @@ import {
   Tr,
   VStack,
 } from '@chakra-ui/react';
-import { TimerRecord } from '../../_types/TimerRecord';
-import { calcAo } from '../../_utils/calcAo';
-import { calcBestAo } from '../../_utils/calcBestAo';
-import { recordToMilliSeconds } from '../../_utils/recordToMilliSeconds';
+import { TimerRecord } from '../../../_types/TimerRecord';
+import { calcAo } from '../../../_utils/calcAo';
+import { calcBestAo } from '../../../_utils/calcBestAo';
+import { recordToMilliSeconds } from '../../../_utils/recordToMilliSeconds';
 
 export const RecordTable: FC<{
   records: TimerRecord[][];

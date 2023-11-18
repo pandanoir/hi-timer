@@ -1,8 +1,8 @@
 import { ResponsiveLine } from '@nivo/line';
 import { FC, useMemo } from 'react';
-import { TimerRecord } from '../../_types/TimerRecord';
-import { recordToMilliSeconds } from '../../_utils/recordToMilliSeconds';
-import { calcRa } from '../../_utils/calcRollingAverage';
+import { TimerRecord } from '../../../_types/TimerRecord';
+import { recordToMilliSeconds } from '../../../_utils/recordToMilliSeconds';
+import { calcRa } from '../../../_utils/calcRollingAverage';
 import { useColorModeValue } from '@chakra-ui/react';
 
 const RecordGraph: FC<{ records: TimerRecord[]; usesPoint?: boolean }> = ({

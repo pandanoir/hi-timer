@@ -22,13 +22,13 @@ import {
 } from '@chakra-ui/react';
 import { Dispatch, FC, lazy, SetStateAction } from 'react';
 import { AiFillDatabase } from 'react-icons/ai';
-import { TimerRecord } from '../_types/TimerRecord';
-import { calcAo } from '../_utils/calcAo';
+import { TimerRecord } from '../../_types/TimerRecord';
+import { calcAo } from '../../_utils/calcAo';
 import 'pure-react-carousel/dist/react-carousel.es.css';
 import { Timer } from './Timer';
 import { ScrambleCarousel } from './ScrambleCarousel';
-import { useLocalStorageState } from './useLocalStorageState';
-import { useScrambleHistory } from './useScrambleHistory';
+import { useLocalStorageState } from '../_hooks/useLocalStorageState';
+import { useScrambleHistory } from '../_hooks/useScrambleHistory';
 import { useLatestRecord } from './LatestRecordContext';
 
 const RecordModal = lazy(() => import('./RecordModal'));

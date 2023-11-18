@@ -17,12 +17,12 @@ import {
 } from '@chakra-ui/react';
 import { lazy, Suspense, useMemo, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
-import { RecordTable } from './RecordTable';
+import { RecordTable } from './_components/RecordTable';
 import { RecordPage, fetchRecordPage } from '../../_utils/fetchRecordPage';
 import { useRouter } from 'next/navigation';
 
-const RecordGraph = lazy(() => import('./RecordGraph'));
-const DailyAverageGraph = lazy(() => import('./DailyAverageGraph'));
+const RecordGraph = lazy(() => import('./_components/RecordGraph'));
+const DailyAverageGraph = lazy(() => import('./_components/DailyAverageGraph'));
 const pageSize = 100;
 const useTimerRecordsInfinite = (event: string) => {
   const { data, error, size, setSize } = useSWRInfinite(
