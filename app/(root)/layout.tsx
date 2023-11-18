@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react';
 import { setTimeout } from 'timers/promises';
 import { redirect } from 'next/navigation';
 import { kv } from '@vercel/kv';
-import { SWRConfigClient } from '../SWRConfigClient';
+import { SWRConfigClient } from '../_components/SWRConfigClient';
 import { getSession } from '../api/getSession';
 import { fetchRecordInServerSide } from '../api/record/read/fetchRecordInServerSide';
 import { TimerRecord } from '../_types/TimerRecord';

@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { Metadata, Viewport } from 'next';
 import { setTimeout } from 'timers/promises';
-import { RootLayout } from './RootLayout';
+import { RootLayout } from './_components/RootLayout';
 import { getSession } from './api/getSession';
 import { ColorModeScript } from '@chakra-ui/react';
 import { cookies } from 'next/headers';
