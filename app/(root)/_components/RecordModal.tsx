@@ -1,8 +1,6 @@
 import {
   Button,
   HStack,
-  List,
-  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -10,7 +8,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Table,
+  Tbody,
+  Td,
   Text,
+  Tr,
   VStack,
 } from '@chakra-ui/react';
 import { FC, useMemo } from 'react';
@@ -41,19 +43,22 @@ const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
     return bestAverages;
   }, [records]);
   return (
-    <List>
-      {Object.entries(bestRecords).map(([ao, val]) => (
-        <ListItem key={ao}>
-          {ao === 'best' ? 'best: ' : `best ${ao}: `}
-          {Number.isFinite(val) ?
-            `${Math.trunc(val / 1000)}.${`${Math.trunc(val % 1000)}`.padStart(
-              3,
-              '0',
-            )}`
-          : 'DNF'}
-        </ListItem>
-      ))}
-    </List>
+    <Table size="sm" w="max">
+      <Tbody>
+        {Object.entries(bestRecords).map(([ao, val]) => (
+          <Tr key={ao}>
+            <Td>{ao === 'best' ? 'best' : `best ${ao}`}</Td>
+            <Td>
+              {Number.isFinite(val) ?
+                `${Math.trunc(val / 1000)}.${`${Math.trunc(
+                  val % 1000,
+                )}`.padStart(3, '0')}`
+              : 'DNF'}
+            </Td>
+          </Tr>
+        ))}
+      </Tbody>
+    </Table>
   );
 };
 const RecordModal: FC<{
