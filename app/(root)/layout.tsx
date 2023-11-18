@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { kv } from '@vercel/kv';
 import { SWRConfigClient } from '../SWRConfigClient';
 import { getSession } from '../api/getSession';
-import { fetchRecordInServerSide } from '../api/record/read/route';
+import { fetchRecordInServerSide } from '../api/record/read/fetchRecordInServerSide';
 import { TimerRecord } from '../_types/TimerRecord';
 import { LatestRecordProvider } from './LatestRecordContext';
 

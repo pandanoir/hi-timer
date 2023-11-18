@@ -1,4 +1,3 @@
-'use client';
 import { Heading, VStack } from '@chakra-ui/react';
 
 const TopPage = () => {

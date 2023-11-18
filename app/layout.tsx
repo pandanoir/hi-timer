@@ -1,13 +1,18 @@
 import { PropsWithChildren } from 'react';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import { setTimeout } from 'timers/promises';
 import { RootLayout } from './RootLayout';
 import { getSession } from './api/getSession';
 
 export const metadata: Metadata = {
   title: 'Hi-Timer',
-  viewport: 'width=device-width, initial-scale=1.0, user-scalable=no',
 };
+const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1.0,
+  userScalable: false,
+};
+export { viewport };
 
 export default async function Layout({ children }: PropsWithChildren) {
   const timeout = setTimeout(100, 'timeout' as const).then(() => undefined);
