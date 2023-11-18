@@ -33,7 +33,7 @@ export const SettingModal: FC<{
 
         <ModalBody>
           <VStack align="left">
-            <FormLabel display="inline-block">
+            <FormLabel w="max">
               use light mode{' '}
               <Switch
                 isChecked={colorMode === 'light'}
