@@ -4,14 +4,17 @@ import { readBody } from '../../readBody';
 import { $boolean, $number, $object, $string, Infer } from 'lizod';
 import { getSession } from '@auth0/nextjs-auth0';
 
-const validate = $object({
-  time: $number,
-  penalty: $boolean,
-  dnf: $boolean,
-  scramble: $string,
-  event: $string,
-  createdAt: $number,
-});
+const validate = $object(
+  {
+    time: $number,
+    penalty: $boolean,
+    dnf: $boolean,
+    scramble: $string,
+    event: $string,
+    createdAt: $number,
+  },
+  false,
+);
 export type RequestBody = Infer<typeof validate>;
 
 export const POST = async (req: Request) => {

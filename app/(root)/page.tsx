@@ -160,13 +160,16 @@ const useTimerRecords = (event: string) => {
       );
     },
 
-    restoreDeletedRecord: (record: Omit<TimerRecord, 'id'>) => {
+    restoreDeletedRecord: (record: Omit<TimerRecord, 'id' | 'userId'>) => {
       mutate(
         { url: '/api/record/read', query: { event, limit: '100' } },
         fetch('/api/record/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(record),
+          body: JSON.stringify({
+            ...record,
+            createdAt: new Date(record.createdAt).getTime(),
+          } satisfies CreateRequestBody),
         }).then(
           async (res) =>
             ({ data: [await res.json(), ...records] }) satisfies Omit<
