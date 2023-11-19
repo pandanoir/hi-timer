@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
-import { getSession } from '../../getSession';
 import { readBody } from '../../readBody';
 import {
   $boolean,
@@ -12,6 +11,7 @@ import {
   $union,
   Infer,
 } from 'lizod';
+import { getSession } from '@auth0/nextjs-auth0';
 
 const validate = $intersection([
   $object(

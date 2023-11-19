@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
-import { getSession } from '../../getSession';
 import { TimerRecord } from '@prisma/client';
 import { kv } from '@vercel/kv';
+import { getSession } from '@auth0/nextjs-auth0';
 
 type Response = {
   data: TimerRecord[];

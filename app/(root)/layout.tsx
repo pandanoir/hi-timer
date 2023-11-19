@@ -3,10 +3,10 @@ import { setTimeout } from 'timers/promises';
 import { redirect } from 'next/navigation';
 import { kv } from '@vercel/kv';
 import { SWRConfigClient } from '../_components/SWRConfigClient';
-import { getSession } from '../api/getSession';
 import { fetchRecordInServerSide } from '../api/record/read/fetchRecordInServerSide';
 import { TimerRecord } from '../_types/TimerRecord';
 import { LatestRecordProvider } from './_components/LatestRecordContext';
+import { getSession } from '@auth0/nextjs-auth0';
 
 export default async function Layout({ children }: PropsWithChildren) {
   const timeout = setTimeout(100, 'timeout' as const);

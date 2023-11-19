@@ -16,7 +16,7 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
-    "@auth0/nextjs-auth0": "2.6.0",
+    "@auth0/nextjs-auth0": "3.3.0",
     "@babel/core": "7.22.1",
     "@babel/plugin-transform-modules-commonjs": "7.21.5",
     "@babel/preset-env": "7.22.4",

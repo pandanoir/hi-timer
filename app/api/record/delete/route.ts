@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
-import { getSession } from '../../getSession';
 import { readBody } from '../../readBody';
 import { $number, $object, $string, $union, Infer } from 'lizod';
+import { getSession } from '@auth0/nextjs-auth0';
 
 const validate = $union([
   $object({ id: $string }),
