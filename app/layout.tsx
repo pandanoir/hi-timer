@@ -18,6 +18,7 @@ const viewport: Viewport = {
 export { viewport };
 
 export default async function Layout({ children }: PropsWithChildren) {
+  const cookieStore = cookies(); // HACK: getSession より後に cookies を呼び出すと DynamicServerError - Dynamic Server Usage で怒られる。そのためココで cookieStore に格納している
   const timeout = setTimeout(100, 'timeout' as const).then(() => undefined);
   const userPromise = getSession().then((session) => session?.user);
 
@@ -26,7 +27,7 @@ export default async function Layout({ children }: PropsWithChildren) {
       <body>
         <ColorModeScript
           initialColorMode={
-            cookies().get('chakra-ui-color-mode')?.value === 'light' ?
+            cookieStore.get('chakra-ui-color-mode')?.value === 'light' ?
               'light'
             : 'dark'
           }
