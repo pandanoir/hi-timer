@@ -2,7 +2,6 @@
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Dispatch, FC, SetStateAction } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import 'pure-react-carousel/dist/react-carousel.es.css';
 import { TimerRecord } from '../_types/TimerRecord';
 import { useLocalStorageState } from './_hooks/useLocalStorageState';
 import { useScrambleHistory } from './_hooks/useScrambleHistory';

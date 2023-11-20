@@ -1,6 +1,5 @@
 'use client';
 import { FC, useState } from 'react';
-import 'pure-react-carousel/dist/react-carousel.es.css';
 import { TimerRecord } from '../_types/TimerRecord';
 import { useLocalStorageState } from '../(root)/_hooks/useLocalStorageState';
 import { useScrambleHistory } from '../(root)/_hooks/useScrambleHistory';
