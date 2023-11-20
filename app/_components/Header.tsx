@@ -3,7 +3,6 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { MoonIcon, SettingsIcon, SunIcon } from '@chakra-ui/icons';
 import {
   Button,
-  Fade,
   Heading,
   HStack,
   IconButton,
@@ -25,6 +24,28 @@ const ColorModeButton = () => {
     />
   );
 };
+const SettingButton = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
+  const {
+    isOpen: isSettingModalOpen,
+    onOpen: onSettingModalOpen,
+    onClose: onSettingModalClose,
+  } = useDisclosure();
+  return (
+    <>
+      <IconButton
+        onClick={onSettingModalOpen}
+        icon={<SettingsIcon />}
+        aria-label="setting"
+        variant="outline"
+      />
+      <SettingModal
+        isOpen={isSettingModalOpen}
+        onClose={onSettingModalClose}
+        isLoggedIn={isLoggedIn}
+      />
+    </>
+  );
+};
 
 export const SecondaryLinkButton = (props: ComponentProps<typeof Button>) => (
   <Button as="a" variant="outline" w="min" {...props} />
@@ -35,40 +56,23 @@ export const PrimaryLinkButton = (props: ComponentProps<typeof Button>) => (
 );
 
 export const Header = () => {
-  const { user, isLoading } = useUser();
-  const {
-    isOpen: isSettingModalOpen,
-    onOpen: onSettingModalOpen,
-    onClose: onSettingModalClose,
-  } = useDisclosure();
+  const { user } = useUser();
 
   return (
     <HStack justify="space-between" as="header">
       <Heading>
         <Link href="/">Hi-Timer</Link>
       </Heading>
-      <Fade in={!isLoading}>
-        <HStack>
-          <ColorModeButton />
-          <IconButton
-            onClick={onSettingModalOpen}
-            icon={<SettingsIcon />}
-            aria-label="setting"
-            variant="outline"
-          />
-          {user ?
-            <SecondaryLinkButton href="/records">Records</SecondaryLinkButton>
-          : <PrimaryLinkButton colorScheme="blue" href="/api/auth/login">
-              Login
-            </PrimaryLinkButton>
-          }
-        </HStack>
-      </Fade>
-      <SettingModal
-        isOpen={isSettingModalOpen}
-        onClose={onSettingModalClose}
-        isLoggedIn={!!user}
-      />
+      <HStack>
+        <ColorModeButton />
+        <SettingButton isLoggedIn={!!user} />
+        {user ?
+          <SecondaryLinkButton href="/records">Records</SecondaryLinkButton>
+        : <PrimaryLinkButton colorScheme="blue" href="/api/auth/login">
+            Login
+          </PrimaryLinkButton>
+        }
+      </HStack>
     </HStack>
   );
 };
