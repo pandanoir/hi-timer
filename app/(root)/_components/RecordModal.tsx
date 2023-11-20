@@ -15,6 +15,7 @@ import {
   Tr,
   VStack,
 } from '@chakra-ui/react';
+import NextLink from 'next/link';
 import { FC, useMemo } from 'react';
 import { TimerRecord } from '../../_types/TimerRecord';
 import { calcAo } from '../../_utils/calcAo';
@@ -72,7 +73,7 @@ const RecordModal: FC<{
       <ModalHeader>
         <HStack gap="2">
           <Text>100 most recent time records</Text>
-          <Button as="a" href="/records" w="max-content">
+          <Button as={NextLink} href="/records" w="max-content">
             See more records
           </Button>
         </HStack>

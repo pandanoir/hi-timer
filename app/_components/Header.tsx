@@ -3,13 +3,14 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { MoonIcon, SettingsIcon, SunIcon } from '@chakra-ui/icons';
 import {
   Button,
+  Link,
   Heading,
   HStack,
   IconButton,
   useColorMode,
   useDisclosure,
 } from '@chakra-ui/react';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { ComponentProps } from 'react';
 import { SettingModal } from './SettingModal';
 
@@ -48,11 +49,11 @@ const SettingButton = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 };
 
 export const SecondaryLinkButton = (props: ComponentProps<typeof Button>) => (
-  <Button as="a" variant="outline" w="min" {...props} />
+  <Button as={NextLink} variant="outline" w="min" {...props} />
 );
 
 export const PrimaryLinkButton = (props: ComponentProps<typeof Button>) => (
-  <Button as="a" w="min" {...props} />
+  <Button as={NextLink} w="min" {...props} />
 );
 
 export const Header = () => {
@@ -61,7 +62,9 @@ export const Header = () => {
   return (
     <HStack justify="space-between" as="header">
       <Heading>
-        <Link href="/">Hi-Timer</Link>
+        <Link as={NextLink} href="/" _hover={{ textDecoration: 'none' }}>
+          Hi-Timer
+        </Link>
       </Heading>
       <HStack>
         <ColorModeButton />
