@@ -20,7 +20,7 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import { Dispatch, FC, lazy, SetStateAction } from 'react';
+import { ComponentProps, Dispatch, FC, lazy, SetStateAction } from 'react';
 import { AiFillDatabase } from 'react-icons/ai';
 import { TimerRecord } from '../../_types/TimerRecord';
 import { calcAo } from '../../_utils/calcAo';
@@ -33,6 +33,88 @@ import { useLatestRecord } from './LatestRecordContext';
 
 const RecordModal = lazy(() => import('./RecordModal'));
 
+const RecordText = ({
+  record,
+  ...props
+}: ComponentProps<typeof Text> & { record: TimerRecord }) => (
+  <Text
+    fontSize={['5xl', '8xl']}
+    fontWeight="bold"
+    fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
+    {...props}
+  >
+    {record.dnf ?
+      'DNF'
+    : `${Math.trunc(record.time / 1000)}.${`${record.time % 1000}`.padStart(
+        3,
+        '0',
+      )}sec${record.penalty ? ' + 2' : ''}`
+    }
+  </Text>
+);
+const SecondaryButton = (props: ComponentProps<typeof Button>) => (
+  <Button variant="outline" colorScheme="blue" {...props} />
+);
+const DeleteButton = ({
+  deleteRecord,
+  restoreDeletedRecord,
+}: {
+  deleteRecord: () => TimerRecord;
+  restoreDeletedRecord: (record: Omit<TimerRecord, 'id'>) => void;
+}) => {
+  const toast = useToast();
+  return (
+    <Button
+      onClick={() => {
+        const deletedRecord = deleteRecord();
+        toast({
+          isClosable: true,
+          render: ({ status, variant, onClose, isClosable }) => (
+            <Alert
+              addRole={false}
+              status={status}
+              variant={variant}
+              alignItems="start"
+              borderRadius="md"
+              boxShadow="lg"
+              paddingEnd={8}
+              textAlign="start"
+              width="auto"
+            >
+              <AlertDescription flex="1" maxWidth="100%" display="block">
+                <Flex align="center">
+                  <Text flex="1">deleted</Text>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      restoreDeletedRecord(deletedRecord);
+                      onClose();
+                    }}
+                  >
+                    undo
+                  </Button>
+                </Flex>
+              </AlertDescription>
+              {isClosable && (
+                <CloseButton
+                  size="md"
+                  onClick={onClose}
+                  position="absolute"
+                  insetEnd={1}
+                  top={1}
+                />
+              )}
+            </Alert>
+          ),
+        });
+      }}
+      variant="outline"
+      colorScheme="red"
+    >
+      delete
+    </Button>
+  );
+};
 export const TimerPagePresenter: FC<
   (
     | {
@@ -89,7 +171,6 @@ export const TimerPagePresenter: FC<
     onOpen: onRecordModalOpen,
     onClose: onRecordModalClose,
   } = useDisclosure();
-  const toast = useToast();
   const latestRecord = useLatestRecord();
 
   return (
@@ -109,14 +190,13 @@ export const TimerPagePresenter: FC<
           <option value="6x6x6">6x6x6</option>
           <option value="7x7x7">7x7x7</option>
         </Select>
-        <FormLabel userSelect="none" htmlFor="use inspection">
-          use inspection:
+        <FormLabel userSelect="none">
+          use inspection:{' '}
+          <Switch
+            isChecked={usesInspection}
+            onChange={({ target: { checked } }) => setUsesInspection(checked)}
+          />
         </FormLabel>
-        <Switch
-          id="use inspection"
-          isChecked={usesInspection}
-          onChange={({ target: { checked } }) => setUsesInspection(checked)}
-        />
         {isAnonymousMode && (
           <Alert status="error" w="max-content">
             <AlertIcon />
@@ -154,161 +234,70 @@ export const TimerPagePresenter: FC<
             nextScramble();
           }}
         >
-          {records ?
-            <VStack align="center">
-              {records[0] && (
-                <Text
-                  fontSize={['5xl', '8xl']}
-                  fontWeight="bold"
-                  fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
-                >
-                  {records[0].dnf ?
-                    'DNF'
-                  : `${Math.trunc(records[0].time / 1000)}.${`${
-                      records[0].time % 1000
-                    }`.padStart(3, '0')}sec${records[0].penalty ? ' + 2' : ''}`
-                  }
-                </Text>
-              )}
-              <Grid templateColumns="max-content 1fr" columnGap={1}>
-                {records.length >= 5 && (
-                  <>
-                    <GridItem>ao5</GridItem>
-                    <GridItem>
-                      {(() => {
-                        const ao5 = calcAo(records.slice(0, 5));
-                        return Number.isFinite(ao5) ?
-                            `${Math.trunc(ao5) / 1000}sec`
-                          : 'DNF';
-                      })()}
-                    </GridItem>
-                  </>
-                )}
-                {records.length >= 12 && (
-                  <>
-                    <GridItem>ao12</GridItem>
-                    <GridItem>
-                      {(() => {
-                        const ao12 = calcAo(records.slice(0, 12));
-                        return Number.isFinite(ao12) ?
-                            `${Math.trunc(ao12) / 1000}sec`
-                          : 'DNF';
-                      })()}
-                    </GridItem>
-                  </>
-                )}
-              </Grid>
-            </VStack>
-          : <VStack align="center">
-              {latestRecord && (
-                <Text
-                  fontSize={['5xl', '8xl']}
-                  fontWeight="bold"
-                  fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
-                >
-                  {latestRecord.dnf ?
-                    'DNF'
-                  : `${Math.trunc(latestRecord.time / 1000)}.${`${
-                      latestRecord.time % 1000
-                    }`.padStart(3, '0')}sec${
-                      latestRecord.penalty ? ' + 2' : ''
-                    }`
-                  }
-                </Text>
-              )}
-            </VStack>
-          }
+          <VStack align="center">
+            {records ?
+              <>
+                {records[0] && <RecordText record={records[0]} />}
+                <Grid templateColumns="max-content 1fr" columnGap={1}>
+                  {records.length >= 5 && (
+                    <>
+                      <GridItem>ao5</GridItem>
+                      <GridItem>
+                        {(() => {
+                          const ao5 = calcAo(records.slice(0, 5));
+                          return Number.isFinite(ao5) ?
+                              `${Math.trunc(ao5) / 1000}sec`
+                            : 'DNF';
+                        })()}
+                      </GridItem>
+                    </>
+                  )}
+                  {records.length >= 12 && (
+                    <>
+                      <GridItem>ao12</GridItem>
+                      <GridItem>
+                        {(() => {
+                          const ao12 = calcAo(records.slice(0, 12));
+                          return Number.isFinite(ao12) ?
+                              `${Math.trunc(ao12) / 1000}sec`
+                            : 'DNF';
+                        })()}
+                      </GridItem>
+                    </>
+                  )}
+                </Grid>
+              </>
+            : latestRecord && <RecordText record={latestRecord} />}
+          </VStack>
         </Timer>
       </Box>
 
       {records?.[0] && (
         <HStack justify="space-between">
           <HStack spacing={2} flex="1">
-            {!records[0].dnf && (
-              <Button
-                key="+2"
-                onClick={() => {
-                  if (records[0].penalty) {
-                    undoPenalty(records[0]);
-                  } else {
-                    imposePenalty(records[0]);
-                  }
-                }}
-                variant="outline"
-                colorScheme="blue"
-              >
-                {records[0].penalty ? 'undo +2' : '+2'}
-              </Button>
-            )}
-            <Button
-              key="DNF"
-              onClick={() => {
-                if (records[0].dnf) {
-                  undoDNF(records[0]);
-                } else {
-                  toDNF(records[0]);
-                }
-              }}
-              variant="outline"
-              colorScheme="blue"
-            >
-              {records[0].dnf ? 'undo DNF' : 'DNF'}
-            </Button>
-            <Button
-              key="delete"
-              onClick={() => {
-                const deletedRecord = records[0];
+            {!records[0].dnf &&
+              (records[0].penalty ?
+                <SecondaryButton onClick={() => undoPenalty(records[0])}>
+                  undo +2
+                </SecondaryButton>
+              : <SecondaryButton onClick={() => imposePenalty(records[0])}>
+                  +2
+                </SecondaryButton>)}
+            {records[0].dnf ?
+              <SecondaryButton onClick={() => undoDNF(records[0])}>
+                undo DNF
+              </SecondaryButton>
+            : <SecondaryButton onClick={() => toDNF(records[0])}>
+                DNF
+              </SecondaryButton>
+            }
+            <DeleteButton
+              deleteRecord={() => {
                 deleteRecord(records[0]);
-                toast({
-                  isClosable: true,
-                  render: ({ status, variant, onClose, isClosable }) => (
-                    <Alert
-                      addRole={false}
-                      status={status}
-                      variant={variant}
-                      alignItems="start"
-                      borderRadius="md"
-                      boxShadow="lg"
-                      paddingEnd={8}
-                      textAlign="start"
-                      width="auto"
-                    >
-                      <AlertDescription
-                        flex="1"
-                        maxWidth="100%"
-                        display="block"
-                      >
-                        <Flex align="center">
-                          <Text flex="1">deleted</Text>
-                          <Button
-                            variant="ghost"
-                            onClick={() => {
-                              restoreDeletedRecord(deletedRecord);
-                              onClose();
-                            }}
-                          >
-                            undo
-                          </Button>
-                        </Flex>
-                      </AlertDescription>
-                      {isClosable && (
-                        <CloseButton
-                          size="md"
-                          onClick={onClose}
-                          position="absolute"
-                          insetEnd={1}
-                          top={1}
-                        />
-                      )}
-                    </Alert>
-                  ),
-                });
+                return records[0];
               }}
-              variant="outline"
-              colorScheme="red"
-            >
-              delete
-            </Button>
+              restoreDeletedRecord={restoreDeletedRecord}
+            />
           </HStack>
           <IconButton
             onClick={onRecordModalOpen}
