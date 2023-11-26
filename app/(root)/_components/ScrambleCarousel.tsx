@@ -10,6 +10,7 @@ import {
   Slider,
 } from 'pure-react-carousel';
 import { memo, useContext, useEffect } from 'react';
+import { useEffectEvent } from '../../_hooks/useEffectEvent';
 
 const CarouselIndex = ({
   carouselIndex,
@@ -20,14 +21,15 @@ const CarouselIndex = ({
 }) => {
   const carouselContext = useContext(CarouselContext);
 
-  useEffect(() => {
-    const listener = () => {
+  {
+    const listener = useEffectEvent(() => {
       onCarouselIndexChange(carouselContext.state.currentSlide);
-    };
-    carouselContext.subscribe(listener);
-    return () => carouselContext.unsubscribe(listener);
-  }, [carouselContext, onCarouselIndexChange]);
-
+    });
+    useEffect(() => {
+      carouselContext.subscribe(listener);
+      return () => carouselContext.unsubscribe(listener);
+    }, [carouselContext, listener]);
+  }
   useEffect(() => {
     carouselContext.setStoreState({ currentSlide: carouselIndex });
   }, [carouselIndex, carouselContext]);
