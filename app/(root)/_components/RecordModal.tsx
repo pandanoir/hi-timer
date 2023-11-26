@@ -15,13 +15,13 @@ import {
   Tr,
   VStack,
 } from '@chakra-ui/react';
-import NextLink from 'next/link';
 import { FC, useMemo } from 'react';
 import { TimerRecord } from '../../_types/TimerRecord';
 import { calcAo } from '../../_utils/calcAo';
 import { calcBestAo } from '../../_utils/calcBestAo';
 import { recordToMilliSeconds } from '../../_utils/recordToMilliSeconds';
 import RecordGraph from '../../records/[[...type]]/_components/RecordGraph';
+import { NextLink } from '../../_components/NextLink';
 
 const BestAverages: FC<{ records: TimerRecord[] }> = ({ records }) => {
   const bestRecords = useMemo<Record<string, number>>(() => {

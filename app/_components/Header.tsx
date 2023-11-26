@@ -10,9 +10,9 @@ import {
   useColorMode,
   useDisclosure,
 } from '@chakra-ui/react';
-import NextLink from 'next/link';
 import { ComponentProps } from 'react';
 import { SettingModal } from './SettingModal';
+import { NextLink } from './NextLink';
 
 const ColorModeButton = () => {
   const { colorMode, toggleColorMode } = useColorMode();
