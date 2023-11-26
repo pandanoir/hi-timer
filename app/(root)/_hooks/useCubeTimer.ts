@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
+import { noop } from '../../_utils/noop';
 
 const fps = 60;
 const useStopwatch = ({
-  onStop = () => void 0,
+  onStop = noop,
 }: { onStop?: (elapsedTime: number) => void } = {}) => {
   const [elapsedTime, setElapsedTime] = useState<null | number>(null);
   const [startedAt, setStartedAt] = useState(0);

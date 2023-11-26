@@ -3,8 +3,8 @@ import {
   Button,
   VStack,
   Modal,
-  ModalOverlay,
   ModalContent,
+  ModalOverlay,
   useColorModeValue,
 } from '@chakra-ui/react';
 import {
@@ -18,32 +18,10 @@ import {
 } from 'react';
 import { useCountdownTimer } from '../_hooks/useCountdownTimer';
 import { useCubeTimer } from '../_hooks/useCubeTimer';
+import { useEffectEvent } from '../../_hooks/useEffectEvent';
+import { noop } from '../../_utils/noop';
 
-export const usePreventDefault = <T extends HTMLElement>(
-  eventName: string,
-  enable = true,
-) => {
-  const ref = useRef<T>(null);
-  useEffect(() => {
-    if (!enable) {
-      return;
-    }
-    const current = ref.current;
-    if (!current) {
-      return;
-    }
-    const handler = (event: Event) => {
-      event.preventDefault();
-    };
-    current.addEventListener(eventName, handler);
-    return () => {
-      current.removeEventListener(eventName, handler);
-    };
-  }, [enable, eventName]);
-
-  return ref;
-};
-
+// 画面全体がクリックできるボタン
 const ScreenButton = (props: ComponentProps<typeof VStack>) => (
   <VStack
     h="full"
@@ -53,7 +31,34 @@ const ScreenButton = (props: ComponentProps<typeof VStack>) => (
     style={{ touchAction: 'none' }}
   />
 );
+const OverlaidScreenButton = ({
+  onPointerDown,
+  onPointerUp,
+  children,
+}: PropsWithChildren<{
+  onPointerDown?: () => void;
+  onPointerUp?: () => void;
+}>) => (
+  <Modal isOpen onClose={noop} size="full">
+    <ModalOverlay bg={useColorModeValue('whiteAlpha.700', 'blackAlpha.600')} />
+    <ModalContent bg="transparent" boxShadow="none" m="0">
+      <ScreenButton
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        h="100dvh"
+      >
+        {children}
+      </ScreenButton>
+    </ModalContent>
+  </Modal>
+);
 
+const stop =
+  <T extends { stopPropagation: () => void }>(f: (event: T) => void) =>
+  (event: T) => {
+    event.stopPropagation();
+    f(event);
+  };
 export const Timer: FC<
   PropsWithChildren<{
     usesInspection: boolean;
@@ -89,12 +94,28 @@ export const Timer: FC<
     off();
   }, [isReadyToStart, timer, off]);
 
-  useEffect(() => {
-    if (!usesInspection) {
-      const keydownListener = ({ key }: KeyboardEvent) => {
-        if (key !== ' ') {
-          return;
+  {
+    const keydownListener = useEffectEvent(({ key }: KeyboardEvent) => {
+      if (key !== ' ') {
+        return;
+      }
+      if (usesInspection) {
+        switch (timer.state) {
+          case 'before inspection':
+            if (!isSpaceKeyPressed.current) {
+              timer.startInspection();
+            }
+            break;
+          case 'inspecting':
+            if (!isSpaceKeyPressed.current) {
+              on();
+            }
+            break;
+          case 'recording':
+            timer.stop();
+            break;
         }
+      } else {
         switch (timer.state) {
           case 'before start':
             if (!isSpaceKeyPressed.current) {
@@ -105,12 +126,24 @@ export const Timer: FC<
             timer.stop();
             break;
         }
-        isSpaceKeyPressed.current = true;
-      };
-      const keyupListener = ({ key }: KeyboardEvent) => {
-        if (key !== ' ') {
-          return;
+      }
+      isSpaceKeyPressed.current = true;
+    });
+    const keyupListener = useEffectEvent(({ key }: KeyboardEvent) => {
+      if (key !== ' ') {
+        return;
+      }
+      if (usesInspection) {
+        switch (timer.state) {
+          case 'before inspection':
+            break;
+          case 'inspecting':
+            onReleaseStartButton();
+            break;
+          case 'recording':
+            break;
         }
+      } else {
         switch (timer.state) {
           case 'before start':
             onReleaseStartButton();
@@ -118,59 +151,18 @@ export const Timer: FC<
           case 'recording':
             break;
         }
-        isSpaceKeyPressed.current = false;
-      };
+      }
+      isSpaceKeyPressed.current = false;
+    });
+    useEffect(() => {
       document.addEventListener('keydown', keydownListener);
       document.addEventListener('keyup', keyupListener);
       return () => {
         document.removeEventListener('keydown', keydownListener);
         document.removeEventListener('keyup', keyupListener);
       };
-    }
-    const keydownListener = ({ key }: KeyboardEvent) => {
-      if (key !== ' ') {
-        return;
-      }
-      switch (timer.state) {
-        case 'before inspection':
-          if (!isSpaceKeyPressed.current) {
-            timer.startInspection();
-          }
-          break;
-        case 'inspecting':
-          if (!isSpaceKeyPressed.current) {
-            on();
-          }
-          break;
-        case 'recording':
-          timer.stop();
-          break;
-      }
-      isSpaceKeyPressed.current = true;
-    };
-    const keyupListener = ({ key }: KeyboardEvent) => {
-      if (key !== ' ') {
-        return;
-      }
-      switch (timer.state) {
-        case 'before inspection':
-          break;
-        case 'inspecting':
-          onReleaseStartButton();
-          break;
-        case 'recording':
-          break;
-      }
-      isSpaceKeyPressed.current = false;
-    };
-    document.addEventListener('keydown', keydownListener);
-    document.addEventListener('keyup', keyupListener);
-    return () => {
-      document.removeEventListener('keydown', keydownListener);
-      document.removeEventListener('keyup', keyupListener);
-    };
-  }, [on, timer, usesInspection, onReleaseStartButton]);
-
+    }, [keydownListener, keyupListener]);
+  }
   {
     const prevTimerState = useRef<typeof timer.state>(timer.state);
     useEffect(() => {
@@ -183,8 +175,6 @@ export const Timer: FC<
       prevTimerState.current = timer.state;
     }, [onStart, timer.state]);
   }
-
-  const bg = useColorModeValue('whiteAlpha.700', 'blackAlpha.600');
 
   if (timer.state === 'before start') {
     // 押してる秒数に応じて色が変わる
@@ -220,42 +210,33 @@ export const Timer: FC<
       : undefined;
 
     return (
-      <Modal isOpen onClose={() => void 0} size="full">
-        <ModalOverlay bg={bg} />
-        <ModalContent bg="transparent" boxShadow="none" m="0">
-          <ScreenButton
-            key={timer.state}
-            onPointerDown={on}
-            onPointerUp={onReleaseStartButton}
-            h="100dvh"
-          >
-            <Button colorScheme={colorScheme}>
-              {timer.elapsedInspectionTime < 15000 ?
-                `${15 - Math.trunc(timer.elapsedInspectionTime / 1000)}sec`
-              : timer.elapsedInspectionTime < 17000 ?
-                '+2'
-              : 'DNF'}
-            </Button>
-            <Button
-              onPointerDown={(event) => {
-                event.stopPropagation();
-              }}
-              onClick={() => {
-                onCancel?.();
-                off();
-                timer.cancel();
-              }}
-              colorScheme="red"
-            >
-              cancel
-            </Button>
-          </ScreenButton>
-        </ModalContent>
-      </Modal>
+      <OverlaidScreenButton
+        onPointerDown={on}
+        onPointerUp={onReleaseStartButton}
+      >
+        <Button colorScheme={colorScheme}>
+          {timer.elapsedInspectionTime < 15000 ?
+            `${15 - Math.trunc(timer.elapsedInspectionTime / 1000)}sec`
+          : timer.elapsedInspectionTime < 17000 ?
+            '+2'
+          : 'DNF'}
+        </Button>
+        <Button
+          onPointerDown={stop(noop)}
+          onClick={() => {
+            onCancel?.();
+            off();
+            timer.cancel();
+          }}
+          colorScheme="red"
+        >
+          cancel
+        </Button>
+      </OverlaidScreenButton>
     );
   }
-  return (
-    timer.state === 'before inspection' ?
+  if (timer.state === 'before inspection') {
+    return (
       <ScreenButton
         key={timer.state}
         onPointerDown={onInspectionStartButtonPress}
@@ -268,40 +249,36 @@ export const Timer: FC<
       >
         {children}
         <Button
-          onPointerDown={(event) => {
-            event.stopPropagation();
-            onInspectionStartButtonPress();
-          }}
-          onClick={(event) => {
-            event.stopPropagation();
+          onPointerDown={stop(onInspectionStartButtonPress)}
+          onClick={stop(() => {
             if (isInspectionStartButtonPressed.current) {
               timer.startInspection();
             }
             onInspectionStartButtonRelease();
-          }}
+          })}
         >
           inspection start
         </Button>
       </ScreenButton>
-    : timer.state === 'recording' ?
-      <Modal isOpen onClose={() => void 0} isCentered size="full">
-        <ModalOverlay bg={bg} />
-        <ModalContent bg="transparent" boxShadow="none" m="0">
-          <ScreenButton key={timer.state} onPointerDown={timer.stop} h="100dvh">
-            <Text
-              fontSize={['5xl', '8xl']}
-              fontWeight="bold"
-              fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
-            >
-              {typeof timer.elapsedTime === 'number' &&
-                `${Math.trunc(timer.elapsedTime / 1000)}.${`${
-                  timer.elapsedTime % 1000
-                }`.padStart(3, '0')}sec`}
-            </Text>
-            <Button onPointerDown={timer.stop}>stop</Button>
-          </ScreenButton>
-        </ModalContent>
-      </Modal>
-    : (timer satisfies never, null)
-  );
+    );
+  }
+  if (timer.state === 'recording') {
+    return (
+      <OverlaidScreenButton onPointerDown={timer.stop}>
+        <Text
+          fontSize={['5xl', '8xl']}
+          fontWeight="bold"
+          fontFamily="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace"
+        >
+          {typeof timer.elapsedTime === 'number' &&
+            `${Math.trunc(timer.elapsedTime / 1000)}.${`${
+              timer.elapsedTime % 1000
+            }`.padStart(3, '0')}sec`}
+        </Text>
+        <Button onPointerDown={timer.stop}>stop</Button>
+      </OverlaidScreenButton>
+    );
+  }
+  timer satisfies never;
+  throw new Error(); // 型検査用。これがないと Timer の返り値に undefined が含まれてしまう
 });
